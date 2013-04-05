@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Do not modify this file directly.  Instead, copy entries that you -->
+<!-- wish to modify from this file into core-site.xml and change them -->
+<!-- there.  If core-site.xml does not already exist, create it.      -->
+
+<configuration>
+
+<!--- Jxta properties -->
+
+<property>
+  <name>hadoop.p2p.dir</name>
+  <value>${hadoop.home.dir}/var/p2p/</value>
+  <description>A base for P2P secure data.</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.password</name>
+  <value>MyKSPassword2</value>
+  <description>The password used to protect the keystore and priv key.</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.namenode.port</name>
+  <value>19100</value>
+  <description>The listenning port for the Rendez Vous peer</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.datanode.port</name>
+  <value>19101</value>
+  <description>The listenning port for the Edge peer</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.dfsclient.port</name>
+  <value>19102</value>
+  <description>The listenning port for the DFS Client peer</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.use.multicast</name>
+  <value>true</value>
+  <description>Should multicast be enabled</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.rpc.backlog</name>
+  <value>200</value>
+  <description>The rpc server socket backlog</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.info.backlog</name>
+  <value>1000</value>
+  <description>The INFO server socket backlog</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.rpc.timeout</name>
+  <value>30000</value>
+  <description>The rpc server socket timeout</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.info.timeout</name>
+  <value>30000</value>
+  <description>The info server socket timeout</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.rpc.rdv</name>
+  <value>tcp://127.0.0.1:19100</value>
+  <description>The rpc rendez-vous seed</description>
+</property>
+
+<property>
+  <name>hadoop.p2p.rpc.relay</name>
+  <value>tcp://127.0.0.1:19100</value>
+  <description>The rpc relay seed</description>
+</property>
+
+</configuration>

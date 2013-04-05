@@ -1,0 +1,40 @@
+*** Instructions to start the Namenode & Datanodes ***
+
+-- Namenode
+	1/ Set the JAVA_HOME environment variable
+	2/ Unzip the jxtadoop-datanode-x.y.z.zip to the target directory
+			+ chmod the executable in bin/ directory
+	3/ Edit the etc/hdfs-p2p.xml and set the following 2 properties :
+			hadoop.p2p.rpc.rdv
+			hadoop.p2p.rpc.relay 
+		Note that this 2 properties are mandatory even if the same multicast network
+		to avoid issues with multiple namenodes running in the same network.
+	4/ Initiliaze thenamenode : 
+			> bin/hadoop namenode -format
+	5/ Start up the namenode
+			> bin/start-namenode.sh
+
+-- Datanode
+	1/ Set the JAVA_HOME environment variable
+	2/ Unzip the jxtadoop-datanode-x.y.z.zip to the target directory
+			+ chmod the executable in bin/ directory
+	3/ Edit the etc/hdfs-p2p.xml and set the following 2 properties :
+			hadoop.p2p.rpc.rdv
+			hadoop.p2p.rpc.relay
+	4/ Start up the namenode
+			> bin/start-datanode.sh
+
+-- DFSClient
+You can use the DFSClient as per Hadoop. For example
+	> bin/hadoop fs -mkdir /test
+	> bin/hadoop fs -chmod 777 /test
+	> bin/hadoop fs -put ~/tmp/myfile /test
+	> bin/hadoop fs get /test/myfile /tmp
+
+Contact
+-------
+	Mail to : jxtadoop@besnard.mobi
+
+Known issues
+------------
+i1/ The JXTA layer may generate P2P exceptions upon sockets closure;
