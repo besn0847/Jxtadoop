@@ -21,7 +21,7 @@ package org.apache.jxtadoop.io;
 import java.io.*;
 
 /** A WritableComparable for longs. */
-public class LongWritable implements WritableComparable {
+public class LongWritable implements WritableComparable<Object> {
   private long value;
 
   public LongWritable() {}
@@ -81,7 +81,8 @@ public class LongWritable implements WritableComparable {
 
   /** A decreasing Comparator optimized for LongWritable. */ 
   public static class DecreasingComparator extends Comparator {
-    public int compare(WritableComparable a, WritableComparable b) {
+    @SuppressWarnings("rawtypes")
+	public int compare(WritableComparable a, WritableComparable b) {
       return -super.compare(a, b);
     }
     public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {

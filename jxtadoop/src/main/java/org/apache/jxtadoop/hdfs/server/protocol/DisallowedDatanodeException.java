@@ -29,6 +29,7 @@ import org.apache.jxtadoop.hdfs.protocol.DatanodeID;
  * or has been specifically excluded.
  * 
  */
+@SuppressWarnings("serial")
 public class DisallowedDatanodeException extends IOException {
 
   public DisallowedDatanodeException(DatanodeID nodeID) {

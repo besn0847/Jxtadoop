@@ -21,7 +21,7 @@ package org.apache.jxtadoop.io;
 import java.io.*;
 
 /** Singleton Writable with no data. */
-public class NullWritable implements WritableComparable {
+public class NullWritable implements WritableComparable<Object> {
 
   private static final NullWritable THIS = new NullWritable();
 

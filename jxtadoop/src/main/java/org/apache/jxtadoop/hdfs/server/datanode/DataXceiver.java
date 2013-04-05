@@ -36,15 +36,12 @@ import org.apache.jxtadoop.hdfs.protocol.Block;
 import org.apache.jxtadoop.hdfs.protocol.DataTransferProtocol;
 import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
-import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
 import org.apache.jxtadoop.hdfs.server.datanode.FSDatasetInterface.MetaDataInputStream;
 import org.apache.jxtadoop.io.IOUtils;
 import org.apache.jxtadoop.io.MD5Hash;
 import org.apache.jxtadoop.io.Text;
-import org.apache.jxtadoop.net.NetUtils;
 import org.apache.jxtadoop.util.DataChecksum;
 import org.apache.jxtadoop.util.StringUtils;
-import org.apache.jxtadoop.metrics.util.MetricsTimeVaryingRate;
 import static org.apache.jxtadoop.hdfs.server.datanode.DataNode.DN_CLIENTTRACE_FORMAT;
 
 /**

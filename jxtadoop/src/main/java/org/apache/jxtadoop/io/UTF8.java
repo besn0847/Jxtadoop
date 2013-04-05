@@ -31,7 +31,7 @@ import org.apache.commons.logging.*;
  *
  * @deprecated replaced by Text
  */
-public class UTF8 implements WritableComparable {
+public class UTF8 implements WritableComparable<Object> {
   private static final Log LOG= LogFactory.getLog(UTF8.class);
   private static final DataOutputBuffer OBUF = new DataOutputBuffer();
   private static final DataInputBuffer IBUF = new DataInputBuffer();

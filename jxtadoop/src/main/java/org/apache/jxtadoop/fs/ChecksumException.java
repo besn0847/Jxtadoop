@@ -21,6 +21,7 @@ package org.apache.jxtadoop.fs;
 import java.io.IOException;
 
 /** Thrown for checksum errors. */
+@SuppressWarnings("serial")
 public class ChecksumException extends IOException {
   private long pos;
   public ChecksumException(String description, long pos) {

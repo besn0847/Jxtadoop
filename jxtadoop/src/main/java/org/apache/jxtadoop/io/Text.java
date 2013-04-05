@@ -32,9 +32,6 @@ import java.nio.charset.MalformedInputException;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /** This class stores text using standard UTF8 encoding.  It provides methods
  * to serialize, deserialize, and compare texts at byte level.  The type of
  * length is integer and is serialized using zero-compressed format.  <p>In
@@ -46,8 +43,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Text extends BinaryComparable
     implements WritableComparable<BinaryComparable> {
-  private static final Log LOG= LogFactory.getLog(Text.class);
-  
   private static ThreadLocal<CharsetEncoder> ENCODER_FACTORY =
     new ThreadLocal<CharsetEncoder>() {
       protected CharsetEncoder initialValue() {

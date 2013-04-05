@@ -266,17 +266,6 @@ public class LocalDirAllocator {
     int getCurrentDirectoryIndex() {
       return dirNumLastAccessed;
     }
-    
-    /** Get a path from the local FS. This method should be used if the size of 
-     *  the file is not known a priori. 
-     *  
-     *  It will use roulette selection, picking directories
-     *  with probability proportional to their available space. 
-     */
-    public synchronized Path getLocalPathForWrite(String path, 
-        Configuration conf) throws IOException {
-      return getLocalPathForWrite(path, -1, conf);
-    }
 
     /** Get a path from the local FS. If size is known, we go
      *  round-robin over the set of disks (via the configured dirs) and return

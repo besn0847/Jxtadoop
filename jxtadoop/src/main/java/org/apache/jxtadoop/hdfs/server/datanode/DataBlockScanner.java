@@ -47,7 +47,6 @@ import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.LocatedBlock;
 import org.apache.jxtadoop.io.IOUtils;
 import org.apache.jxtadoop.util.StringUtils;
-import org.apache.jxtadoop.metrics.util.MetricsTimeVaryingInt;
 
 /*
  * This keeps track of blocks and their last verification times.

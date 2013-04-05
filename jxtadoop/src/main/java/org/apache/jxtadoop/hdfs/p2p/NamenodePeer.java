@@ -48,7 +48,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	/**
 	 * The listener array
 	 */
-	private List _dnlisteners = new ArrayList();
+	private List<P2PListener> _dnlisteners = new ArrayList<P2PListener>();
 	
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
@@ -196,7 +196,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	 */
 	@Override
 	public synchronized void fireEvent(DatanodeEvent event)	{
-		Iterator i = _dnlisteners.iterator();
+		Iterator<P2PListener> i = _dnlisteners.iterator();
 
 		while(i.hasNext())	{
 			((P2PListener) i.next()).handleDisconnectEvent(event);

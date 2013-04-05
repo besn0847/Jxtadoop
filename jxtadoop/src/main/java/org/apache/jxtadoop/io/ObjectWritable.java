@@ -32,7 +32,7 @@ import org.apache.jxtadoop.conf.Configured;
  */
 public class ObjectWritable implements Writable, Configurable {
 
-  private Class declaredClass;
+  private Class<?> declaredClass;
   private Object instance;
   private Configuration conf;
 
@@ -42,7 +42,7 @@ public class ObjectWritable implements Writable, Configurable {
     set(instance);
   }
 
-  public ObjectWritable(Class declaredClass, Object instance) {
+  public ObjectWritable(Class<?> declaredClass, Object instance) {
     this.declaredClass = declaredClass;
     this.instance = instance;
   }
@@ -51,7 +51,7 @@ public class ObjectWritable implements Writable, Configurable {
   public Object get() { return instance; }
   
   /** Return the class this is meant to be. */
-  public Class getDeclaredClass() { return declaredClass; }
+  public Class<?> getDeclaredClass() { return declaredClass; }
   
   /** Reset the instance. */
   public void set(Object instance) {
@@ -87,12 +87,12 @@ public class ObjectWritable implements Writable, Configurable {
 
   private static class NullInstance extends Configured implements Writable {
     private Class<?> declaredClass;
-    public NullInstance() { super(null); }
-    public NullInstance(Class declaredClass, Configuration conf) {
+    public NullInstance(Class<?> declaredClass, Configuration conf) {
       super(conf);
       this.declaredClass = declaredClass;
     }
-    public void readFields(DataInput in) throws IOException {
+    @SuppressWarnings("deprecation")
+	public void readFields(DataInput in) throws IOException {
       String className = UTF8.readString(in);
       declaredClass = PRIMITIVE_NAMES.get(className);
       if (declaredClass == null) {
@@ -103,15 +103,17 @@ public class ObjectWritable implements Writable, Configurable {
         }
       }
     }
-    public void write(DataOutput out) throws IOException {
+    @SuppressWarnings("deprecation")
+	public void write(DataOutput out) throws IOException {
       UTF8.writeString(out, declaredClass.getName());
     }
   }
 
   /** Write a {@link Writable}, {@link String}, primitive type, or an array of
    * the preceding. */
-  public static void writeObject(DataOutput out, Object instance,
-                                 Class declaredClass, 
+  @SuppressWarnings("deprecation")
+public static void writeObject(DataOutput out, Object instance,
+                                 Class<?> declaredClass, 
                                  Configuration conf) throws IOException {
 
     if (instance == null) {                       // null
@@ -155,7 +157,7 @@ public class ObjectWritable implements Writable, Configurable {
         throw new IllegalArgumentException("Not a primitive: "+declaredClass);
       }
     } else if (declaredClass.isEnum()) {         // enum
-      UTF8.writeString(out, ((Enum)instance).name());
+      UTF8.writeString(out, ((Enum<?>)instance).name());
     } else if (Writable.class.isAssignableFrom(declaredClass)) { // Writable
       UTF8.writeString(out, instance.getClass().getName());
       ((Writable)instance).write(out);
@@ -175,7 +177,7 @@ public class ObjectWritable implements Writable, Configurable {
     
   /** Read a {@link Writable}, {@link String}, primitive type, or an array of
    * the preceding. */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "deprecation", "rawtypes" })
   public static Object readObject(DataInput in, ObjectWritable objectWritable, Configuration conf)
     throws IOException {
     String className = UTF8.readString(in);
@@ -245,7 +247,7 @@ public class ObjectWritable implements Writable, Configurable {
       }
     }
 
-    if (objectWritable != null) {                 // store values
+    if (objectWritable != null) {                // store values
       objectWritable.declaredClass = declaredClass;
       objectWritable.instance = instance;
     }

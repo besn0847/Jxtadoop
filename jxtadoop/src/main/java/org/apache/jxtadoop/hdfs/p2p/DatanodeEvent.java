@@ -5,7 +5,7 @@ import java.util.EventObject;
 import net.jxta.peer.PeerID;
 
 public class DatanodeEvent extends EventObject {
-	
+	private static final long serialVersionUID = 1L;
 	private PeerID datanodeId;
 
 	public DatanodeEvent(Object source,PeerID pid) {

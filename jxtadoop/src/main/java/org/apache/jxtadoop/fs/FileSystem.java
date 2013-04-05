@@ -46,7 +46,6 @@ import org.apache.jxtadoop.security.UserGroupInformation;
 import org.apache.jxtadoop.util.Progressable;
 import org.apache.jxtadoop.util.ReflectionUtils;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
-import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 
 /****************************************************************
  * An abstract base class for a fairly generic filesystem.  It
@@ -978,9 +977,6 @@ public abstract class FileSystem extends Configured implements Closeable {
     private static final char  PAT_ANY = '.';
     /** Default pattern character: Character set close. */
     private static final char  PAT_SET_CLOSE = ']';
-      
-    GlobFilter() {
-    }
       
     GlobFilter(String filePattern) throws IOException {
       setRegex(filePattern);

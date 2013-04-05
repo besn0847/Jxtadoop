@@ -20,6 +20,7 @@ package org.apache.jxtadoop.security;
 /**
  * An exception class for access control related issues.
  */
+@SuppressWarnings("deprecation")
 public class AccessControlException 
     extends org.apache.jxtadoop.fs.permission.AccessControlException {
 

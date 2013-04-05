@@ -3,7 +3,6 @@ package org.apache.jxtadoop.ipc;
 
 import java.net.Socket;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.ConnectException;
 
@@ -61,9 +60,6 @@ public class Client {
   private AtomicBoolean running = new AtomicBoolean(true); // if client runs
   final private Configuration conf;
   final private int maxIdleTime; //connections will be culled if it was idle for 
-                           //maxIdleTime msecs
-  final private int maxRetries; //the max. no. of retries for socket connections
-  private boolean tcpNoDelay; // if T then disable Nagle's Algorithm
   private int pingInterval; // how often sends ping to the server in msecs
 
   private SocketFactory socketFactory;           // how to create sockets
@@ -279,8 +275,6 @@ public class Client {
         return;
       }
       
-      short ioFailures = 0;
-      short timeoutFailures = 0;
       try {
         /*while (true) {
           try {
@@ -317,46 +311,6 @@ public class Client {
         markClosed(e);
         close();
       }
-    }
-
-    /* Handle connection failures
-     *
-     * If the current number of retries is equal to the max number of retries,
-     * stop retrying and throw the exception; Otherwise backoff 1 second and
-     * try connecting again.
-     *
-     * This Method is only called from inside setupIOstreams(), which is
-     * synchronized. Hence the sleep is synchronized; the locks will be retained.
-     *
-     * @param curRetries current number of retries
-     * @param maxRetries max number of retries allowed
-     * @param ioe failure reason
-     * @throws IOException if max number of retries is reached
-     */
-    private void handleConnectionFailure(
-        int curRetries, int maxRetries, IOException ioe) throws IOException {
-      // close the current connection
-      try {
-        socket.close();
-      } catch (IOException e) {
-        LOG.warn("Not able to close a socket", e);
-      }
-      // set socket to null so that the next call to setupIOstreams
-      // can start the process of connect all over again.
-      socket = null;
-
-      // throw the exception if the maximum number of retries is reached
-      if (curRetries >= maxRetries) {
-        throw ioe;
-      }
-
-      // otherwise back off and retry
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException ignored) {}
-      
-      LOG.info("Retrying connect to server: " + jsockserveraddr + 
-          ". Already tried " + curRetries + " time(s).");
     }
 
     /* Write the header for each connection
@@ -407,13 +361,6 @@ public class Client {
         return false;
       }
     }
-
-    /*public InetSocketAddress getRemoteAddress() {
-      return server;
-    }*/
-    public SocketAddress getRemoteAddress() {
-        return jsockserveraddr;
-      }
 
     /* Send a ping to the server if the time elapsed 
      * since last I/O activity is equal to or greater than the ping interval
@@ -620,8 +567,8 @@ public class Client {
     this.valueClass = valueClass;
     this.maxIdleTime = 
       conf.getInt("ipc.client.connection.maxidletime", 60000); //10s
-    this.maxRetries = conf.getInt("ipc.client.connect.max.retries", 10);
-    this.tcpNoDelay = conf.getBoolean("ipc.client.tcpnodelay", false);
+    conf.getInt("ipc.client.connect.max.retries", 10);
+    conf.getBoolean("ipc.client.tcpnodelay", false);
     this.pingInterval = getPingInterval(conf);
     if (LOG.isDebugEnabled()) {
       LOG.debug("The ping interval is" + this.pingInterval + "ms.");

@@ -94,7 +94,7 @@ public class DNS {
                               .getHostAddress() };
       else {
         Vector<String> ips = new Vector<String>();
-        Enumeration e = netIF.getInetAddresses();
+        Enumeration<?> e = netIF.getInetAddresses();
         while (e.hasMoreElements())
           ips.add(((InetAddress) e.nextElement()).getHostAddress());
         return ips.toArray(new String[] {});

@@ -71,6 +71,7 @@ import org.apache.jxtadoop.metrics.util.MetricsTimeVaryingRate;
  * All methods in the protocol should throw only IOException.  No field data of
  * the protocol instance is transmitted.
  */
+@SuppressWarnings("deprecation")
 public class RPC {
   private static final Log LOG =
     LogFactory.getLog(RPC.class);
@@ -81,11 +82,13 @@ public class RPC {
   /** A method invocation, including the method name and its parameters.*/
   private static class Invocation implements Writable, Configurable {
     private String methodName;
-    private Class[] parameterClasses;
+    @SuppressWarnings("rawtypes")
+	private Class[] parameterClasses;
     private Object[] parameters;
     private Configuration conf;
 
-    public Invocation() {}
+    @SuppressWarnings("unused")
+	public Invocation() {}
 
     public Invocation(Method method, Object[] parameters) {
       this.methodName = method.getName();
@@ -97,7 +100,8 @@ public class RPC {
     public String getMethodName() { return methodName; }
 
     /** The parameter classes. */
-    public Class[] getParameterClasses() { return parameterClasses; }
+    @SuppressWarnings("rawtypes")
+	public Class[] getParameterClasses() { return parameterClasses; }
 
     /** The parameter instances. */
     public Object[] getParameters() { return parameters; }
@@ -247,7 +251,8 @@ public class RPC {
   /**
    * A version mismatch for the RPC protocol.
    */
-  public static class VersionMismatch extends IOException {
+  @SuppressWarnings("serial")
+public static class VersionMismatch extends IOException {
     private String interfaceName;
     private long clientVersion;
     private long serverVersion;
@@ -291,7 +296,7 @@ public class RPC {
     }
   }
   
-  public static VersionedProtocol waitForProxy(Class protocol,
+  public static VersionedProtocol waitForProxy(Class<?> protocol,
       long clientVersion, PeerGroup pg,
       JxtaSocketAddress jsocka,
       Configuration conf
@@ -309,7 +314,7 @@ public class RPC {
    * @return the proxy
    * @throws IOException if the far end through a RemoteException
    */
-  static VersionedProtocol waitForProxy(Class protocol,
+  static VersionedProtocol waitForProxy(Class<?> protocol,
                                                long clientVersion, PeerGroup pg,
                                                JxtaSocketAddress jsocka,
                                                Configuration conf,
@@ -568,11 +573,5 @@ public class RPC {
         ServiceAuthorizationManager.authorize(user, protocol);
       }
     }
-  }
-
-  private static void log(String value) {
-    if (value!= null && value.length() > 55)
-      value = value.substring(0, 55)+"...";
-    LOG.info(value);
   }
 }

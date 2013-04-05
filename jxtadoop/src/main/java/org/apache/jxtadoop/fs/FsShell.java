@@ -22,8 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -96,7 +94,8 @@ public class FsShell extends Configured implements Tool {
 	}
   }
   
-  protected void init() throws IOException {
+  @SuppressWarnings("deprecation")
+protected void init() throws IOException {
 	dfs.init();
 	
 	getConf().set("fs.default.name", dfs.getDfsClientPeer().getNameNodePeerId().toString().replaceAll("urn:jxta:cbid-", ""));
@@ -115,7 +114,8 @@ public class FsShell extends Configured implements Tool {
   /**
    * Copies from stdin to the indicated file.
    */
-  private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
+  @SuppressWarnings("deprecation")
+private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
     if (dstFs.isDirectory(dst)) {
       throw new IOException("When source is stdin, destination must be a file.");
     }
@@ -381,7 +381,7 @@ public class FsShell extends Configured implements Tool {
 
   private class TextRecordInputStream extends InputStream {
     SequenceFile.Reader r;
-    WritableComparable key;
+    WritableComparable<?> key;
     Writable val;
 
     DataInputBuffer inbuf;
@@ -437,7 +437,8 @@ public class FsShell extends Configured implements Tool {
   void text(String srcf) throws IOException {
     Path srcPattern = new Path(srcf);
     new DelayedExceptionThrowing() {
-      @Override
+      @SuppressWarnings("deprecation")
+	@Override
       void process(Path p, FileSystem srcFs) throws IOException {
         if (srcFs.isDirectory(p)) {
           throw new IOException("Source must be a file.");
@@ -856,7 +857,8 @@ public class FsShell extends Configured implements Tool {
    * @throws IOException  
    * @see org.apache.jxtadoop.fs.FileSystem#globStatus(Path)
    */
-  void rename(String srcf, String dstf) throws IOException {
+  @SuppressWarnings("deprecation")
+void rename(String srcf, String dstf) throws IOException {
     Path srcPath = new Path(srcf);
     Path dstPath = new Path(dstf);
     FileSystem srcFs = srcPath.getFileSystem(getConf());
@@ -905,7 +907,8 @@ public class FsShell extends Configured implements Tool {
    * must be a directory. Otherwise, IOException is thrown.
    * @exception: IOException  
    */
-  private int rename(String argv[], Configuration conf) throws IOException {
+  @SuppressWarnings("deprecation")
+private int rename(String argv[], Configuration conf) throws IOException {
     int i = 0;
     int exitCode = 0;
     String cmd = argv[i++];  
@@ -967,7 +970,8 @@ public class FsShell extends Configured implements Tool {
    * @throws IOException  
    * @see org.apache.jxtadoop.fs.FileSystem#globStatus(Path)
    */
-  void copy(String srcf, String dstf, Configuration conf) throws IOException {
+  @SuppressWarnings("deprecation")
+void copy(String srcf, String dstf, Configuration conf) throws IOException {
     Path srcPath = new Path(srcf);
     FileSystem srcFs = srcPath.getFileSystem(getConf());
     Path dstPath = new Path(dstf);
@@ -990,7 +994,8 @@ public class FsShell extends Configured implements Tool {
    * must be a directory. Otherwise, IOException is thrown.
    * @exception: IOException  
    */
-  private int copy(String argv[], Configuration conf) throws IOException {
+  @SuppressWarnings("deprecation")
+private int copy(String argv[], Configuration conf) throws IOException {
     int i = 0;
     int exitCode = 0;
     String cmd = argv[i++];  
@@ -1116,7 +1121,8 @@ public class FsShell extends Configured implements Tool {
    * @param pos ignore anything before this pos in cmd
    * @throws IOException 
    */
-  private void tail(String[] cmd, int pos) throws IOException {
+  @SuppressWarnings("deprecation")
+private void tail(String[] cmd, int pos) throws IOException {
     CommandFormat c = new CommandFormat("tail", 1, 1, "f");
     String src = null;
     Path path = null;

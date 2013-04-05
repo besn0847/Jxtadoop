@@ -28,8 +28,6 @@ import javax.management.InstanceAlreadyExistsException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jxtadoop.hdfs.DFSClient;
-
 
 /**
  * This util class provides a method to register an MBean using

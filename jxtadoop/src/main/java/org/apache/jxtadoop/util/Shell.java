@@ -240,7 +240,8 @@ abstract public class Shell {
   /**
    * This is an IOException with exit code added.
    */
-  public static class ExitCodeException extends IOException {
+  @SuppressWarnings("serial")
+public static class ExitCodeException extends IOException {
     int exitCode;
     
     public ExitCodeException(int exitCode, String message) {

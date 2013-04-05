@@ -52,14 +52,15 @@ public class ArrayWritable implements Writable {
     this.values = values;
   }
 
-  public ArrayWritable(String[] strings) {
+  @SuppressWarnings("deprecation")
+public ArrayWritable(String[] strings) {
     this(UTF8.class, new Writable[strings.length]);
     for (int i = 0; i < strings.length; i++) {
       values[i] = new UTF8(strings[i]);
     }
   }
 
-  public Class getValueClass() {
+  public Class<? extends Writable> getValueClass() {
     return valueClass;
   }
 

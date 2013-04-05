@@ -55,7 +55,7 @@ public class SerializationFactory extends Configured {
     }
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private void add(Configuration conf, String serializationName) {
     try {
       
@@ -77,7 +77,7 @@ public class SerializationFactory extends Configured {
     return getSerialization(c).getDeserializer(c);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T> Serialization<T> getSerialization(Class<T> c) {
     for (Serialization serialization : serializations) {
       if (serialization.accept(c)) {

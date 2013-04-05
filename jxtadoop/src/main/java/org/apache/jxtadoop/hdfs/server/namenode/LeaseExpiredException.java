@@ -23,6 +23,7 @@ import java.io.IOException;
 /**
  * The lease that was being used to create this file has expired.
  */
+@SuppressWarnings("serial")
 public class LeaseExpiredException extends IOException {
   public LeaseExpiredException(String msg) {
     super(msg);

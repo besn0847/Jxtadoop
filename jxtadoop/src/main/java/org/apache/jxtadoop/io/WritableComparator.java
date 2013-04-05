@@ -32,13 +32,15 @@ import org.apache.jxtadoop.util.ReflectionUtils;
  * {@link #compare(byte[],int,int,byte[],int,int)}.  Static utility methods are
  * provided to assist in optimized implementations of this method.
  */
-public class WritableComparator implements RawComparator {
+public class WritableComparator implements RawComparator<Object> {
 
-  private static HashMap<Class, WritableComparator> comparators =
+  @SuppressWarnings("rawtypes")
+private static HashMap<Class, WritableComparator> comparators =
     new HashMap<Class, WritableComparator>(); // registry
 
   /** Get a comparator for a {@link WritableComparable} implementation. */
-  public static synchronized WritableComparator get(Class<? extends WritableComparable> c) {
+  @SuppressWarnings("rawtypes")
+public static synchronized WritableComparator get(Class<? extends WritableComparable> c) {
     WritableComparator comparator = comparators.get(c);
     if (comparator == null)
       comparator = new WritableComparator(c, true);
@@ -47,23 +49,29 @@ public class WritableComparator implements RawComparator {
 
   /** Register an optimized comparator for a {@link WritableComparable}
    * implementation. */
-  public static synchronized void define(Class c,
+  @SuppressWarnings("rawtypes")
+public static synchronized void define(Class c,
                                          WritableComparator comparator) {
     comparators.put(c, comparator);
   }
 
 
-  private final Class<? extends WritableComparable> keyClass;
-  private final WritableComparable key1;
-  private final WritableComparable key2;
+  @SuppressWarnings("rawtypes")
+private final Class<? extends WritableComparable> keyClass;
+  @SuppressWarnings("rawtypes")
+private final WritableComparable key1;
+  @SuppressWarnings("rawtypes")
+private final WritableComparable key2;
   private final DataInputBuffer buffer;
 
   /** Construct for a {@link WritableComparable} implementation. */
-  protected WritableComparator(Class<? extends WritableComparable> keyClass) {
+  @SuppressWarnings("rawtypes")
+protected WritableComparator(Class<? extends WritableComparable> keyClass) {
     this(keyClass, false);
   }
 
-  protected WritableComparator(Class<? extends WritableComparable> keyClass,
+  @SuppressWarnings("rawtypes")
+protected WritableComparator(Class<? extends WritableComparable> keyClass,
       boolean createInstances) {
     this.keyClass = keyClass;
     if (createInstances) {
@@ -77,10 +85,12 @@ public class WritableComparator implements RawComparator {
   }
 
   /** Returns the WritableComparable implementation class. */
-  public Class<? extends WritableComparable> getKeyClass() { return keyClass; }
+  @SuppressWarnings("rawtypes")
+public Class<? extends WritableComparable> getKeyClass() { return keyClass; }
 
   /** Construct a new {@link WritableComparable} instance. */
-  public WritableComparable newKey() {
+  @SuppressWarnings("rawtypes")
+public WritableComparable newKey() {
     return ReflectionUtils.newInstance(keyClass, null);
   }
 
@@ -110,12 +120,13 @@ public class WritableComparator implements RawComparator {
    *
    * <p> The default implementation uses the natural ordering, calling {@link
    * Comparable#compareTo(Object)}. */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public int compare(WritableComparable a, WritableComparable b) {
     return a.compareTo(b);
   }
 
-  public int compare(Object a, Object b) {
+  @SuppressWarnings("rawtypes")
+public int compare(Object a, Object b) {
     return compare((WritableComparable)a, (WritableComparable)b);
   }
 

@@ -249,9 +249,11 @@ public class BlocksMap {
 
     boolean listIsConsistent(DatanodeDescriptor dn) {
       // going forward
-      int count = 0;
+      @SuppressWarnings("unused")
+	int count = 0;
       BlockInfo next, nextPrev;
       BlockInfo cur = this;
+      
       while(cur != null) {
         next = cur.getNext(cur.findDatanode(dn));
         if(next != null) {

@@ -111,12 +111,14 @@ public class MD5Hash implements WritableComparable<MD5Hash> {
   }
 
   /** Construct a hash value for a String. */
-  public static MD5Hash digest(String string) {
+  @SuppressWarnings("deprecation")
+public static MD5Hash digest(String string) {
     return digest(UTF8.getBytes(string));
   }
 
   /** Construct a hash value for a String. */
-  public static MD5Hash digest(UTF8 utf8) {
+  @SuppressWarnings("deprecation")
+public static MD5Hash digest(UTF8 utf8) {
     return digest(utf8.getBytes(), 0, utf8.getLength());
   }
 

@@ -21,7 +21,6 @@ package org.apache.jxtadoop.fs;
 import java.io.*;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileLock;
 import java.util.*;
 
 import org.apache.jxtadoop.conf.Configuration;

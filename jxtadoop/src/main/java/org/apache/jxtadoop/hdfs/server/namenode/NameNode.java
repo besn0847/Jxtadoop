@@ -72,7 +72,6 @@ import org.apache.jxtadoop.security.authorize.ServiceAuthorizationManager;
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
-import java.util.EventObject;
 import java.util.Iterator;
 
 /**********************************************************

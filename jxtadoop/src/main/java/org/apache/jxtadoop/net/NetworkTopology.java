@@ -18,7 +18,6 @@
 package org.apache.jxtadoop.net;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -54,19 +53,11 @@ public class NetworkTopology {
       super(path);
     }
         
-    /** Construct an InnerNode from its name and its network location */
-    InnerNode(String name, String location) {
-      super(name, location);
-    }
-        
     /** Construct an InnerNode
      * from its name, its network location, its parent, and its level */
     InnerNode(String name, String location, InnerNode parent, int level) {
       super(name, location, parent, level);
     }
-        
-    /** Get its children */
-    Collection<Node> getChildren() {return children;}
         
     /** Return the number of children this node has */
     int getNumOfChildren() {

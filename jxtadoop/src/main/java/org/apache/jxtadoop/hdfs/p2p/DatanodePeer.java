@@ -26,7 +26,6 @@ import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PipeAdvertisement;
-import net.jxta.socket.JxtaServerSocket;
 import net.jxta.socket.JxtaSocket;
 import net.jxta.socket.JxtaSocketAddress;
 /**

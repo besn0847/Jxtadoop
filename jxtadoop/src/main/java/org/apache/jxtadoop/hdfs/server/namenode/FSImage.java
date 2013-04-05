@@ -64,6 +64,7 @@ import org.apache.jxtadoop.hdfs.server.common.UpgradeManager;
  * FSImage handles checkpointing and logging of the namespace edits.
  * 
  */
+@SuppressWarnings("deprecation")
 public class FSImage extends Storage {
 
   private static final SimpleDateFormat DATE_FORM =

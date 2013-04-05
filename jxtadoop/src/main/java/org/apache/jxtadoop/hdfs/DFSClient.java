@@ -44,7 +44,6 @@ import org.apache.jxtadoop.net.NetUtils;
 import org.apache.jxtadoop.net.NodeBase;
 import org.apache.jxtadoop.hdfs.DistributedFileSystem.DiskStatus;
 import org.apache.jxtadoop.hdfs.p2p.DFSClientPeer;
-import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.AlreadyBeingCreatedException;
 import org.apache.jxtadoop.hdfs.protocol.Block;
@@ -117,7 +116,6 @@ public class DFSClient implements FSConstants, java.io.Closeable {
   private short defaultReplication;
   private SocketFactory socketFactory;
   private int socketTimeout;
-  private int datanodeWriteTimeout;
   final int writePacketSize;
   private final FileSystem.Statistics stats;
   private int maxBlockAcquireFailures;
@@ -223,7 +221,7 @@ public class DFSClient implements FSConstants, java.io.Closeable {
   DFSClient(ClientProtocol rpcNamenode,
       Configuration conf, FileSystem.Statistics stats)
     throws IOException {
-    this.conf = conf;
+    DFSClient.conf = conf;
     this.stats = stats;
     /*this.socketTimeout = conf.getInt("dfs.socket.timeout", HdfsConstants.READ_TIMEOUT);
     this.datanodeWriteTimeout = conf.getInt("dfs.datanode.socket.write.timeout",
@@ -759,8 +757,7 @@ public class DFSClient implements FSConstants, java.io.Closeable {
       final DatanodeInfo[] datanodes = lb.getLocations();
       
       //try each datanode location of the block
-      final int timeout = 3000 * datanodes.length + socketTimeout;
-      boolean done = false;
+     boolean done = false;
       for(int j = 0; !done && j < datanodes.length; j++) {
         //connect to a datanode
         /*final Socket sock = socketFactory.createSocket();

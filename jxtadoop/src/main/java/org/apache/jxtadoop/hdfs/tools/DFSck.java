@@ -68,7 +68,8 @@ public class DFSck extends Configured implements Tool {
     super(conf);
   }
   
-  private String getInfoServer() throws IOException {
+  @SuppressWarnings("deprecation")
+private String getInfoServer() throws IOException {
     return NetUtils.getServerAddress(getConf(), "dfs.info.bindAddress", 
                                      "dfs.info.port", "dfs.http.address");
   }

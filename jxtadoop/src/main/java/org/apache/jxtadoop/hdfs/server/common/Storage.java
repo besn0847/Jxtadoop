@@ -748,7 +748,8 @@ public abstract class Storage extends StorageInfo {
   // Pre-upgrade version compatibility
   protected abstract void corruptPreUpgradeStorage(File rootDir) throws IOException;
 
-  protected void writeCorruptedData(RandomAccessFile file) throws IOException {
+  @SuppressWarnings("deprecation")
+protected void writeCorruptedData(RandomAccessFile file) throws IOException {
     final String messageForPreUpgradeVersion =
       "\nThis file is INTENTIONALLY CORRUPTED so that versions\n"
       + "of Hadoop prior to 0.13 (which are incompatible\n"

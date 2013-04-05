@@ -21,7 +21,7 @@ package org.apache.jxtadoop.io;
 import java.io.*;
 
 /** A WritableComparable for ints. */
-public class IntWritable implements WritableComparable {
+public class IntWritable implements WritableComparable<Object> {
   private int value;
 
   public IntWritable() {}

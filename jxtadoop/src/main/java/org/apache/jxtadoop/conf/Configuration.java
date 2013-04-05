@@ -228,7 +228,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
                 (new IOException("config(config)")));
     }*/
    
-   this.resources = (ArrayList)other.resources.clone();
+   this.resources = (ArrayList<Object>)other.resources.clone();
    synchronized(other) {
      if (other.properties != null) {
        this.properties = (Properties)other.properties.clone();
@@ -1024,7 +1024,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   }
 
   private void loadResources(Properties properties,
-                             ArrayList resources,
+                             ArrayList<?> resources,
                              boolean quiet) {
     if(loadDefaults) {
       for (String resource : defaultResources) {
@@ -1187,7 +1187,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
       Element conf = doc.createElement("configuration");
       doc.appendChild(conf);
       conf.appendChild(doc.createTextNode("\n"));
-      for (Enumeration e = properties.keys(); e.hasMoreElements();) {
+      for (Enumeration<Object> e = properties.keys(); e.hasMoreElements();) {
         String name = (String)e.nextElement();
         Object object = properties.get(name);
         String value = null;
@@ -1252,8 +1252,8 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     return sb.toString();
   }
 
-  private void toString(ArrayList resources, StringBuffer sb) {
-    ListIterator i = resources.listIterator();
+  private void toString(ArrayList<?> resources, StringBuffer sb) {
+    ListIterator<?> i = resources.listIterator();
     while (i.hasNext()) {
       if (i.nextIndex() != 0) {
         sb.append(", ");

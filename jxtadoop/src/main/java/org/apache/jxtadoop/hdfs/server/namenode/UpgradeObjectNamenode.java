@@ -19,7 +19,6 @@ package org.apache.jxtadoop.hdfs.server.namenode;
 
 import java.io.IOException;
 
-import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
 import org.apache.jxtadoop.hdfs.server.common.UpgradeObject;
 import org.apache.jxtadoop.hdfs.server.protocol.UpgradeCommand;

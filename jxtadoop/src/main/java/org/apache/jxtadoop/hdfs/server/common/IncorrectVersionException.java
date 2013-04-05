@@ -26,6 +26,7 @@ import org.apache.jxtadoop.hdfs.protocol.FSConstants;
  * current version of the appication.
  * 
  */
+@SuppressWarnings("serial")
 public class IncorrectVersionException extends IOException {
 
   public IncorrectVersionException(int versionReported, String ofWhat) {

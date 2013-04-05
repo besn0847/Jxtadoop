@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.jxtadoop.metrics.spi.AbstractMetricsContext;
 import org.apache.jxtadoop.metrics.spi.NullContext;
 
 /**
@@ -78,7 +77,7 @@ public class ContextFactory {
     String[] result = new String[attributeMap.size()];
     int i = 0;
     // for (String attributeName : attributeMap.keySet()) {
-    Iterator it = attributeMap.keySet().iterator();
+    Iterator<String> it = attributeMap.keySet().iterator();
     while (it.hasNext()) {
       result[i++] = (String) it.next();
     }
@@ -130,7 +129,7 @@ public class ContextFactory {
       if (className == null) {
         className = DEFAULT_CONTEXT_CLASSNAME;
       }
-      Class contextClass = Class.forName(className);
+      Class<?> contextClass = Class.forName(className);
       metricsContext = (MetricsContext) contextClass.newInstance();
       metricsContext.init(contextName, this);
       contextMap.put(contextName, metricsContext);
@@ -182,7 +181,7 @@ public class ContextFactory {
       Properties properties = new Properties();
       properties.load(is);
       //for (Object propertyNameObj : properties.keySet()) {
-      Iterator it = properties.keySet().iterator();
+      Iterator<?> it = properties.keySet().iterator();
       while (it.hasNext()) {
         String propertyName = (String) it.next();
         String propertyValue = properties.getProperty(propertyName);

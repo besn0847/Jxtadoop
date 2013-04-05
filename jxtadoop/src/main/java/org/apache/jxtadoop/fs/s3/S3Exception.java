@@ -21,6 +21,7 @@ package org.apache.jxtadoop.fs.s3;
 /**
  * Thrown if there is a problem communicating with Amazon S3.
  */
+@SuppressWarnings("serial")
 public class S3Exception extends RuntimeException {
 
   public S3Exception(Throwable t) {

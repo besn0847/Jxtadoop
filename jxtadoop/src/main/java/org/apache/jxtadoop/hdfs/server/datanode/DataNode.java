@@ -52,6 +52,7 @@ import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.conf.Configured;
 import org.apache.jxtadoop.hdfs.HDFSPolicyProvider;
 import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
+import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.Block;
 import org.apache.jxtadoop.hdfs.protocol.BlockListAsLongs;
 import org.apache.jxtadoop.hdfs.protocol.ClientDatanodeProtocol;
@@ -68,7 +69,6 @@ import org.apache.jxtadoop.hdfs.server.common.IncorrectVersionException;
 import org.apache.jxtadoop.hdfs.server.common.Storage;
 import org.apache.jxtadoop.hdfs.server.datanode.metrics.DataNodeMetrics;
 import org.apache.jxtadoop.hdfs.server.namenode.FSNamesystem;
-import org.apache.jxtadoop.hdfs.server.namenode.NameNode;
 import org.apache.jxtadoop.hdfs.server.protocol.BlockCommand;
 import org.apache.jxtadoop.hdfs.server.protocol.BlockMetaDataInfo;
 import org.apache.jxtadoop.hdfs.server.protocol.DatanodeCommand;
@@ -381,7 +381,7 @@ public class DataNode extends Configured
     dnRegistration.setIpcPort(ipcServer.getListenerAddress().getPort());
     */
     ipcServer = RPC.getServer(this, dnpeer.getPeerGroup(),  dnpeer.getServerSocketAddress(), conf.getInt("dfs.datanode.handler.count", 3),false,conf);
-    dnRegistration.setIpcPort(dnpeer.RPCPIPEID);
+    dnRegistration.setIpcPort(P2PConstants.RPCPIPEID);
     
     LOG.info("dnRegistration = " + dnRegistration);
     

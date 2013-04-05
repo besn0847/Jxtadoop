@@ -27,13 +27,15 @@ import java.io.IOException;
 
 public class DiskChecker {
 
-  public static class DiskErrorException extends IOException {
+  @SuppressWarnings("serial")
+public static class DiskErrorException extends IOException {
     public DiskErrorException(String msg) {
       super(msg);
     }
   }
     
-  public static class DiskOutOfSpaceException extends IOException {
+  @SuppressWarnings("serial")
+public static class DiskOutOfSpaceException extends IOException {
     public DiskOutOfSpaceException(String msg) {
       super(msg);
     }

@@ -27,7 +27,7 @@ import org.apache.jxtadoop.conf.Configuration;
  * Path strings use slash as the directory separator.  A path string is
  * absolute if it begins with a slash.
  */
-public class Path implements Comparable {
+public class Path implements Comparable<Object> {
 
   /** The directory separator, a slash. */
   public static final String SEPARATOR = "/";

@@ -45,13 +45,9 @@ import org.apache.jxtadoop.security.UnixUserGroupInformation;
 import org.apache.jxtadoop.security.UserGroupInformation;
 import org.apache.jxtadoop.util.Daemon;
 import org.apache.jxtadoop.util.HostsFileReader;
-import org.apache.jxtadoop.util.ReflectionUtils;
 import org.apache.jxtadoop.util.StringUtils;
 import org.apache.jxtadoop.metrics.util.MBeanUtil;
-import org.apache.jxtadoop.net.CachedDNSToSwitchMapping;
-import org.apache.jxtadoop.net.DNSToSwitchMapping;
 import org.apache.jxtadoop.net.NetworkTopology;
-import org.apache.jxtadoop.net.ScriptBasedMapping;
 import org.apache.jxtadoop.hdfs.server.namenode.LeaseManager.Lease;
 import org.apache.jxtadoop.hdfs.server.namenode.UnderReplicatedBlocks.BlockIterator;
 import org.apache.jxtadoop.hdfs.server.protocol.BlocksWithLocations;
@@ -78,8 +74,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.DataOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -274,7 +268,8 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
 
   public static FSNamesystem fsNamesystemObject;
   /** NameNode RPC address */
-  private PeerID nameNodePeerID = null; // TODO: name-node has this field, it should be removed here
+  @SuppressWarnings("unused")
+private PeerID nameNodePeerID = null;
   private JxtaSocketAddress nameNodeJxtaAddress = null;
   private SafeModeInfo safeMode;  // safe mode information
   private Host2NodesMap host2DataNodeMap = new Host2NodesMap();

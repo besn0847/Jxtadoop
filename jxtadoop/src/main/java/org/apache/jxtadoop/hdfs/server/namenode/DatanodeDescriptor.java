@@ -27,6 +27,7 @@ import org.apache.jxtadoop.io.WritableUtils;
  * fsImage.
 
  **************************************************/
+@SuppressWarnings("deprecation")
 public class DatanodeDescriptor extends DatanodeInfo {
   /** Block and targets pair */
   public static class BlockTargetPair {

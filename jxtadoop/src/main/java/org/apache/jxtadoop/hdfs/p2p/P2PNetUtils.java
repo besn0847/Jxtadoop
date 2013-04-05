@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-import net.jxta.peer.PeerID;
-import net.jxta.socket.JxtaSocketAddress;
 /**
  * <b><font color="red">Class added to Hadoop to use Jxta pipes</font></b><br><br>
  * 

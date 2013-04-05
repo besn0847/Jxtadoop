@@ -485,16 +485,6 @@ public class HarFileSystem extends FilterFileSystem {
       return isDir;
     }
     
-    public String getName() {
-      return name;
-    }
-    
-    public List<String> getChildren() {
-      return children;
-    }
-    public String getFileName() {
-      return name;
-    }
     public String getPartName() {
       return partName;
     }

@@ -19,7 +19,6 @@ package org.apache.jxtadoop.hdfs.server.namenode;
 
 import org.apache.commons.logging.*;
 
-import org.apache.jxtadoop.hdfs.protocol.DatanodeID;
 import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.protocol.LocatedBlock;
@@ -51,7 +50,8 @@ class ReplicationTargetChooser {
     this.clusterMap = clusterMap;
   }
     
-  private static class NotEnoughReplicasException extends Exception {
+  @SuppressWarnings("serial")
+private static class NotEnoughReplicasException extends Exception {
     NotEnoughReplicasException(String msg) {
       super(msg);
     }

@@ -21,10 +21,6 @@ import java.io.*;
 import java.net.*;
 import java.util.regex.Pattern;
 
-
-import org.apache.commons.logging.*;
-import org.apache.commons.logging.impl.*;
-
 /**
  * Change log level in runtime.
  */
