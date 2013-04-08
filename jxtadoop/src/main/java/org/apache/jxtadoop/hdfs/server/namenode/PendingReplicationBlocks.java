@@ -35,6 +35,7 @@ import java.sql.Time;
  *     that never made it.
  *
  ***************************************************/
+@SuppressWarnings({"rawtypes"})
 class PendingReplicationBlocks {
   private Map<Block, PendingBlockInfo> pendingReplications;
   private ArrayList<Block> timedOutItems;
@@ -197,12 +198,11 @@ class PendingReplicationBlocks {
      */
     void pendingReplicationCheck() {
       synchronized (pendingReplications) {
-        Iterator<?> iter = pendingReplications.entrySet().iterator();
+        Iterator iter = pendingReplications.entrySet().iterator();
         long now = FSNamesystem.now();
         FSNamesystem.LOG.debug("PendingReplicationMonitor checking Q");
         while (iter.hasNext()) {
-          @SuppressWarnings("rawtypes")
-		Map.Entry entry = (Map.Entry) iter.next();
+          Map.Entry entry = (Map.Entry) iter.next();
           PendingBlockInfo pendingBlock = (PendingBlockInfo) entry.getValue();
           if (now > pendingBlock.getTimeStamp() + timeout) {
             Block block = (Block) entry.getKey();
@@ -238,10 +238,9 @@ class PendingReplicationBlocks {
     synchronized (pendingReplications) {
       out.println("Metasave: Blocks being replicated: " +
                   pendingReplications.size());
-      Iterator<?> iter = pendingReplications.entrySet().iterator();
+      Iterator iter = pendingReplications.entrySet().iterator();
       while (iter.hasNext()) {
-        @SuppressWarnings("rawtypes")
-		Map.Entry entry = (Map.Entry) iter.next();
+        Map.Entry entry = (Map.Entry) iter.next();
         PendingBlockInfo pendingBlock = (PendingBlockInfo) entry.getValue();
         Block block = (Block) entry.getKey();
         out.println(block + 

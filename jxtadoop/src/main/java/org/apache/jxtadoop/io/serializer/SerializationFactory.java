@@ -33,6 +33,7 @@ import org.apache.jxtadoop.util.StringUtils;
  * A factory for {@link Serialization}s.
  * </p>
  */
+@SuppressWarnings({"rawtypes"})
 public class SerializationFactory extends Configured {
   
   private static final Log LOG =
@@ -55,7 +56,7 @@ public class SerializationFactory extends Configured {
     }
   }
   
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings("unchecked")
   private void add(Configuration conf, String serializationName) {
     try {
       
@@ -77,7 +78,7 @@ public class SerializationFactory extends Configured {
     return getSerialization(c).getDeserializer(c);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings("unchecked")
   public <T> Serialization<T> getSerialization(Class<T> c) {
     for (Serialization serialization : serializations) {
       if (serialization.accept(c)) {

@@ -36,6 +36,7 @@ import java.lang.reflect.Array;
  * }
  * </code>
  */
+@SuppressWarnings({"deprecation","rawtypes"})
 public class ArrayWritable implements Writable {
   private Class<? extends Writable> valueClass;
   private Writable[] values;
@@ -52,15 +53,14 @@ public class ArrayWritable implements Writable {
     this.values = values;
   }
 
-  @SuppressWarnings("deprecation")
-public ArrayWritable(String[] strings) {
+  public ArrayWritable(String[] strings) {
     this(UTF8.class, new Writable[strings.length]);
     for (int i = 0; i < strings.length; i++) {
       values[i] = new UTF8(strings[i]);
     }
   }
 
-  public Class<? extends Writable> getValueClass() {
+  public Class getValueClass() {
     return valueClass;
   }
 

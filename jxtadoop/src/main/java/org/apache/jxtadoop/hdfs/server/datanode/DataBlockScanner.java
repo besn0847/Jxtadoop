@@ -47,12 +47,13 @@ import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.LocatedBlock;
 import org.apache.jxtadoop.io.IOUtils;
 import org.apache.jxtadoop.util.StringUtils;
+import org.apache.jxtadoop.metrics.util.MetricsTimeVaryingInt;
 
 /*
  * This keeps track of blocks and their last verification times.
  * Currently it does not modify the metadata for block.
  */
-
+@SuppressWarnings({"unused"})
 class DataBlockScanner implements Runnable {
   
   public static final Log LOG = LogFactory.getLog(DataBlockScanner.class);

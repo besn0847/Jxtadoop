@@ -24,18 +24,16 @@ import java.io.IOException;
 /**
  * Class that provides utility functions for checking disk problem
  */
-
+@SuppressWarnings({"serial"})
 public class DiskChecker {
 
-  @SuppressWarnings("serial")
-public static class DiskErrorException extends IOException {
+  public static class DiskErrorException extends IOException {
     public DiskErrorException(String msg) {
       super(msg);
     }
   }
     
-  @SuppressWarnings("serial")
-public static class DiskOutOfSpaceException extends IOException {
+  public static class DiskOutOfSpaceException extends IOException {
     public DiskOutOfSpaceException(String msg) {
       super(msg);
     }

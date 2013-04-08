@@ -35,7 +35,7 @@ import org.apache.jxtadoop.io.WritableFactory;
  * to a data-node handshake.
  * 
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation"})
 public class NamespaceInfo extends StorageInfo implements Writable {
   String  buildVersion;
   int distributedUpgradeVersion;

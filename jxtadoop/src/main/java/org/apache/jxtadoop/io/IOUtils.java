@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jxtadoop.conf.Configuration;
+import org.apache.jxtadoop.hdfs.DFSClient;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 
 import net.jxta.socket.JxtaSocket;
@@ -32,6 +33,7 @@ import net.jxta.socket.JxtaSocket;
 /**
  * An utility class for I/O related functionality. 
  */
+@SuppressWarnings({"unused"})
 public class IOUtils {
 	public static final Log LOG = LogFactory.getLog(IOUtils.class);
 

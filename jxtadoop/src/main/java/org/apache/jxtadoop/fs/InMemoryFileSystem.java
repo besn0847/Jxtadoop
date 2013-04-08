@@ -36,6 +36,7 @@ import org.apache.jxtadoop.util.Progressable;
  * ramfs:// .
  */
 @Deprecated
+@SuppressWarnings({"unused","rawtypes"})
 public class InMemoryFileSystem extends ChecksumFileSystem {
   private static class RawInMemoryFileSystem extends FileSystem {
     private URI uri;
@@ -113,7 +114,8 @@ public class InMemoryFileSystem extends ChecksumFileSystem {
       public int available() throws IOException {
         return din.available(); 
       }
-     
+      public boolean markSupport() { return false; }
+
       public int read() throws IOException {
         return din.read();
       }
@@ -138,6 +140,10 @@ public class InMemoryFileSystem extends ChecksumFileSystem {
         throws IOException {
         this.fAttr = fAttr;
         this.f = f;
+      }
+    
+      public long getPos() throws IOException {
+        return count;
       }
     
       public void close() throws IOException {
@@ -321,11 +327,11 @@ public class InMemoryFileSystem extends ChecksumFileSystem {
       synchronized (this) {
         List<String> closedFilesList = new ArrayList<String>();
         synchronized (pathToFileAttribs) {
-          Set<String> paths = pathToFileAttribs.keySet();
+          Set paths = pathToFileAttribs.keySet();
           if (paths == null || paths.isEmpty()) {
             return new Path[0];
           }
-          Iterator<String> iter = paths.iterator();
+          Iterator iter = paths.iterator();
           while (iter.hasNext()) {
             String f = (String)iter.next();
             if (filter.accept(new Path(f))) {

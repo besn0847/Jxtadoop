@@ -20,6 +20,7 @@ package org.apache.jxtadoop.io.retry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +31,7 @@ import org.apache.jxtadoop.ipc.RemoteException;
  * A collection of useful implementations of {@link RetryPolicy}.
  * </p>
  */
+@SuppressWarnings({"unused"})
 public class RetryPolicies {
   
   /**

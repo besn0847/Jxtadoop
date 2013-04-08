@@ -15,7 +15,7 @@ import org.apache.jxtadoop.io.WritableComparable;
  * which it currently represents.
  * 
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation"})
 public class DatanodeID implements WritableComparable<DatanodeID> {
   public static final DatanodeID[] EMPTY_ARRAY = {}; 
 

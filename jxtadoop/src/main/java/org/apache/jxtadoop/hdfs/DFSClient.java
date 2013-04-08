@@ -44,6 +44,7 @@ import org.apache.jxtadoop.net.NetUtils;
 import org.apache.jxtadoop.net.NodeBase;
 import org.apache.jxtadoop.hdfs.DistributedFileSystem.DiskStatus;
 import org.apache.jxtadoop.hdfs.p2p.DFSClientPeer;
+import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.AlreadyBeingCreatedException;
 import org.apache.jxtadoop.hdfs.protocol.Block;
@@ -100,6 +101,7 @@ import javax.security.auth.login.LoginException;
  * filesystem tasks.
  *
  ***************************************************Breakpoint 5****/
+@SuppressWarnings({"unused"})
 public class DFSClient implements FSConstants, java.io.Closeable {
   public static final Log LOG = LogFactory.getLog(DFSClient.class);
   public static final int MAX_BLOCK_ACQUIRE_FAILURES = 3;
@@ -116,6 +118,7 @@ public class DFSClient implements FSConstants, java.io.Closeable {
   private short defaultReplication;
   private SocketFactory socketFactory;
   private int socketTimeout;
+  private int datanodeWriteTimeout;
   final int writePacketSize;
   private final FileSystem.Statistics stats;
   private int maxBlockAcquireFailures;
@@ -757,7 +760,8 @@ public class DFSClient implements FSConstants, java.io.Closeable {
       final DatanodeInfo[] datanodes = lb.getLocations();
       
       //try each datanode location of the block
-     boolean done = false;
+      final int timeout = 3000 * datanodes.length + socketTimeout;
+      boolean done = false;
       for(int j = 0; !done && j < datanodes.length; j++) {
         //connect to a datanode
         /*final Socket sock = socketFactory.createSocket();

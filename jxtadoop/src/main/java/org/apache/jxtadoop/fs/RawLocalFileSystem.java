@@ -21,6 +21,7 @@ package org.apache.jxtadoop.fs;
 import java.io.*;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileLock;
 import java.util.*;
 
 import org.apache.jxtadoop.conf.Configuration;
@@ -33,6 +34,7 @@ import org.apache.jxtadoop.util.Shell;
  * Implement the FileSystem API for the raw local filesystem.
  *
  *****************************************************************/
+@SuppressWarnings({"unused"})
 public class RawLocalFileSystem extends FileSystem {
   static final URI NAME = URI.create("file:///");
   private Path workingDir;

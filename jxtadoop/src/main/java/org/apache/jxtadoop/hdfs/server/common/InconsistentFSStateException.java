@@ -26,7 +26,7 @@ import org.apache.jxtadoop.util.StringUtils;
  * and is not recoverable. 
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class InconsistentFSStateException extends IOException {
 
   public InconsistentFSStateException(File dir, String descr) {

@@ -42,7 +42,7 @@ import org.apache.jxtadoop.util.Progressable;
  * and the master index contains pointers to the positions in 
  * index for ranges of hashcodes.
  */
-
+@SuppressWarnings({"unused"})
 public class HarFileSystem extends FilterFileSystem {
   public static final int VERSION = 1;
   // uri representation of this Har filesystem
@@ -485,6 +485,16 @@ public class HarFileSystem extends FilterFileSystem {
       return isDir;
     }
     
+    public String getName() {
+      return name;
+    }
+    
+    public List<String> getChildren() {
+      return children;
+    }
+    public String getFileName() {
+      return name;
+    }
     public String getPartName() {
       return partName;
     }

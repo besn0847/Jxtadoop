@@ -25,7 +25,7 @@ import java.io.IOException;
  * Client cannot modified namespace until the safe mode is off. 
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class SafeModeException extends IOException {
 
   public SafeModeException(String text, FSNamesystem.SafeModeInfo mode ) {

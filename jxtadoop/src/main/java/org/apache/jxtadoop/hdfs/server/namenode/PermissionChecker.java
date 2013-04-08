@@ -24,10 +24,12 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jxtadoop.fs.permission.FsAction;
 import org.apache.jxtadoop.fs.permission.FsPermission;
+import org.apache.jxtadoop.ipc.Server;
 import org.apache.jxtadoop.security.AccessControlException;
 import org.apache.jxtadoop.security.UserGroupInformation;
 
 /** Perform permission checking in {@link FSNamesystem}. */
+@SuppressWarnings({"unused"})
 class PermissionChecker {
   static final Log LOG = LogFactory.getLog(UserGroupInformation.class);
 

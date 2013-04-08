@@ -27,6 +27,7 @@ import java.security.*;
 
 /** A Writable for MD5 hash values.
  */
+@SuppressWarnings({"deprecation"})
 public class MD5Hash implements WritableComparable<MD5Hash> {
   public static final int MD5_LEN = 16;
 
@@ -111,14 +112,12 @@ public class MD5Hash implements WritableComparable<MD5Hash> {
   }
 
   /** Construct a hash value for a String. */
-  @SuppressWarnings("deprecation")
-public static MD5Hash digest(String string) {
+  public static MD5Hash digest(String string) {
     return digest(UTF8.getBytes(string));
   }
 
   /** Construct a hash value for a String. */
-  @SuppressWarnings("deprecation")
-public static MD5Hash digest(UTF8 utf8) {
+  public static MD5Hash digest(UTF8 utf8) {
     return digest(utf8.getBytes(), 0, utf8.getLength());
   }
 

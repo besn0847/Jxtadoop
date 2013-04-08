@@ -38,6 +38,7 @@ import org.apache.jxtadoop.util.StringUtils;
  * It generates & verifies checksums at the client side.
  *
  *****************************************************************/
+@SuppressWarnings({"unused","deprecation"})
 public abstract class ChecksumFileSystem extends FilterFileSystem {
   private static final byte[] CHECKSUM_VERSION = new byte[] {'c', 'r', 'c', 0};
   private int bytesPerChecksum = 512;
@@ -312,6 +313,18 @@ public abstract class ChecksumFileSystem extends FilterFileSystem {
     private FSDataOutputStream sums;
     private static final float CHKSUM_AS_FRACTION = 0.01f;
     
+	public ChecksumFSOutputSummer(ChecksumFileSystem fs, 
+                          Path file, 
+                          boolean overwrite, 
+                          short replication,
+                          long blockSize,
+                          Configuration conf)
+      throws IOException {
+      this(fs, file, overwrite, 
+           conf.getInt("io.file.buffer.size", P2PConstants.IO_FILE_BUFFER_SIZE),
+           replication, blockSize, null);
+    }
+    
     public ChecksumFSOutputSummer(ChecksumFileSystem fs, 
                           Path file, 
                           boolean overwrite,
@@ -388,8 +401,7 @@ public abstract class ChecksumFileSystem extends FilterFileSystem {
   /**
    * Rename files/dirs
    */
-  @SuppressWarnings("deprecation")
-public boolean rename(Path src, Path dst) throws IOException {
+  public boolean rename(Path src, Path dst) throws IOException {
     if (fs.isDirectory(src)) {
       return fs.rename(src, dst);
     } else {
@@ -485,8 +497,7 @@ public boolean rename(Path src, Path dst) throws IOException {
    * If src and dst are directories, the copyCrc parameter
    * determines whether to copy CRC files.
    */
-  @SuppressWarnings("deprecation")
-public void copyToLocalFile(Path src, Path dst, boolean copyCrc)
+  public void copyToLocalFile(Path src, Path dst, boolean copyCrc)
     throws IOException {
     if (!fs.isDirectory(src)) { // source is a file
       fs.copyToLocalFile(src, dst);

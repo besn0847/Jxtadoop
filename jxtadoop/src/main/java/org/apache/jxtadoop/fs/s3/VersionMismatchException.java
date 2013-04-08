@@ -21,7 +21,7 @@ package org.apache.jxtadoop.fs.s3;
  * Thrown when Hadoop cannot read the version of the data stored
  * in {@link S3FileSystem}.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class VersionMismatchException extends S3FileSystemException {
   public VersionMismatchException(String clientVersion, String dataVersion) {
     super("Version mismatch: client expects version " + clientVersion +

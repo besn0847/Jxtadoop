@@ -71,7 +71,7 @@ import org.apache.jxtadoop.metrics.util.MetricsTimeVaryingRate;
  * All methods in the protocol should throw only IOException.  No field data of
  * the protocol instance is transmitted.
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"unused","deprecation","rawtypes","serial"})
 public class RPC {
   private static final Log LOG =
     LogFactory.getLog(RPC.class);
@@ -82,13 +82,11 @@ public class RPC {
   /** A method invocation, including the method name and its parameters.*/
   private static class Invocation implements Writable, Configurable {
     private String methodName;
-    @SuppressWarnings("rawtypes")
-	private Class[] parameterClasses;
+    private Class[] parameterClasses;
     private Object[] parameters;
     private Configuration conf;
 
-    @SuppressWarnings("unused")
-	public Invocation() {}
+    public Invocation() {}
 
     public Invocation(Method method, Object[] parameters) {
       this.methodName = method.getName();
@@ -100,8 +98,7 @@ public class RPC {
     public String getMethodName() { return methodName; }
 
     /** The parameter classes. */
-    @SuppressWarnings("rawtypes")
-	public Class[] getParameterClasses() { return parameterClasses; }
+    public Class[] getParameterClasses() { return parameterClasses; }
 
     /** The parameter instances. */
     public Object[] getParameters() { return parameters; }
@@ -251,8 +248,7 @@ public class RPC {
   /**
    * A version mismatch for the RPC protocol.
    */
-  @SuppressWarnings("serial")
-public static class VersionMismatch extends IOException {
+  public static class VersionMismatch extends IOException {
     private String interfaceName;
     private long clientVersion;
     private long serverVersion;
@@ -296,7 +292,7 @@ public static class VersionMismatch extends IOException {
     }
   }
   
-  public static VersionedProtocol waitForProxy(Class<?> protocol,
+  public static VersionedProtocol waitForProxy(Class protocol,
       long clientVersion, PeerGroup pg,
       JxtaSocketAddress jsocka,
       Configuration conf
@@ -314,7 +310,7 @@ public static class VersionMismatch extends IOException {
    * @return the proxy
    * @throws IOException if the far end through a RemoteException
    */
-  static VersionedProtocol waitForProxy(Class<?> protocol,
+  static VersionedProtocol waitForProxy(Class protocol,
                                                long clientVersion, PeerGroup pg,
                                                JxtaSocketAddress jsocka,
                                                Configuration conf,
@@ -573,5 +569,11 @@ public static class VersionMismatch extends IOException {
         ServiceAuthorizationManager.authorize(user, protocol);
       }
     }
+  }
+
+  private static void log(String value) {
+    if (value!= null && value.length() > 55)
+      value = value.substring(0, 55)+"...";
+    LOG.info(value);
   }
 }

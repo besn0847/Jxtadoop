@@ -26,7 +26,7 @@ import java.io.IOException;
  * registered is trying to access the name node.
  * 
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class UnregisteredDatanodeException extends IOException {
 
   public UnregisteredDatanodeException(DatanodeID nodeID) {

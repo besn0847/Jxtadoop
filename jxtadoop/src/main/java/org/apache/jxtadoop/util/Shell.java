@@ -34,6 +34,7 @@ import org.apache.jxtadoop.conf.Configuration;
  * <code>df</code>. It also offers facilities to gate commands by 
  * time-intervals.
  */
+@SuppressWarnings({"serial"})
 abstract public class Shell {
   
   public static final Log LOG = LogFactory.getLog(Shell.class);
@@ -240,8 +241,7 @@ abstract public class Shell {
   /**
    * This is an IOException with exit code added.
    */
-  @SuppressWarnings("serial")
-public static class ExitCodeException extends IOException {
+  public static class ExitCodeException extends IOException {
     int exitCode;
     
     public ExitCodeException(int exitCode, String message) {

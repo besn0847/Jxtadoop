@@ -27,7 +27,8 @@ import org.apache.jxtadoop.io.Writable;
 
 /** Interface that represents the client side information for a file.
  */
-public class FileStatus implements Writable, Comparable<Object> {
+@SuppressWarnings({"rawtypes"})
+public class FileStatus implements Writable, Comparable {
 
   private Path path;
   private long length;

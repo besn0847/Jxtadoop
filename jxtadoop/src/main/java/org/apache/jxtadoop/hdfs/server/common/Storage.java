@@ -58,6 +58,7 @@ import org.apache.jxtadoop.util.VersionInfo;
  * The locks are released when the servers stop (normally or abnormally).
  * 
  */
+@SuppressWarnings({"deprecation"})
 public abstract class Storage extends StorageInfo {
   public static final Log LOG = LogFactory.getLog(Storage.class.getName());
 
@@ -748,8 +749,7 @@ public abstract class Storage extends StorageInfo {
   // Pre-upgrade version compatibility
   protected abstract void corruptPreUpgradeStorage(File rootDir) throws IOException;
 
-  @SuppressWarnings("deprecation")
-protected void writeCorruptedData(RandomAccessFile file) throws IOException {
+  protected void writeCorruptedData(RandomAccessFile file) throws IOException {
     final String messageForPreUpgradeVersion =
       "\nThis file is INTENTIONALLY CORRUPTED so that versions\n"
       + "of Hadoop prior to 0.13 (which are incompatible\n"

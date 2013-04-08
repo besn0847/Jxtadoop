@@ -17,8 +17,69 @@
  */
 package org.apache.jxtadoop.hdfs.server.balancer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jxtadoop.conf.Configuration;
+import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
+import org.apache.jxtadoop.hdfs.server.common.Util;
+import org.apache.jxtadoop.hdfs.protocol.AlreadyBeingCreatedException;
+import org.apache.jxtadoop.hdfs.protocol.Block;
+import org.apache.jxtadoop.hdfs.protocol.ClientProtocol;
+import org.apache.jxtadoop.hdfs.protocol.DataTransferProtocol;
+import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.jxtadoop.hdfs.protocol.FSConstants;
+import org.apache.jxtadoop.hdfs.protocol.FSConstants.DatanodeReportType;
+import org.apache.jxtadoop.hdfs.server.datanode.DataNode;
+import org.apache.jxtadoop.hdfs.server.namenode.NameNode;
+import org.apache.jxtadoop.hdfs.server.protocol.NamenodeProtocol;
+import org.apache.jxtadoop.hdfs.server.protocol.BlocksWithLocations.BlockWithLocations;
+import org.apache.jxtadoop.fs.FileSystem;
+import org.apache.jxtadoop.fs.Path;
+import org.apache.jxtadoop.io.IOUtils;
+import org.apache.jxtadoop.io.Text;
+import org.apache.jxtadoop.io.Writable;
+import org.apache.jxtadoop.io.retry.RetryPolicies;
+import org.apache.jxtadoop.io.retry.RetryPolicy;
+import org.apache.jxtadoop.io.retry.RetryProxy;
+import org.apache.jxtadoop.ipc.RPC;
+import org.apache.jxtadoop.ipc.RemoteException;
+import org.apache.jxtadoop.net.NetUtils;
+import org.apache.jxtadoop.net.NetworkTopology;
+import org.apache.jxtadoop.security.UnixUserGroupInformation;
+import org.apache.jxtadoop.security.UserGroupInformation;
+import org.apache.jxtadoop.util.StringUtils;
 import org.apache.jxtadoop.util.Tool;
+import org.apache.jxtadoop.util.ToolRunner;
 
 /** <p>The balancer is a tool that balances disk space usage on an HDFS cluster
  * when some datanodes become full or when new empty nodes join the cluster.
@@ -116,8 +177,12 @@ import org.apache.jxtadoop.util.Tool;
  * time by running the command "stop-balancer.sh" on the machine where the 
  * balancer is running.
  */
-
+@SuppressWarnings({"unused"})
 public class Balancer implements Tool {
+  private static final Log LOG = 
+    LogFactory.getLog(Balancer.class.getName());
+  final private static long MAX_BLOCKS_SIZE_TO_FETCH = 2*1024*1024*1024L; //2GB
+
   /** The maximum number of concurrent blocks moves for 
    * balancing purpose at a datanode
    */

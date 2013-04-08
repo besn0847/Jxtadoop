@@ -55,6 +55,7 @@ import org.apache.jxtadoop.util.ToolRunner;
  *  The tool also provides and option to filter open files during the scan.
  *  
  */
+@SuppressWarnings({"deprecation"})
 public class DFSck extends Configured implements Tool {
 
   DFSck() {}
@@ -68,8 +69,7 @@ public class DFSck extends Configured implements Tool {
     super(conf);
   }
   
-  @SuppressWarnings("deprecation")
-private String getInfoServer() throws IOException {
+  private String getInfoServer() throws IOException {
     return NetUtils.getServerAddress(getConf(), "dfs.info.bindAddress", 
                                      "dfs.info.port", "dfs.http.address");
   }

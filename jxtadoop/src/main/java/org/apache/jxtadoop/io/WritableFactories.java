@@ -25,22 +25,20 @@ import java.util.HashMap;
 
 /** Factories for non-public writables.  Defining a factory permits {@link
  * ObjectWritable} to be able to construct instances of non-public classes. */
+@SuppressWarnings({"rawtypes"})
 public class WritableFactories {
-  @SuppressWarnings("rawtypes")
-private static final HashMap<Class, WritableFactory> CLASS_TO_FACTORY =
+  private static final HashMap<Class, WritableFactory> CLASS_TO_FACTORY =
     new HashMap<Class, WritableFactory>();
 
   private WritableFactories() {}                  // singleton
 
   /** Define a factory for a class. */
-  @SuppressWarnings("rawtypes")
-public static synchronized void setFactory(Class c, WritableFactory factory) {
+  public static synchronized void setFactory(Class c, WritableFactory factory) {
     CLASS_TO_FACTORY.put(c, factory);
   }
 
   /** Define a factory for a class. */
-  @SuppressWarnings("rawtypes")
-public static synchronized WritableFactory getFactory(Class c) {
+  public static synchronized WritableFactory getFactory(Class c) {
     return CLASS_TO_FACTORY.get(c);
   }
 

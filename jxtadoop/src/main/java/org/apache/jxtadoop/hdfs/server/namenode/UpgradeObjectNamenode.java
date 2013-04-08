@@ -19,6 +19,7 @@ package org.apache.jxtadoop.hdfs.server.namenode;
 
 import java.io.IOException;
 
+import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
 import org.apache.jxtadoop.hdfs.server.common.UpgradeObject;
 import org.apache.jxtadoop.hdfs.server.protocol.UpgradeCommand;
@@ -27,6 +28,7 @@ import org.apache.jxtadoop.hdfs.server.protocol.UpgradeCommand;
  * Base class for name-node upgrade objects.
  * Data-node upgrades are run in separate threads.
  */
+@SuppressWarnings({"unused"})
 public abstract class UpgradeObjectNamenode extends UpgradeObject {
 
   /**

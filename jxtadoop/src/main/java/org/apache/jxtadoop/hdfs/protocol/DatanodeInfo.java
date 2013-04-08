@@ -22,7 +22,7 @@ import org.apache.jxtadoop.util.StringUtils;
  * This object is used for communication in the
  * Datanode Protocol and the Client Protocol.
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation"})
 public class DatanodeInfo extends DatanodeID implements Node {
   protected long capacity;
   protected long dfsUsed;

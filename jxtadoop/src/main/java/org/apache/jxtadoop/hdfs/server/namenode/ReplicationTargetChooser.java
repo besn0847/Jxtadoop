@@ -19,6 +19,7 @@ package org.apache.jxtadoop.hdfs.server.namenode;
 
 import org.apache.commons.logging.*;
 
+import org.apache.jxtadoop.hdfs.protocol.DatanodeID;
 import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.protocol.LocatedBlock;
@@ -36,6 +37,7 @@ import java.util.*;
  * that is on a different rack. The 3rd replica is placed on a datanode
  * which is on the same rack as the first replca.
  */
+@SuppressWarnings({"unused","serial"})
 class ReplicationTargetChooser {
   public static final Log LOG = LogFactory.getLog(ReplicationTargetChooser.class);
 	
@@ -50,8 +52,7 @@ class ReplicationTargetChooser {
     this.clusterMap = clusterMap;
   }
     
-  @SuppressWarnings("serial")
-private static class NotEnoughReplicasException extends Exception {
+  private static class NotEnoughReplicasException extends Exception {
     NotEnoughReplicasException(String msg) {
       super(msg);
     }

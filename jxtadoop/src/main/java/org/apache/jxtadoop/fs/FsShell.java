@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -48,6 +50,7 @@ import org.apache.jxtadoop.util.ToolRunner;
 import org.apache.jxtadoop.util.StringUtils;
 
 /** Provide command line access to a FileSystem. */
+@SuppressWarnings({"unused","deprecation","rawtypes"})
 public class FsShell extends Configured implements Tool {
 	static{
 		    Configuration.addDefaultResource("hdfs-default.xml");
@@ -94,8 +97,7 @@ public class FsShell extends Configured implements Tool {
 	}
   }
   
-  @SuppressWarnings("deprecation")
-protected void init() throws IOException {
+  protected void init() throws IOException {
 	dfs.init();
 	
 	getConf().set("fs.default.name", dfs.getDfsClientPeer().getNameNodePeerId().toString().replaceAll("urn:jxta:cbid-", ""));
@@ -114,8 +116,7 @@ protected void init() throws IOException {
   /**
    * Copies from stdin to the indicated file.
    */
-  @SuppressWarnings("deprecation")
-private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
+  private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
     if (dstFs.isDirectory(dst)) {
       throw new IOException("When source is stdin, destination must be a file.");
     }
@@ -381,7 +382,7 @@ private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
 
   private class TextRecordInputStream extends InputStream {
     SequenceFile.Reader r;
-    WritableComparable<?> key;
+    WritableComparable key;
     Writable val;
 
     DataInputBuffer inbuf;
@@ -437,8 +438,7 @@ private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
   void text(String srcf) throws IOException {
     Path srcPattern = new Path(srcf);
     new DelayedExceptionThrowing() {
-      @SuppressWarnings("deprecation")
-	@Override
+      @Override
       void process(Path p, FileSystem srcFs) throws IOException {
         if (srcFs.isDirectory(p)) {
           throw new IOException("Source must be a file.");
@@ -857,8 +857,7 @@ private void copyFromStdin(Path dst, FileSystem dstFs) throws IOException {
    * @throws IOException  
    * @see org.apache.jxtadoop.fs.FileSystem#globStatus(Path)
    */
-  @SuppressWarnings("deprecation")
-void rename(String srcf, String dstf) throws IOException {
+  void rename(String srcf, String dstf) throws IOException {
     Path srcPath = new Path(srcf);
     Path dstPath = new Path(dstf);
     FileSystem srcFs = srcPath.getFileSystem(getConf());
@@ -907,8 +906,7 @@ void rename(String srcf, String dstf) throws IOException {
    * must be a directory. Otherwise, IOException is thrown.
    * @exception: IOException  
    */
-  @SuppressWarnings("deprecation")
-private int rename(String argv[], Configuration conf) throws IOException {
+  private int rename(String argv[], Configuration conf) throws IOException {
     int i = 0;
     int exitCode = 0;
     String cmd = argv[i++];  
@@ -970,8 +968,7 @@ private int rename(String argv[], Configuration conf) throws IOException {
    * @throws IOException  
    * @see org.apache.jxtadoop.fs.FileSystem#globStatus(Path)
    */
-  @SuppressWarnings("deprecation")
-void copy(String srcf, String dstf, Configuration conf) throws IOException {
+  void copy(String srcf, String dstf, Configuration conf) throws IOException {
     Path srcPath = new Path(srcf);
     FileSystem srcFs = srcPath.getFileSystem(getConf());
     Path dstPath = new Path(dstf);
@@ -994,8 +991,7 @@ void copy(String srcf, String dstf, Configuration conf) throws IOException {
    * must be a directory. Otherwise, IOException is thrown.
    * @exception: IOException  
    */
-  @SuppressWarnings("deprecation")
-private int copy(String argv[], Configuration conf) throws IOException {
+  private int copy(String argv[], Configuration conf) throws IOException {
     int i = 0;
     int exitCode = 0;
     String cmd = argv[i++];  
@@ -1121,8 +1117,7 @@ private int copy(String argv[], Configuration conf) throws IOException {
    * @param pos ignore anything before this pos in cmd
    * @throws IOException 
    */
-  @SuppressWarnings("deprecation")
-private void tail(String[] cmd, int pos) throws IOException {
+  private void tail(String[] cmd, int pos) throws IOException {
     CommandFormat c = new CommandFormat("tail", 1, 1, "f");
     String src = null;
     Path path = null;

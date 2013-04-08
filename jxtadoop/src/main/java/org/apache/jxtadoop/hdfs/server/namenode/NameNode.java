@@ -72,6 +72,7 @@ import org.apache.jxtadoop.security.authorize.ServiceAuthorizationManager;
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.Iterator;
 
 /**********************************************************
@@ -108,6 +109,7 @@ import java.util.Iterator;
  * secondary namenodes or rebalancing processes to get partial namenode's
  * state, for example partial blocksMap etc.
  **********************************************************/
+@SuppressWarnings({"unused"})
 public class NameNode implements ClientProtocol, DatanodeProtocol,
                                  NamenodeProtocol, FSConstants,
                                  RefreshAuthorizationPolicyProtocol, P2PListener {

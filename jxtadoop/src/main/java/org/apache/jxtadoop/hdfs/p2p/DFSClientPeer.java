@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -19,6 +20,7 @@ import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
+import net.jxta.id.IDFactory;
 import net.jxta.impl.protocol.PeerAdv;
 import net.jxta.peer.PeerID;
 import net.jxta.platform.NetworkManager;
@@ -28,6 +30,7 @@ import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.socket.JxtaSocket;
 import net.jxta.socket.JxtaSocketAddress;
 
+@SuppressWarnings({"unused"})
 public class DFSClientPeer extends Peer implements DiscoveryListener {
 	List<PipeAdvertisement> rpcpipeadvs;
 	
@@ -287,7 +290,9 @@ public class DFSClientPeer extends Peer implements DiscoveryListener {
 		return false;
 	}
 	
-	public String getLocalDatanodePeerID() {		
+	public String getLocalDatanodePeerID() {
+		PeerID dnpid = null;
+		
 		File dnPeerDirectory = new File(p2pdir,"../cert");
 		
 		File[] CRTfile = dnPeerDirectory.listFiles(new CRTFilter());

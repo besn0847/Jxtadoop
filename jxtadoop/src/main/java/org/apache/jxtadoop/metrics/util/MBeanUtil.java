@@ -28,6 +28,8 @@ import javax.management.InstanceAlreadyExistsException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jxtadoop.hdfs.DFSClient;
+
 
 /**
  * This util class provides a method to register an MBean using
@@ -35,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
  *  for {link {@link #registerMBean(String, String, Object)}
  *
  */
+@SuppressWarnings({"unused"})
 public class MBeanUtil {
 	public static final Log LOG = LogFactory.getLog(MBeanUtil.class);
 	

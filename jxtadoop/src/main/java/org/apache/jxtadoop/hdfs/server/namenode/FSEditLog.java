@@ -55,7 +55,7 @@ import org.apache.jxtadoop.fs.permission.PermissionStatus;
  * FSEditLog maintains a log of the namespace modifications.
  * 
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation"})
 public class FSEditLog {
   private static final byte OP_INVALID = -1;
   private static final byte OP_ADD = 0;

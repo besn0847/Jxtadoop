@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * The file has not finished being written to enough datanodes yet.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class NotReplicatedYetException extends IOException {
   public NotReplicatedYetException(String msg) {
     super(msg);

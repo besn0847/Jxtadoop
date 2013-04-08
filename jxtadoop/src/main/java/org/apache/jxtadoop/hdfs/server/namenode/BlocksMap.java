@@ -26,6 +26,7 @@ import org.apache.jxtadoop.hdfs.protocol.Block;
  * block's metadata currently includes INode it belongs to and
  * the datanodes that store the block.
  */
+@SuppressWarnings({"unused"})
 public class BlocksMap {
         
   /**
@@ -249,11 +250,9 @@ public class BlocksMap {
 
     boolean listIsConsistent(DatanodeDescriptor dn) {
       // going forward
-      @SuppressWarnings("unused")
-	int count = 0;
+      int count = 0;
       BlockInfo next, nextPrev;
       BlockInfo cur = this;
-      
       while(cur != null) {
         next = cur.getNext(cur.findDatanode(dn));
         if(next != null) {

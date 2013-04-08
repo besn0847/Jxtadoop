@@ -21,9 +21,14 @@ import java.io.*;
 import java.net.*;
 import java.util.regex.Pattern;
 
+
+import org.apache.commons.logging.*;
+import org.apache.commons.logging.impl.*;
+
 /**
  * Change log level in runtime.
  */
+@SuppressWarnings({"unused"})
 public class LogLevel {
   public static final String USAGES = "\nUSAGES:\n"
     + "java " + LogLevel.class.getName()

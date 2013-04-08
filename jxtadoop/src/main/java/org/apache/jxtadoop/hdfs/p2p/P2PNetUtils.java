@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+import net.jxta.peer.PeerID;
+import net.jxta.socket.JxtaSocketAddress;
 /**
  * <b><font color="red">Class added to Hadoop to use Jxta pipes</font></b><br><br>
  * 
@@ -15,6 +17,7 @@ import java.net.SocketAddress;
  * @since November, 2011
  *
  */
+@SuppressWarnings({"unused"})
 public class P2PNetUtils extends org.apache.jxtadoop.net.NetUtils {	
 	public static void connect(Socket socket, SocketAddress endpoint, int timeout) throws IOException {
 		if (socket == null || endpoint == null || timeout < 0) {

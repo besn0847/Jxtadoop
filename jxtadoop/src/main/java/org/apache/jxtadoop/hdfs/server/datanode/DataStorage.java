@@ -35,6 +35,7 @@ import org.apache.jxtadoop.hdfs.protocol.Block;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.server.common.HdfsConstants.NodeType;
 import org.apache.jxtadoop.hdfs.server.common.HdfsConstants.StartupOption;
+import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
 import org.apache.jxtadoop.hdfs.server.common.InconsistentFSStateException;
 import org.apache.jxtadoop.hdfs.server.common.Storage;
 import org.apache.jxtadoop.hdfs.server.common.StorageInfo;
@@ -48,6 +49,7 @@ import org.apache.jxtadoop.io.IOUtils;
  * <p>
  * @see Storage
  */
+@SuppressWarnings({"unused"})
 public class DataStorage extends Storage {
   // Constants
   final static String BLOCK_SUBDIR_PREFIX = "subdir";

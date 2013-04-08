@@ -193,6 +193,7 @@ import org.apache.jxtadoop.util.PriorityQueue;
  * 
  * @see CompressionCodec
  */
+@SuppressWarnings({"deprecation","rawtypes"})
 public class SequenceFile {
   private static final Log LOG = LogFactory.getLog(SequenceFile.class);
 
@@ -270,7 +271,7 @@ public class SequenceFile {
    */
   public static Writer 
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass) 
+                 Class keyClass, Class valClass) 
     throws IOException {
     return createWriter(fs, conf, name, keyClass, valClass,
                         getCompressionType(conf));
@@ -289,7 +290,7 @@ public class SequenceFile {
    */
   public static Writer 
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass, CompressionType compressionType) 
+                 Class keyClass, Class valClass, CompressionType compressionType) 
     throws IOException {
     return createWriter(fs, conf, name, keyClass, valClass,
             fs.getConf().getInt("io.file.buffer.size", P2PConstants.IO_FILE_BUFFER_SIZE),
@@ -311,7 +312,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass, CompressionType compressionType,
+                 Class keyClass, Class valClass, CompressionType compressionType,
                  Progressable progress) throws IOException {
     return createWriter(fs, conf, name, keyClass, valClass,
             fs.getConf().getInt("io.file.buffer.size", P2PConstants.IO_FILE_BUFFER_SIZE),
@@ -333,7 +334,7 @@ public class SequenceFile {
    */
   public static Writer 
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass, 
+                 Class keyClass, Class valClass, 
                  CompressionType compressionType, CompressionCodec codec) 
     throws IOException {
     return createWriter(fs, conf, name, keyClass, valClass,
@@ -358,7 +359,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass, 
+                 Class keyClass, Class valClass, 
                  CompressionType compressionType, CompressionCodec codec,
                  Progressable progress, Metadata metadata) throws IOException {
     return createWriter(fs, conf, name, keyClass, valClass,
@@ -386,7 +387,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(FileSystem fs, Configuration conf, Path name,
-                 Class<Object> keyClass, Class<Object> valClass, int bufferSize,
+                 Class keyClass, Class valClass, int bufferSize,
                  short replication, long blockSize,
                  CompressionType compressionType, CompressionCodec codec,
                  Progressable progress, Metadata metadata) throws IOException {
@@ -431,7 +432,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(FileSystem fs, Configuration conf, Path name, 
-                 Class<Object> keyClass, Class<Object> valClass, 
+                 Class keyClass, Class valClass, 
                  CompressionType compressionType, CompressionCodec codec,
                  Progressable progress) throws IOException {
     Writer writer = createWriter(fs, conf, name, keyClass, valClass, 
@@ -452,7 +453,7 @@ public class SequenceFile {
    */
   private static Writer
     createWriter(Configuration conf, FSDataOutputStream out, 
-                 Class<Object> keyClass, Class<Object> valClass, boolean compress, boolean blockCompress,
+                 Class keyClass, Class valClass, boolean compress, boolean blockCompress,
                  CompressionCodec codec, Metadata metadata)
     throws IOException {
     if (codec != null && (codec instanceof GzipCodec) && 
@@ -492,7 +493,7 @@ public class SequenceFile {
    */
   private static Writer
   createWriter(FileSystem fs, Configuration conf, Path file, 
-               Class<Object> keyClass, Class<Object> valClass, 
+               Class keyClass, Class valClass, 
                boolean compress, boolean blockCompress,
                CompressionCodec codec, Progressable progress, Metadata metadata)
   throws IOException {
@@ -532,7 +533,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(Configuration conf, FSDataOutputStream out, 
-                 Class<Object> keyClass, Class<Object> valClass, CompressionType compressionType,
+                 Class keyClass, Class valClass, CompressionType compressionType,
                  CompressionCodec codec, Metadata metadata)
     throws IOException {
     if ((codec instanceof GzipCodec) && 
@@ -568,7 +569,7 @@ public class SequenceFile {
    */
   public static Writer
     createWriter(Configuration conf, FSDataOutputStream out, 
-                 Class<Object> keyClass, Class<Object> valClass, CompressionType compressionType,
+                 Class keyClass, Class valClass, CompressionType compressionType,
                  CompressionCodec codec)
     throws IOException {
     Writer writer = createWriter(conf, out, keyClass, valClass, compressionType,
@@ -792,8 +793,8 @@ public class SequenceFile {
     boolean ownOutputStream = true;
     DataOutputBuffer buffer = new DataOutputBuffer();
 
-    Class<Object> keyClass;
-    Class<Object> valClass;
+    Class keyClass;
+    Class valClass;
 
     private boolean compress;
     CompressionCodec codec = null;
@@ -802,11 +803,9 @@ public class SequenceFile {
     Metadata metadata = null;
     Compressor compressor = null;
     
-    protected Serializer<Object> keySerializer;
-    @SuppressWarnings("rawtypes")
-	protected Serializer uncompressedValSerializer;
-    @SuppressWarnings("rawtypes")
-	protected Serializer compressedValSerializer;
+    protected Serializer keySerializer;
+    protected Serializer uncompressedValSerializer;
+    protected Serializer compressedValSerializer;
     
     // Insert a globally unique 16-byte value every few entries, so that one
     // can seek into the middle of a file and then synchronize with record
@@ -829,16 +828,14 @@ public class SequenceFile {
     {}
     
     /** Create the named file. */
-    @SuppressWarnings("rawtypes")
-	public Writer(FileSystem fs, Configuration conf, Path name, 
+    public Writer(FileSystem fs, Configuration conf, Path name, 
                   Class keyClass, Class valClass)
       throws IOException {
       this(fs, conf, name, keyClass, valClass, null, new Metadata());
     }
     
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings("rawtypes")
-	public Writer(FileSystem fs, Configuration conf, Path name, 
+    public Writer(FileSystem fs, Configuration conf, Path name, 
                   Class keyClass, Class valClass,
                   Progressable progress, Metadata metadata)
       throws IOException {
@@ -849,8 +846,7 @@ public class SequenceFile {
     }
     
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings("rawtypes")
-	public Writer(FileSystem fs, Configuration conf, Path name,
+    public Writer(FileSystem fs, Configuration conf, Path name,
                   Class keyClass, Class valClass,
                   int bufferSize, short replication, long blockSize,
                   Progressable progress, Metadata metadata)
@@ -864,8 +860,7 @@ public class SequenceFile {
     }
 
     /** Write to an arbitrary stream using a specified buffer size. */
-    @SuppressWarnings("rawtypes")
-	private Writer(Configuration conf, FSDataOutputStream out, 
+    private Writer(Configuration conf, FSDataOutputStream out, 
                    Class keyClass, Class valClass, Metadata metadata)
       throws IOException {
       this.ownOutputStream = false;
@@ -908,7 +903,7 @@ public class SequenceFile {
     }
     
     /** Initialize. */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     void init(Path name, Configuration conf, FSDataOutputStream out,
               Class keyClass, Class valClass,
               boolean compress, CompressionCodec codec, Metadata metadata) 
@@ -937,10 +932,10 @@ public class SequenceFile {
     }
     
     /** Returns the class of keys in this file. */
-    public Class<Object> getKeyClass() { return keyClass; }
+    public Class getKeyClass() { return keyClass; }
 
     /** Returns the class of values in this file. */
-    public Class<Object> getValueClass() { return valClass; }
+    public Class getValueClass() { return valClass; }
 
     /** Returns the compression codec of data in this file. */
     public CompressionCodec getCompressionCodec() { return codec; }
@@ -1063,16 +1058,14 @@ public class SequenceFile {
   static class RecordCompressWriter extends Writer {
     
     /** Create the named file. */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
+    public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
                                 Class keyClass, Class valClass, CompressionCodec codec) 
       throws IOException {
       this(conf, fs.create(name), keyClass, valClass, codec, new Metadata());
     }
     
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
+    public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
                                 Class keyClass, Class valClass, CompressionCodec codec,
                                 Progressable progress, Metadata metadata)
       throws IOException {
@@ -1084,7 +1077,7 @@ public class SequenceFile {
 
     /** Create the named file with write-progress reporter. */
     public RecordCompressWriter(FileSystem fs, Configuration conf, Path name,
-                                Class<Object> keyClass, Class<Object> valClass,
+                                Class keyClass, Class valClass,
                                 int bufferSize, short replication, long blockSize,
                                 CompressionCodec codec,
                                 Progressable progress, Metadata metadata)
@@ -1099,8 +1092,7 @@ public class SequenceFile {
     }
 
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings("rawtypes")
-	public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
+    public RecordCompressWriter(FileSystem fs, Configuration conf, Path name, 
                                 Class keyClass, Class valClass, CompressionCodec codec,
                                 Progressable progress)
       throws IOException {
@@ -1109,7 +1101,7 @@ public class SequenceFile {
     
     /** Write to an arbitrary stream using a specified buffer size. */
     private RecordCompressWriter(Configuration conf, FSDataOutputStream out,
-                                 Class<Object> keyClass, Class<Object> valClass, CompressionCodec codec, Metadata metadata)
+                                 Class keyClass, Class valClass, CompressionCodec codec, Metadata metadata)
       throws IOException {
       this.ownOutputStream = false;
       super.init(null, conf, out, keyClass, valClass, true, codec, metadata);
@@ -1188,7 +1180,7 @@ public class SequenceFile {
     
     /** Create the named file. */
     public BlockCompressWriter(FileSystem fs, Configuration conf, Path name, 
-                               Class<?> keyClass, Class<?> valClass, CompressionCodec codec) 
+                               Class keyClass, Class valClass, CompressionCodec codec) 
       throws IOException {
       this(fs, conf, name, keyClass, valClass,
            fs.getConf().getInt("io.file.buffer.size", P2PConstants.IO_FILE_BUFFER_SIZE),
@@ -1198,7 +1190,7 @@ public class SequenceFile {
     
     /** Create the named file with write-progress reporter. */
     public BlockCompressWriter(FileSystem fs, Configuration conf, Path name, 
-                               Class<Object> keyClass, Class<Object> valClass, CompressionCodec codec,
+                               Class keyClass, Class valClass, CompressionCodec codec,
                                Progressable progress, Metadata metadata)
       throws IOException {
       this(fs, conf, name, keyClass, valClass,
@@ -1208,8 +1200,7 @@ public class SequenceFile {
     }
 
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings("rawtypes")
-	public BlockCompressWriter(FileSystem fs, Configuration conf, Path name,
+    public BlockCompressWriter(FileSystem fs, Configuration conf, Path name,
                                Class keyClass, Class valClass,
                                int bufferSize, short replication, long blockSize,
                                CompressionCodec codec,
@@ -1226,8 +1217,7 @@ public class SequenceFile {
     }
 
     /** Create the named file with write-progress reporter. */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	public BlockCompressWriter(FileSystem fs, Configuration conf, Path name, 
+    public BlockCompressWriter(FileSystem fs, Configuration conf, Path name, 
                                Class keyClass, Class valClass, CompressionCodec codec,
                                Progressable progress)
       throws IOException {
@@ -1236,7 +1226,7 @@ public class SequenceFile {
     
     /** Write to an arbitrary stream using a specified buffer size. */
     private BlockCompressWriter(Configuration conf, FSDataOutputStream out,
-                                Class<Object> keyClass, Class<Object> valClass, CompressionCodec codec, Metadata metadata)
+                                Class keyClass, Class valClass, CompressionCodec codec, Metadata metadata)
       throws IOException {
       this.ownOutputStream = false;
       super.init(null, conf, out, keyClass, valClass, true, codec, metadata);
@@ -1380,8 +1370,8 @@ public class SequenceFile {
 
     private String keyClassName;
     private String valClassName;
-    private Class<?> keyClass;
-    private Class<?> valClass;
+    private Class keyClass;
+    private Class valClass;
 
     private CompressionCodec codec = null;
     private Metadata metadata = null;
@@ -1424,9 +1414,7 @@ public class SequenceFile {
     private DataInputStream valIn = null;
     private Decompressor valDecompressor = null;
     
-    @SuppressWarnings("rawtypes")
-	private Deserializer keyDeserializer;
-    @SuppressWarnings("rawtypes")
+    private Deserializer keyDeserializer;
     private Deserializer valDeserializer;
 
     /** Open the named file. */
@@ -1435,8 +1423,7 @@ public class SequenceFile {
       this(fs, file, conf.getInt("io.file.buffer.size", P2PConstants.IO_FILE_BUFFER_SIZE), conf, false);
     }
 
-    @SuppressWarnings("deprecation")
-	private Reader(FileSystem fs, Path file, int bufferSize,
+    private Reader(FileSystem fs, Path file, int bufferSize,
                    Configuration conf, boolean tempReader) throws IOException {
       this(fs, file, bufferSize, 0, fs.getLength(file), conf, tempReader);
     }
@@ -1469,8 +1456,7 @@ public class SequenceFile {
      *                  <code>false</code> otherwise.
      * @throws IOException
      */
-    @SuppressWarnings("deprecation")
-	private void init(boolean tempReader) throws IOException {
+    private void init(boolean tempReader) throws IOException {
       byte[] versionBlock = new byte[VERSION.length];
       in.readFully(versionBlock);
 
@@ -1583,7 +1569,7 @@ public class SequenceFile {
       }
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     private Deserializer getDeserializer(SerializationFactory sf, Class c) {
       return sf.getDeserializer(c);
     }
@@ -2235,7 +2221,7 @@ public class SequenceFile {
    */
   public static class Sorter {
 
-    private RawComparator<?> comparator;
+    private RawComparator comparator;
 
     private MergeSort mergeSort; //the implementation of merge sort
     
@@ -2248,23 +2234,21 @@ public class SequenceFile {
 
     private FileSystem fs = null;
 
-    private Class<Object> keyClass;
-    private Class<Object> valClass;
+    private Class keyClass;
+    private Class valClass;
 
     private Configuration conf;
     
     private Progressable progressable = null;
 
     /** Sort and merge files containing the named classes. */
-    @SuppressWarnings("rawtypes")
-	public Sorter(FileSystem fs, Class<? extends WritableComparable> keyClass,
+    public Sorter(FileSystem fs, Class<? extends WritableComparable> keyClass,
                   Class valClass, Configuration conf)  {
       this(fs, WritableComparator.get(keyClass), keyClass, valClass, conf);
     }
 
     /** Sort and merge using an arbitrary {@link RawComparator}. */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	public Sorter(FileSystem fs, RawComparator comparator, Class keyClass, 
+    public Sorter(FileSystem fs, RawComparator comparator, Class keyClass, 
                   Class valClass, Configuration conf) {
       this.fs = fs;
       this.comparator = comparator;
@@ -2376,7 +2360,7 @@ public class SequenceFile {
       private int[] keyLengths = new int[keyOffsets.length];
       private ValueBytes[] rawValues = new ValueBytes[keyOffsets.length];
       
-      private ArrayList<?> segmentLengths = new ArrayList<Object>();
+      private ArrayList segmentLengths = new ArrayList();
       
       private Reader in = null;
       private FSDataOutputStream out = null;
@@ -2626,8 +2610,7 @@ public class SequenceFile {
      * @return RawKeyValueIteratorMergeQueue
      * @throws IOException
      */
-    @SuppressWarnings("deprecation")
-	public RawKeyValueIterator merge(Path [] inNames, boolean deleteInputs,
+    public RawKeyValueIterator merge(Path [] inNames, boolean deleteInputs,
                                      int factor, Path tmpDir) 
       throws IOException {
       //get the segments from inNames
@@ -2653,8 +2636,7 @@ public class SequenceFile {
      * @return RawKeyValueIteratorMergeQueue
      * @throws IOException
      */
-    @SuppressWarnings("deprecation")
-	public RawKeyValueIterator merge(Path [] inNames, Path tempDir, 
+    public RawKeyValueIterator merge(Path [] inNames, Path tempDir, 
                                      boolean deleteInputs) 
       throws IOException {
       //outFile will basically be used as prefix for temp files for the
@@ -2768,7 +2750,7 @@ public class SequenceFile {
     }
     
     /** This class implements the core of the merge logic */
-    private class MergeQueue extends PriorityQueue<Object> 
+    private class MergeQueue extends PriorityQueue 
       implements RawKeyValueIterator {
       private boolean compress;
       private boolean blockCompress;
@@ -2786,6 +2768,7 @@ public class SequenceFile {
       private Map<SegmentDescriptor, Void> sortedSegmentSizes =
         new TreeMap<SegmentDescriptor, Void>();
             
+      @SuppressWarnings("unchecked")
       public void put(SegmentDescriptor stream) throws IOException {
         if (size() == 0) {
           compress = stream.in.isCompressed();
@@ -2892,8 +2875,7 @@ public class SequenceFile {
        * @return RawKeyValueIterator
        * @throws IOException
        */
-      @SuppressWarnings("deprecation")
-	public RawKeyValueIterator merge() throws IOException {
+      public RawKeyValueIterator merge() throws IOException {
         //create the MergeStreams from the sorted map created in the constructor
         //and dump the final output to a file
         int numSegments = sortedSegmentSizes.size();
@@ -3010,7 +2992,7 @@ public class SequenceFile {
           numDescriptors = sortedSegmentSizes.size();
         SegmentDescriptor[] SegmentDescriptors = 
           new SegmentDescriptor[numDescriptors];
-        Iterator<SegmentDescriptor> iter = sortedSegmentSizes.keySet().iterator();
+        Iterator iter = sortedSegmentSizes.keySet().iterator();
         int i = 0;
         while (i < numDescriptors) {
           SegmentDescriptors[i++] = (SegmentDescriptor)iter.next();
@@ -3024,7 +3006,7 @@ public class SequenceFile {
      * provide a customized cleanup method implementation. In this 
      * implementation, cleanup closes the file handle and deletes the file 
      */
-    public class SegmentDescriptor implements Comparable<Object> {
+    public class SegmentDescriptor implements Comparable {
       
       long segmentOffset; //the start of the segment in the file
       long segmentLength; //the length of the segment
@@ -3194,8 +3176,7 @@ public class SequenceFile {
         new ArrayList <SegmentDescriptor>();
       /** This constructor is there primarily to serve the sort routine that 
        * generates a single output file with an associated index file */
-      @SuppressWarnings("deprecation")
-	public SegmentContainer(Path inName, Path indexIn) throws IOException {
+      public SegmentContainer(Path inName, Path indexIn) throws IOException {
         //get the segments from indexIn
         FSDataInputStream fsIndexIn = fs.open(indexIn);
         long end = fs.getLength(indexIn);

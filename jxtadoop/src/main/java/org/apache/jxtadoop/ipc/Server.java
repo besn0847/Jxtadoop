@@ -60,6 +60,7 @@ import org.apache.jxtadoop.security.authorize.AuthorizationException;
  * 
  * @see Client
  */
+@SuppressWarnings({"unused"})
 public abstract class Server {
   
   /**
@@ -131,7 +132,9 @@ public abstract class Server {
     return (addr == null) ? null : addr.getHostAddress();
   }
 
+  private String bindAddress; 
   private PeerGroup rpcpg;
+  private SocketAddress p2pServerSockAddr;
   private JxtaSocketAddress jxtaServerSockAddr;
   
   private int port;                               // port we listen on
@@ -630,6 +633,10 @@ public abstract class Server {
       this.lastContact = lastContact;
     }
 
+    public long getLastContact() {
+      return lastContact;
+    }
+
     public Socket getSocket() {
     	return socket;
     }
@@ -965,6 +972,7 @@ public abstract class Server {
           Class<? extends Writable> paramClass, int handlerCount, 
           Configuration conf, String serverName) 
   			throws IOException {
+		this.p2pServerSockAddr = (SocketAddress)jssa;
 		this.jxtaServerSockAddr = jssa;
 		this.rpcpg = pg;
 		this.conf = conf;

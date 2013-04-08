@@ -69,6 +69,7 @@ import org.apache.jxtadoop.hdfs.server.common.IncorrectVersionException;
 import org.apache.jxtadoop.hdfs.server.common.Storage;
 import org.apache.jxtadoop.hdfs.server.datanode.metrics.DataNodeMetrics;
 import org.apache.jxtadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.jxtadoop.hdfs.server.namenode.NameNode;
 import org.apache.jxtadoop.hdfs.server.protocol.BlockCommand;
 import org.apache.jxtadoop.hdfs.server.protocol.BlockMetaDataInfo;
 import org.apache.jxtadoop.hdfs.server.protocol.DatanodeCommand;
@@ -127,6 +128,7 @@ import org.apache.jxtadoop.util.DiskChecker.DiskOutOfSpaceException;
  * information to clients or other DataNodes that might be interested.
  *
  **********************************************************/
+@SuppressWarnings({"unused"})
 public class DataNode extends Configured 
     implements InterDatanodeProtocol, ClientDatanodeProtocol, FSConstants, Runnable {
   public static final Log LOG = LogFactory.getLog(DataNode.class);

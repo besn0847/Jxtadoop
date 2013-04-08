@@ -38,6 +38,7 @@ import org.apache.jxtadoop.security.UserGroupInformation;
  * @since November, 2011
  *
  */
+@SuppressWarnings({"rawtypes","unchecked"})
 public class NamenodePeer extends Peer implements RendezvousListener {
 	public static final Log LOG = LogFactory.getLog(NamenodePeer.class);
 	/**
@@ -48,7 +49,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	/**
 	 * The listener array
 	 */
-	private List<P2PListener> _dnlisteners = new ArrayList<P2PListener>();
+	private List _dnlisteners = new ArrayList();
 	
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
@@ -196,7 +197,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	 */
 	@Override
 	public synchronized void fireEvent(DatanodeEvent event)	{
-		Iterator<P2PListener> i = _dnlisteners.iterator();
+		Iterator i = _dnlisteners.iterator();
 
 		while(i.hasNext())	{
 			((P2PListener) i.next()).handleDisconnectEvent(event);

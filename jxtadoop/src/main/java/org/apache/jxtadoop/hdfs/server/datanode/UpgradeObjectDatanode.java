@@ -20,6 +20,7 @@ package org.apache.jxtadoop.hdfs.server.datanode;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.server.common.HdfsConstants;
 import org.apache.jxtadoop.hdfs.server.common.UpgradeObject;
+import org.apache.jxtadoop.hdfs.server.common.HdfsConstants.NodeType;
 import org.apache.jxtadoop.hdfs.server.protocol.DatanodeProtocol;
 import org.apache.jxtadoop.hdfs.server.protocol.NamespaceInfo;
 import org.apache.jxtadoop.hdfs.server.protocol.UpgradeCommand;
@@ -31,6 +32,7 @@ import java.net.SocketTimeoutException;
  * Base class for data-node upgrade objects.
  * Data-node upgrades are run in separate threads.
  */
+@SuppressWarnings({"unused"})
 public abstract class UpgradeObjectDatanode extends UpgradeObject implements Runnable {
   private DataNode dataNode = null;
 
