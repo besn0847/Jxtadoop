@@ -16,6 +16,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import javax.security.auth.login.LoginException;
 
@@ -288,7 +289,8 @@ public abstract class Peer implements P2PConstants {
 		File[] CRTfile = CertificateDirectory.listFiles(new CRTFilter());
 		
 		 if (CRTfile.length == 0 ) {
-			 pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+this.peerseed).getBytes());
+			 Random randomGenerator = new Random();
+			 pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());
 			 
 		 } else if (CRTfile.length == 1) {
 			pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
