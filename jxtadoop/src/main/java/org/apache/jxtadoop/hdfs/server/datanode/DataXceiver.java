@@ -181,6 +181,8 @@ class DataXceiver implements Runnable, FSConstants {
       IOUtils.closeStream(in);
       IOUtils.closeSocket(s);
       dataXceiverServer.childSockets.remove(s);
+      
+      s = null;
     }
   }
 

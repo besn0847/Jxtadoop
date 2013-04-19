@@ -159,6 +159,8 @@ class DataXceiverServer implements Runnable, FSConstants {
       LOG.warn(datanode.dnRegistration + ":DataXceiveServer: " 
                               + StringUtils.stringifyException(ie));
     }
+    
+    ss = null;
   }
   
   void kill() {

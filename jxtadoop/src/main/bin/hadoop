@@ -253,6 +253,7 @@ HADOOP_OPTS="$HADOOP_OPTS -Dhadoop.root.logger=${HADOOP_ROOT_LOGGER:-INFO,consol
 HADOOP_OPTS="$HADOOP_OPTS -Dhadoop.id.str=eclipse"
 HADOOP_OPTS="$HADOOP_OPTS -Djava.util.logging.config.file=$HADOOP_HOME/etc/logging.properties"
 HADOOP_OPTS="$HADOOP_OPTS -Djxtadoop.datanode.id=0"
+#HADOOP_OPTS="$HADOOP_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 #HADOOP_OPTS="$HADOOP_OPTS -Djxtadoop.local.datanode=no_local_datanode"
 
 if [ "x$JAVA_LIBRARY_PATH" != "x" ]; then

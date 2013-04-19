@@ -318,13 +318,13 @@ public abstract class Server {
 
     @Override
     public void run() {
+      JxtaSocket s = null;
+    	
       LOG.debug("Methode : Listener run()");
       LOG.info(getName() + ": starting");
       SERVER.set(Server.this);
       
-      while (running) {	        
-    	 JxtaSocket s = null;
-    	  
+      while (running) {	          
     	 try {
 			s = (JxtaSocket) acceptServer.accept();
 				
@@ -398,6 +398,8 @@ public abstract class Server {
 		        }
     		}
 	      }
+    	
+    	s = null;
 	    }
    
     JxtaSocketAddress getAddress() {
@@ -411,13 +413,15 @@ public abstract class Server {
 	    	  } catch (IOException e) {
 	    		  LOG.info(getName() + ":Exception in closing listener socket. " + e);
 	    	  }
+	    	  acceptServer = null;
 	      }
+	      
     }
   }
 
   // Sends responses of RPC back to clients.
   private class Responder extends Thread {
-			final static int PURGE_INTERVAL = 900000;
+			final static int PURGE_INTERVAL = 60000;
 			
 		    Responder() throws IOException {
 		      this.setName("IPC Server Responder");
@@ -842,10 +846,12 @@ public abstract class Server {
 	       
 	      try {
 	    	  socket.shutdownOutput();
-	    	  // socket.close();
+	    	  socket.close();
 	      } catch(Exception e) {
 	    	  // e.printStackTrace();
 	      }
+	      
+	      socket = null;
 	    }
   }
 
@@ -1002,6 +1008,7 @@ public abstract class Server {
       connection.close();
     } catch (IOException e) {
     }
+    connection = null;
   }
   
   /**

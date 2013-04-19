@@ -368,6 +368,7 @@ public abstract class Peer implements P2PConstants {
 	 */
 	protected void publishPeerAdvertisement () throws IOException {		
 		ds.publish(npg.getPeerAdvertisement());
+		//ds.publish(npg.getPeerAdvertisement(),30000,30000);
 		ds.remotePublish(npg.getPeerAdvertisement(),P2PConstants.PEERDELETIONRETRIES*P2PConstants.PEERDELETIONTIMEOUT);
 	}
 	/**
@@ -551,6 +552,8 @@ public abstract class Peer implements P2PConstants {
 			Object[] pidkeys;
 			int pidkeyscount, increment;
 			PeerID lpid;
+			@SuppressWarnings("unused")
+			int queryID;
 			
 			while(running) {		
 				try {
@@ -569,17 +572,22 @@ public abstract class Peer implements P2PConstants {
 					 * 		2. If the max retry count has been reached, then just increase the retry count
 					 * 		2. Else remove the peer from the not responded and datanodes in the cloud list
 					*/
+					//if(increment == pidkeyscount) LOG.debug("No datanode in the not responded list");
+					//else LOG.debug(pidkeyscount+" datanode(s) in the not responded list");
+					
 					while (increment < pidkeyscount ) {
 						lpid = (PeerID) pidkeys[increment];
 						increment++;
 						int attempt = notrespondedpeers.get(lpid);
+						//LOG.debug("Getting notresponding count : "+attempt);
 												
 						if(attempt < P2PConstants.PEERDELETIONRETRIES) {
 							attempt++;
+							//LOG.debug("Reetting notresponding count : "+attempt);
 							notrespondedpeers.remove(lpid);
 							notrespondedpeers.put(lpid, new Integer(attempt));
 						} else {
-							LOG.info("Peer not responding for "+P2PConstants.PEERDELETIONRETRIES+" retries; Assuming dead : "+lpid);
+							//LOG.info("Peer not responding for "+P2PConstants.PEERDELETIONRETRIES+" retries; Assuming dead : "+lpid);
 							fireEvent(new DatanodeEvent(new Object(),lpid));
 							notrespondedpeers.remove(lpid);
 							try {
@@ -594,7 +602,7 @@ public abstract class Peer implements P2PConstants {
 							LOG.info("Number of datanodes in the cloud : "+datanodepeers.size());
 						}
 					}
-						
+
 					pidkeys = datanodepeers.keySet().toArray();
 					pidkeyscount = datanodepeers.size();
 					increment = 0;
@@ -605,29 +613,35 @@ public abstract class Peer implements P2PConstants {
 					 * 
 					 * Note : The DFSClients and DFSAdmin will automatically get removed.
 					 */
+					//if(increment == pidkeyscount) LOG.debug("No datanode in the cloud");
+					//else LOG.debug(pidkeyscount+" datanode(s) in the cloud");
+					
 					while (increment < pidkeyscount ) {
 						lpid = (PeerID) pidkeys[increment];
-						ds.getRemoteAdvertisements(lpid.toString(), DiscoveryService.PEER, "Name", "*Datanode Peer*",P2PConstants.MAXCLOUDPEERCOUNT,this);
-						increment++;
-							
+						queryID = ds.getRemoteAdvertisements(lpid.toString(), DiscoveryService.PEER, "Name", "*Datanode Peer*",0,this);
 						if(!notrespondedpeers.containsKey(lpid)) {
-							LOG.debug("Adding peer to not responded list");
-							notrespondedpeers.put(lpid, new Integer(1));
+							//LOG.debug("Setting notresponding count to 0");
+							notrespondedpeers.put(lpid, 0);
 						}
+						increment++;
 					}	
-				}
 				
-				/*
-				 * If the peer discovery listener is not null, then this is a datanode is not null
-				 * Then trigger a datanode peer discovery in the cloud.
-				 * The threshold is set to a high value (here 10,000) since for a non-multicast situation,
-				 * the rendez-vous will return hundreds of advertisement.				
-				 */
-				if(ds!=null) {
-					ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*",P2PConstants.MAXCLOUDPEERCOUNT,dnlist);
-					try {
-						publishPeerAdvertisement();
-					} catch (Exception e) {}
+					/*
+					 * If the peer discovery listener is not null, then this is a datanode
+					 * Then trigger a datanode peer discovery in the cloud.
+					 * The threshold is set to a high value (here 10,000) since for a non-multicast situation,
+					 * the rendez-vous will return hundreds of advertisement.				
+					 */
+					if(ds!=null) {
+						ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*",P2PConstants.MAXCLOUDPEERCOUNT,dnlist);
+						try {
+							publishPeerAdvertisement();
+						} catch (Exception e) {
+							LOG.error(e.getMessage());
+						}
+					} else {
+						ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*",P2PConstants.MAXCLOUDPEERCOUNT,this);
+					}
 				}
 			}
 		}
@@ -637,11 +651,11 @@ public abstract class Peer implements P2PConstants {
 		@Override
 		public void discoveryEvent(DiscoveryEvent event) {
 			DiscoveryResponseMsg response = event.getResponse();
-						
+			
 			if (response.getDiscoveryType() == DiscoveryService.PEER) {
 				Enumeration<Advertisement> en = response.getAdvertisements();
 				PeerAdv adv;
-				 
+				
 				/*
 				 * If this is a datanode peer, then remove the associated entry from the not-responded list
 				 * as the datanode replied to the remote discovery
@@ -650,15 +664,22 @@ public abstract class Peer implements P2PConstants {
 					adv = (PeerAdv) en.nextElement();
 					if (adv instanceof PeerAdv) {
 						if ((adv.getName()).contains("Datanode Peer")) {
-							// LOG.info("Datanode peer discovered : "+adv.getPeerID());
+							//LOG.debug("Found a datanode peer");
 							if(notrespondedpeers.containsKey(adv.getPeerID())) {
+								//LOG.debug("Resetting notresponding count to 0");
 								notrespondedpeers.remove(adv.getPeerID());
+							}
+							notrespondedpeers.put(adv.getPeerID(),0);
+							
+							synchronized(datanodepeers) {
+								if(!datanodepeers.containsKey(adv.getPeerID())) {
+									datanodepeers.put(adv.getPeerID(), adv);
+								}
 							}
 						}				
 					}
 				}
 			}
 		}
-		
 	}
 }

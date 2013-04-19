@@ -84,7 +84,7 @@ fi
 
 # some variables
 export HADOOP_LOGFILE=hadoop-$HADOOP_IDENT_STRING-$command-$HOSTNAME.log
-export HADOOP_ROOT_LOGGER="DEBUG,DRFA"
+export HADOOP_ROOT_LOGGER="INFO,DRFA"
 log=$HADOOP_LOG_DIR/hadoop-$HADOOP_IDENT_STRING-$command-$HOSTNAME.out
 pid=$HADOOP_PID_DIR/hadoop-$HADOOP_IDENT_STRING-$command.pid
 

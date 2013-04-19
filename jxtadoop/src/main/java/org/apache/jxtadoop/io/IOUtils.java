@@ -63,6 +63,8 @@ public class IOUtils {
       if(close) {
         out.close();
         in.close();
+        out = null;
+        in = null;
       }
     }
   }
@@ -147,6 +149,7 @@ public class IOUtils {
           }
         }
       }
+      c = null;
     }
   }
 
@@ -181,6 +184,7 @@ public class IOUtils {
     	  LOG.debug("Error while closing socket : "+ignored.getMessage());
       }
     }
+    jsock = null;
   }
   
   public static void closeSocket( Socket sock ) {
@@ -193,6 +197,7 @@ public class IOUtils {
     	  LOG.debug("Error while closing socket : "+ignored.getMessage());
       }
     }
+    sock = null;
   }
   
   /** /dev/null of OutputStreams.

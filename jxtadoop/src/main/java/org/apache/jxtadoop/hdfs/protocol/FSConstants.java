@@ -37,7 +37,7 @@ public interface FSConstants {
   //
   // Timeouts, constants
   //
-  public static long HEARTBEAT_INTERVAL = 3;
+  public static long HEARTBEAT_INTERVAL = 60000;
   public static long BLOCKREPORT_INTERVAL = 60 * 60 * 1000;
   public static long BLOCKREPORT_INITIAL_DELAY = 0;
   public static final long LEASE_SOFTLIMIT_PERIOD = 60 * 1000;

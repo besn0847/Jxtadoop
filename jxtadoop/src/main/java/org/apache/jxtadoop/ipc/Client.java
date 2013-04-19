@@ -282,6 +282,7 @@ public class Client {
       
       short ioFailures = 0;
       short timeoutFailures = 0;
+      
       try {
         /*while (true) {
           try {
@@ -298,8 +299,8 @@ public class Client {
         }*/
                
       	int soTimeout = Integer.parseInt(conf.get("hadoop.p2p.rpc.timeout"));
-        this.socket = (Socket) new JxtaSocket(rpcpg, jsockserveraddr.getPeerId(), jsockserveraddr.getPipeAdv(), soTimeout, true);
-        this.socket.setTcpNoDelay(true);
+      	this.socket = (Socket) new JxtaSocket(rpcpg, jsockserveraddr.getPeerId(), jsockserveraddr.getPipeAdv(), soTimeout, true);
+        socket.setTcpNoDelay(true);
     	  
         this.in = new DataInputStream(new BufferedInputStream(
         		new PingInputStream(P2PNetUtils.getInputStream(socket))));
@@ -314,9 +315,14 @@ public class Client {
 
         // start the receiver thread after the socket connection has been set up
         start();
+      } catch (SocketTimeoutException ste) {
+    	  LOG.error("Timeout occurred when connecting Jxta socket : "+ste.getMessage());
+    	  markClosed(ste);
+          close();
       } catch (IOException e) {
-        markClosed(e);
-        close();
+    	  LOG.error("Error occurred when connecting Jxta socket : "+e.getMessage());
+    	  markClosed(e);
+         close();
       }
     }
 
@@ -902,9 +908,6 @@ public class Client {
     
     @Override
     public int hashCode() {
-    	// LOG.debug("jsocka :"+jsocka);
-    	// LOG.debug("protocol :"+protocol);
-    	// LOG.debug("ticket :"+ticket);
       return (jsocka.hashCode() + PRIME * System.identityHashCode(protocol)) ^ 
              System.identityHashCode(ticket);
     }

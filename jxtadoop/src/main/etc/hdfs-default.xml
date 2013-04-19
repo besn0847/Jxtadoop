@@ -151,7 +151,7 @@
 
 <property>
   <name>dfs.heartbeat.interval</name>
-  <value>10</value>
+  <value>60</value>
   <description>Determines datanode heartbeat interval in seconds.</description>
 </property>
 

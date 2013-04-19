@@ -144,17 +144,19 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	 */
 	@Override
 	public void rendezvousEvent(RendezvousEvent event) {			
-		if ( event.getType() == RendezvousEvent.CLIENTCONNECT || event.getType() == RendezvousEvent.CLIENTRECONNECT) {
-			LOG.info("\tClient connected - PeerID : "+event.getPeerID());
-			datanodepeers.put((PeerID)event.getPeerID(),(PeerAdvertisement)null);
-			LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());
-		} else if (event.getType() == RendezvousEvent.CLIENTDISCONNECT || event.getType() == RendezvousEvent.CLIENTFAILED) {
-			LOG.info("\tClient disconnected - PeerID : "+event.getPeerID());
-			if(datanodepeers.containsKey((PeerID)event.getPeerID()))
-				datanodepeers.remove((PeerID)event.getPeerID());
-			LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());
-		} else {
-			LOG.warn("Something weird happenned : "+event.getType() );
+		synchronized(datanodepeers) {
+			if ( event.getType() == RendezvousEvent.CLIENTCONNECT || event.getType() == RendezvousEvent.CLIENTRECONNECT) {
+				LOG.info("\tClient connected - PeerID : "+event.getPeerID());
+				datanodepeers.put((PeerID)event.getPeerID(),(PeerAdvertisement)null);
+				LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());
+			} else if (event.getType() == RendezvousEvent.CLIENTDISCONNECT || event.getType() == RendezvousEvent.CLIENTFAILED) {
+				LOG.info("\tClient disconnected - PeerID : "+event.getPeerID());
+				if(datanodepeers.containsKey((PeerID)event.getPeerID()))
+					datanodepeers.remove((PeerID)event.getPeerID());
+				LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());
+			} else {
+				LOG.warn("Something weird happenned : "+event.getType() );
+			}
 		}
 	}
 	/**
@@ -164,7 +166,8 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	protected void publishPipeAdvertisement () throws IOException {
 		ds.publish(rpcPipeAdv);
 		ds.remotePublish(rpcPipeAdv,DiscoveryService.NO_EXPIRATION);
-		
+		//ds.publish(rpcPipeAdv,30000,30000);
+		//ds.remotePublish(rpcPipeAdv,30000);
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());
 	}
 	/**
