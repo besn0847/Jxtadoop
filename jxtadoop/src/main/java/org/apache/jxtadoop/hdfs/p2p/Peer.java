@@ -368,7 +368,6 @@ public abstract class Peer implements P2PConstants {
 	 */
 	protected void publishPeerAdvertisement () throws IOException {		
 		ds.publish(npg.getPeerAdvertisement());
-		//ds.publish(npg.getPeerAdvertisement(),30000,30000);
 		ds.remotePublish(npg.getPeerAdvertisement(),P2PConstants.PEERDELETIONRETRIES*P2PConstants.PEERDELETIONTIMEOUT);
 	}
 	/**

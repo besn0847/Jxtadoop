@@ -845,6 +845,7 @@ public abstract class Server {
 	    connectionrunning = false;
 	       
 	      try {
+	    	  socket.shutdownInput();
 	    	  socket.shutdownOutput();
 	    	  socket.close();
 	      } catch(Exception e) {

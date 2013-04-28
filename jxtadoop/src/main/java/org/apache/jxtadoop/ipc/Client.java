@@ -344,7 +344,9 @@ public class Client {
         int curRetries, int maxRetries, IOException ioe) throws IOException {
       // close the current connection
       try {
-        socket.close();
+          socket.shutdownInput();
+    	  socket.shutdownOutput();
+    	  socket.close();
       } catch (IOException e) {
         LOG.warn("Not able to close a socket", e);
       }
@@ -547,7 +549,15 @@ public class Client {
       // close the streams and therefore the socket
       IOUtils.closeStream(out);
       IOUtils.closeStream(in);
-
+      
+      try {
+    	  socket.shutdownInput();
+    	  socket.shutdownOutput();
+    	  socket.close();
+      } catch (IOException ioe) {
+    	  LOG.warn("Not able to close a socket", ioe);
+      }
+      
       // clean up all calls
       if (closeException == null) {
         if (!calls.isEmpty()) {
@@ -570,6 +580,8 @@ public class Client {
       }
       if (LOG.isDebugEnabled())
         LOG.debug(getName() + ": closed");
+      
+      socket = null;
     }
     
     /* Cleanup all calls and mark them as done */
@@ -581,6 +593,7 @@ public class Client {
         itor.remove();         
       }
     }
+    
   }
 
   /** Call implementation used for parallel calls. */

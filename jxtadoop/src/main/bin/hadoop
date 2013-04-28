@@ -255,6 +255,7 @@ HADOOP_OPTS="$HADOOP_OPTS -Djava.util.logging.config.file=$HADOOP_HOME/etc/loggi
 HADOOP_OPTS="$HADOOP_OPTS -Djxtadoop.datanode.id=0"
 #HADOOP_OPTS="$HADOOP_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 #HADOOP_OPTS="$HADOOP_OPTS -Djxtadoop.local.datanode=no_local_datanode"
+P2P_OPTS="-Dnet.jxta.impl.cm.Srdi.backend.impl=net.jxta.impl.cm.XIndiceSrdi"
 
 if [ "x$JAVA_LIBRARY_PATH" != "x" ]; then
   HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$JAVA_LIBRARY_PATH"
@@ -262,4 +263,4 @@ fi
 HADOOP_OPTS="$HADOOP_OPTS -Dhadoop.policy.file=$HADOOP_POLICYFILE"
 
 # run it
-exec "$JAVA" $JAVA_HEAP_MAX $HADOOP_OPTS -classpath "$CLASSPATH" $CLASS "$@"
+exec "$JAVA" $JAVA_HEAP_MAX $P2P_OPTS $HADOOP_OPTS -classpath "$CLASSPATH" $CLASS "$@"

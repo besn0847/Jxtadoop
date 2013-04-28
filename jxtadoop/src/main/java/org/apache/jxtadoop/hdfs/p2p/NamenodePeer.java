@@ -166,8 +166,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	protected void publishPipeAdvertisement () throws IOException {
 		ds.publish(rpcPipeAdv);
 		ds.remotePublish(rpcPipeAdv,DiscoveryService.NO_EXPIRATION);
-		//ds.publish(rpcPipeAdv,30000,30000);
-		//ds.remotePublish(rpcPipeAdv,30000);
+		
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());
 	}
 	/**
