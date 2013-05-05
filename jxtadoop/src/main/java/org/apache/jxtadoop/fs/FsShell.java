@@ -93,15 +93,18 @@ public class FsShell extends Configured implements Tool {
 		dfs = new DFSClient(conf,"FsShell");
 	} catch (IOException e) {
 		LOG.fatal("Failed to initialize DFS client; Aborting");
-		e.printStackTrace();
+		// e.printStackTrace();
+		LOG.debug(e.getMessage());
 	}
   }
   
   protected void init() throws IOException {
-	dfs.init();
+	if (dfs==null) 
+		return;
 	
+	dfs.init();
 	getConf().set("fs.default.name", dfs.getDfsClientPeer().getNameNodePeerId().toString().replaceAll("urn:jxta:cbid-", ""));
-	  
+	
     getConf().setQuietMode(true);
     if (this.fs == null) {
      this.fs = FileSystem.get(getConf());
@@ -1894,6 +1897,11 @@ public class FsShell extends Configured implements Tool {
       fs.close();
       fs = null;
     }
+    
+    if(dfs!=null) {
+    	dfs.close();
+    	dfs=null;
+    }
   }
 
   /**
@@ -1903,10 +1911,13 @@ public class FsShell extends Configured implements Tool {
     FsShell shell = new FsShell();
     int res;
     try {
-      res = ToolRunner.run(shell, argv);
+    	LOG.debug("Starting shell with cmd : "+argv);
+        res = ToolRunner.run(shell, argv);
     } finally {
-      shell.close();
+    	LOG.debug("Closing shell");
+    	shell.close();
     }
+    
     System.exit(res);
   }
 

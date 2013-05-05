@@ -343,17 +343,19 @@ public class Client {
     private void handleConnectionFailure(
         int curRetries, int maxRetries, IOException ioe) throws IOException {
       // close the current connection
-      try {
-          socket.shutdownInput();
-    	  socket.shutdownOutput();
-    	  socket.close();
-      } catch (IOException e) {
-        LOG.warn("Not able to close a socket", e);
+      if (socket != null) {
+		try {
+	          socket.shutdownInput();
+	    	  socket.shutdownOutput();
+	    	  socket.close();
+	      } catch (IOException e) {
+	        LOG.warn("Not able to close a socket", e);
+	      }
+	      // set socket to null so that the next call to setupIOstreams
+	      // can start the process of connect all over again.
+	      socket = null;
       }
-      // set socket to null so that the next call to setupIOstreams
-      // can start the process of connect all over again.
-      socket = null;
-
+      
       // throw the exception if the maximum number of retries is reached
       if (curRetries >= maxRetries) {
         throw ioe;
@@ -520,6 +522,7 @@ public class Client {
                                          WritableUtils.readString(in)));
         }
       } catch (IOException e) {
+    	  LOG.debug("Error while reading response : "+e.getMessage());
         markClosed(e);
       }
     }
@@ -547,15 +550,17 @@ public class Client {
       }
 
       // close the streams and therefore the socket
-      IOUtils.closeStream(out);
-      IOUtils.closeStream(in);
+      //if (out!=null) IOUtils.closeStream(out);
+      //if (in != null) IOUtils.closeStream(in);
       
-      try {
-    	  socket.shutdownInput();
-    	  socket.shutdownOutput();
-    	  socket.close();
-      } catch (IOException ioe) {
-    	  LOG.warn("Not able to close a socket", ioe);
+      if(socket != null) {
+    	  try {
+	    	  socket.shutdownInput();
+	    	  socket.shutdownOutput();
+	    	  socket.close();
+	      } catch (IOException ioe) {
+	    	  LOG.warn("Not able to close a socket", ioe);
+	      }
       }
       
       // clean up all calls
@@ -581,6 +586,8 @@ public class Client {
       if (LOG.isDebugEnabled())
         LOG.debug(getName() + ": closed");
       
+      out = null;
+      in =null;
       socket = null;
     }
     

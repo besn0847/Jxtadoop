@@ -132,7 +132,8 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 			publishPipeAdvertisement();
 		} catch (IOException e) {
 			LOG.fatal("Cannot start the Namenode peer; Aborting");
-			e.printStackTrace();
+			LOG.error(e.getMessage());
+			//e.printStackTrace();
 			throw new RuntimeException();
 		}
 		

@@ -280,17 +280,19 @@ public class DFSClient implements FSConstants, java.io.Closeable {
     JxtaSocketAddress nameNodeAddr = null;
     int retry = 3;
     while (retry > 0) {
+    	try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+			//e.printStackTrace();
+		}
+    	
     	nameNodeAddr = DFSClient.getDfsClient().getDfsClientPeer().getRpcSocketAddress();	
     	
     	if(nameNodeAddr != null) break;
     	
     	LOG.debug("nameNodeAddr is null");
-    	try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
+    	
 		retry --;
     }
     
@@ -1715,10 +1717,9 @@ public class DFSClient implements FSConstants, java.io.Closeable {
       }
       
       if (s != null) {
-    	// s.close();
     	s.shutdownInput();
     	s.shutdownOutput();
-    	s.close();
+    	//s.close();
         s = null;
       }
 
@@ -1786,11 +1787,9 @@ public class DFSClient implements FSConstants, java.io.Closeable {
       }
       
       if (s != null) {
-        //s.close();
-    	  try {
-          	//s.close();
-          	s.shutdownInput();
-          	s.shutdownOutput();
+         try {
+          	//s.shutdownInput();
+          	//s.shutdownOutput();
           	s.close();
         } catch (SocketTimeoutException ste) {
         	//throw new IOException("Timeout while shutting down socket");
@@ -3441,10 +3440,9 @@ public class DFSClient implements FSConstants, java.io.Closeable {
       
       if (s != null) {
         try {
-        	//s.close();
         	s.shutdownInput();
         	s.shutdownOutput();
-        	s.close();
+        	//s.close();
         } catch (SocketTimeoutException ste) {}
         s = null;
       }
@@ -3509,12 +3507,10 @@ public class DFSClient implements FSConstants, java.io.Closeable {
             blockReplyStream.close();
           }
           if (s != null) {
-            //s.close();
               try {
-              	//s.close();
               	s.shutdownInput();
               	s.shutdownOutput();
-              	s.close();
+              	//s.close();
               } catch (SocketTimeoutException ste) {
             	  //throw new IOException("Timeout while shutting down socket");
               }

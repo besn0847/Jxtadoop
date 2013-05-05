@@ -135,7 +135,8 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Namenode Peer*", 1,this);
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*", 1,this);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage());
+			//e.printStackTrace();
 		}		
 		
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());
@@ -268,7 +269,6 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 		int soTimeout = Integer.parseInt(pc.get("hadoop.p2p.rpc.timeout"));
 		
 		try {
-			// js = new JxtaSocket(this.getInfoSocketAddress(pid),soTimeout,true);
 			js = new JxtaSocket(npg,pid,this.getInfoSocketAddress(pid).getPipeAdv(),soTimeout,true);
 			js.setNetPeerGroup(npg);
 			js.setTcpNoDelay(true);

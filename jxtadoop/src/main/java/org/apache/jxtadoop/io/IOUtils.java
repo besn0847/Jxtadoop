@@ -149,7 +149,6 @@ public class IOUtils {
           }
         }
       }
-      c = null;
     }
   }
 
@@ -179,7 +178,7 @@ public class IOUtils {
     	  LOG.debug("jsock closed : "+jsock.isClosed());
     	  LOG.debug("jsock bound : "+jsock.isBound());
     	  
-    	  jsock.close();
+    	  //jsock.close();
       } catch ( IOException ignored ) {
     	  LOG.debug("Error while closing socket : "+ignored.getMessage());
       }

@@ -101,7 +101,8 @@ public class DFSClientPeer extends Peer implements DiscoveryListener {
 		try {
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Namenode Peer*", 1,this);
 		} catch(Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage());
+			//e.printStackTrace();
 		}		
 	}
 
@@ -242,8 +243,8 @@ public class DFSClientPeer extends Peer implements DiscoveryListener {
 		int soTimeout = Integer.parseInt(pc.get("hadoop.p2p.rpc.timeout"));
 
 		LOG.debug("pid : "+pid);
-		LOG.debug("soTimeout : "+soTimeout);
-		LOG.debug("pipeAdv : "+this.getInfoSocketAddress(pid).getPipeAdv());
+		// LOG.debug("soTimeout : "+soTimeout);
+		// LOG.debug("pipeAdv : "+this.getInfoSocketAddress(pid).getPipeAdv());
 		
 		int retry = 3;
 		
@@ -251,12 +252,7 @@ public class DFSClientPeer extends Peer implements DiscoveryListener {
 			try {
 				js = new JxtaSocket(npg,pid,this.getInfoSocketAddress(pid).getPipeAdv(),soTimeout,true);
 				js.setTcpNoDelay(true);
-				//js.setSendBufferSize(P2PConstants.JXTA_SOCKET_SENDBUFFER_SIZE);
-				//js.setReceiveBufferSize(P2PConstants.JXTA_SOCKET_RECVBUFFER_SIZE);
-				// js.setRetryTimeout(1000);
-			} catch (SocketTimeoutException ste) {
-				ste.printStackTrace();
-			}
+			} catch (SocketTimeoutException ste) {}
 			
 			if(!js.isClosed())
 				break;

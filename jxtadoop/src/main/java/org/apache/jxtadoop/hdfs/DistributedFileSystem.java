@@ -74,7 +74,8 @@ public class DistributedFileSystem extends FileSystem {
     try {
 		uri = new URI("hdfs://"+peer);
 	} catch (URISyntaxException e) {
-		e.printStackTrace();
+		LOG.error(e.getMessage());
+		//e.printStackTrace();
 	}
 	
 	initialize(uri, conf);
