@@ -27,6 +27,7 @@ import javax.management.StandardMBean;
 import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.fs.DF;
 import org.apache.jxtadoop.fs.DU;
+import org.apache.jxtadoop.fs.DiskUsage;
 import org.apache.jxtadoop.fs.FileUtil;
 import org.apache.jxtadoop.hdfs.protocol.Block;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
@@ -293,7 +294,8 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
     private File tmpDir;
     private File detachDir; // copy on write for blocks in snapshot
     private DF usage;
-    private DU dfsUsage;
+    //private DU dfsUsage;
+    private DiskUsage dfsUsage;
     private long reserved;
 
     
@@ -332,7 +334,8 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
         }
       }
       this.usage = new DF(parent, conf);
-      this.dfsUsage = new DU(parent, conf);
+      //this.dfsUsage = new DU(parent, conf);
+      this.dfsUsage = new DiskUsage(parent, conf);
       this.dfsUsage.start();
     }
 

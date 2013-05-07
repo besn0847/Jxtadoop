@@ -132,6 +132,9 @@ public class DF extends Shell {
     if (args.length > 0)
       path = args[0];
 
-    System.out.println(new DF(new File(path), DF_INTERVAL_DEFAULT).toString());
+    DF df = new DF(new File(path), DF_INTERVAL_DEFAULT);
+    df.getFilesystem();
+    
+    System.out.println(df.toString());
   }
 }

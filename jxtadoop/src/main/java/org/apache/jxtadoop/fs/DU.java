@@ -192,7 +192,9 @@ public class DU extends Shell {
     if (args.length > 0) {
       path = args[0];
     }
-
-    System.out.println(new DU(new File(path), new Configuration()).toString());
+    
+    DU du = new DU(new File(path), new Configuration());
+    
+    System.out.println(du.toString());
   }
 }
