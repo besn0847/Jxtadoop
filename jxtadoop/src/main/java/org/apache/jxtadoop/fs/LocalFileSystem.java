@@ -73,7 +73,8 @@ public class LocalFileSystem extends ChecksumFileSystem {
       File f = ((RawLocalFileSystem)fs).pathToFile(p).getCanonicalFile();
       
       // find highest writable parent dir of f on the same device
-      String device = new DF(f, getConf()).getMount();
+      //String device = new DF(f, getConf()).getMount();
+      String device = new DiskFree(f, getConf()).getMount();
       File parent = f.getParentFile();
       File dir = null;
       while (parent!=null && parent.canWrite() && parent.toString().startsWith(device)) {

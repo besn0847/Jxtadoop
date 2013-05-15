@@ -196,7 +196,8 @@ public class LocalDirAllocator {
     private int dirNumLastAccessed;
     private Random dirIndexRandomizer = new Random();
     private FileSystem localFS;
-    private DF[] dirDF;
+    //private DF[] dirDF;
+    private DiskFree[] dirDF;
     private String contextCfgItemName;
     private String[] localDirs;
     private String savedLocalDirs = "";
@@ -215,7 +216,8 @@ public class LocalDirAllocator {
         localFS = FileSystem.getLocal(conf);
         int numDirs = localDirs.length;
         ArrayList<String> dirs = new ArrayList<String>(numDirs);
-        ArrayList<DF> dfList = new ArrayList<DF>(numDirs);
+        //ArrayList<DF> dfList = new ArrayList<DF>(numDirs);
+        ArrayList<DiskFree> dfList = new ArrayList<DiskFree>(numDirs);
         for (int i = 0; i < numDirs; i++) {
           try {
             // filter problematic directories
@@ -224,7 +226,8 @@ public class LocalDirAllocator {
               try {
                 DiskChecker.checkDir(new File(localDirs[i]));
                 dirs.add(localDirs[i]);
-                dfList.add(new DF(new File(localDirs[i]), 30000));
+                //dfList.add(new DF(new File(localDirs[i]), 30000));
+                dfList.add(new DiskFree(new File(localDirs[i]), 30000));
               } catch (DiskErrorException de) {
                 LOG.warn( localDirs[i] + "is not writable\n" +
                     StringUtils.stringifyException(de));
@@ -238,7 +241,8 @@ public class LocalDirAllocator {
           } //ignore
         }
         localDirs = dirs.toArray(new String[dirs.size()]);
-        dirDF = dfList.toArray(new DF[dirs.size()]);
+        //dirDF = dfList.toArray(new DF[dirs.size()]);
+        dirDF = dfList.toArray(new DiskFree[dirs.size()]);
         savedLocalDirs = newLocalDirs;
         
         // randomize the first disk picked in the round-robin selection 

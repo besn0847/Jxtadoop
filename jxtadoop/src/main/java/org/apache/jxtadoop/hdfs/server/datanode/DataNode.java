@@ -812,9 +812,10 @@ public class DataNode extends Configured
           shutdown();
           return;
         }
-        LOG.warn(StringUtils.stringifyException(re));
+        //LOG.warn(StringUtils.stringifyException(re));
+        LOG.warn(re.getMessage());
       } catch (IOException e) {
-        LOG.warn(StringUtils.stringifyException(e));
+        LOG.warn(e.getMessage());
       }
     } // while (shouldRun)
   } // offerService
@@ -1193,7 +1194,8 @@ public class DataNode extends Configured
         startDistributedUpgradeIfNeeded();
         offerService();
       } catch (Exception ex) {
-        LOG.error("Exception: " + StringUtils.stringifyException(ex));
+        //LOG.error("Exception: " + StringUtils.stringifyException(ex));
+    	LOG.error("Exception: " + ex.getMessage());
         if (shouldRun) {
           try {
             Thread.sleep(5000);

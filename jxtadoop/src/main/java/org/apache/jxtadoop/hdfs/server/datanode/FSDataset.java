@@ -25,8 +25,7 @@ import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.jxtadoop.conf.Configuration;
-import org.apache.jxtadoop.fs.DF;
-import org.apache.jxtadoop.fs.DU;
+import org.apache.jxtadoop.fs.DiskFree;
 import org.apache.jxtadoop.fs.DiskUsage;
 import org.apache.jxtadoop.fs.FileUtil;
 import org.apache.jxtadoop.hdfs.protocol.Block;
@@ -293,7 +292,8 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
     private FSDir dataDir;
     private File tmpDir;
     private File detachDir; // copy on write for blocks in snapshot
-    private DF usage;
+    //private DF usage;
+    private DiskFree usage;
     //private DU dfsUsage;
     private DiskUsage dfsUsage;
     private long reserved;
@@ -333,7 +333,8 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
           throw new IOException("Mkdirs failed to create " + detachDir.toString());
         }
       }
-      this.usage = new DF(parent, conf);
+      //this.usage = new DF(parent, conf);
+      this.usage = new DiskFree(parent, conf);
       //this.dfsUsage = new DU(parent, conf);
       this.dfsUsage = new DiskUsage(parent, conf);
       this.dfsUsage.start();

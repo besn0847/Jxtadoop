@@ -783,15 +783,15 @@ public class Client {
     if (exception instanceof ConnectException) {
       //connection refused; include the host:port in the error
       return (ConnectException)new ConnectException(
-           "Call to " + jsock + " failed on connection exception: " + exception)
+           "Call to " + jsock.getPipeAdv().getName() + " failed on connection exception: " + exception.getMessage())
                     .initCause(exception);
     } else if (exception instanceof SocketTimeoutException) {
       return (SocketTimeoutException)new SocketTimeoutException(
-           "Call to " + jsock + " failed on socket timeout exception: "
-                      + exception).initCause(exception);
+           "Call to " +  jsock.getPipeAdv().getName() + " failed on socket timeout exception: "
+                      + exception.getMessage()).initCause(exception);
     } else {
       return (IOException)new IOException(
-           "Call to " + jsock + " failed on local exception: " + exception)
+           "Call to " +  jsock.getPipeAdv().getName() + " failed on local exception: " + exception.getMessage())
                                  .initCause(exception);
 
     }

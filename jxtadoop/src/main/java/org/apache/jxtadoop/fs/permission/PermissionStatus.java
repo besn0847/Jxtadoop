@@ -21,6 +21,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.io.Text;
 import org.apache.jxtadoop.io.Writable;
 import org.apache.jxtadoop.io.WritableFactories;
@@ -58,10 +59,17 @@ public class PermissionStatus implements Writable {
 
   /** Constructor */
   public PermissionStatus(String user, String group, FsPermission permission) {
-    username = user;
-    groupname = group;
-    this.permission = permission;
+    //username = user;
+    //groupname = group;
+    //this.permission = permission;
+	this(permission);
   }
+  
+  public PermissionStatus(FsPermission permission) {
+	    username = FSConstants.DEFAULT_HDFS_USER;
+	    groupname = FSConstants.DEFAULT_HDFS_GROUP;
+	    this.permission = permission;
+	  }
 
   /** Return user name */
   public String getUserName() {return username;}

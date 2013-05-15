@@ -25,6 +25,10 @@ import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
  *
  ************************************/
 public interface FSConstants {
+	// Default user & group
+	public static String DEFAULT_HDFS_USER = "root";
+	public static String DEFAULT_HDFS_GROUP = "root";
+	
   public static int MIN_BLOCKS_FOR_WRITE = 5;
 
   // Chunk the block Invalidate message
