@@ -263,4 +263,11 @@
   </description>
 </property>
 
+<property>
+  <name>hadoop.job.ugi</name>
+  <value>root,root</value>
+  <description>User credentials to be used by the DFSClient</description>
+</property>
+
+
 </configuration>

@@ -1,5 +1,7 @@
 *** Instructions to start the Namenode & Datanodes ***
 
+FIRST : Make sure you use JRE 1.7+
+
 -- Namenode
 	1/ Set the JAVA_HOME environment variable
 	2/ Unzip the jxtadoop-datanode-x.y.z.zip to the target directory
@@ -33,7 +35,7 @@ You can use the DFSClient as per Hadoop. For example
 
 Contact
 -------
-	Mail to : jxtadoop@besnard.mobi
+	Mail to : franck@besnard.mobi
 
 Known issues
 ------------

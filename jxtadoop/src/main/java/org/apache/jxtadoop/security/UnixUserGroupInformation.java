@@ -30,13 +30,14 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.util.Shell;
+import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.io.Text;
 import org.apache.jxtadoop.io.WritableUtils;
 
 /** An implementation of UserGroupInformation in the Unix system */
 public class UnixUserGroupInformation extends UserGroupInformation {
-  public static final String DEFAULT_USERNAME = "DrWho";
-  public static final String DEFAULT_GROUP = "Tardis";
+  public static final String DEFAULT_USERNAME = FSConstants.DEFAULT_HDFS_USER;
+  public static final String DEFAULT_GROUP = FSConstants.DEFAULT_HDFS_GROUP;
 
   final static public String UGI_PROPERTY_NAME = "hadoop.job.ugi";
   final static private HashMap<String, UnixUserGroupInformation> user2UGIMap =
