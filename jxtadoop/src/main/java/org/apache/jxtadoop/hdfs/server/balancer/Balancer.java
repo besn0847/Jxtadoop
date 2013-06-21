@@ -188,19 +188,16 @@ public class Balancer implements Tool {
    */
   public static final int MAX_NUM_CONCURRENT_MOVES = 5;
 
-@Override
 public int run(String[] args) throws Exception {
 	// TODO Auto-generated method stub
 	return 0;
 }
 
-@Override
 public Configuration getConf() {
 	// TODO Auto-generated method stub
 	return null;
 }
 
-@Override
 public void setConf(Configuration conf) {
 	// TODO Auto-generated method stub
 	

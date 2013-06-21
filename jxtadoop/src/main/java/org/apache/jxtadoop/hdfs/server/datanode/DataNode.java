@@ -1162,11 +1162,13 @@ public class DataNode extends Configured
         blockSender.sendBlock(out, baseStream, null);
 
         // no response necessary
-        LOG.info(dnRegistration + ":Transmitted block " + b + " to " + curTarget);
+        LOG.info(dnRegistration + ":Transmitted block " + b + " to " + curTarget.getPeerAdvertisement().getPeerID().toString());
 
       } catch (IOException ie) {
-        LOG.warn(dnRegistration + ":Failed to transfer " + b + " to " + targets[0].getName()
-            + " got " + StringUtils.stringifyException(ie));
+        //LOG.warn(dnRegistration + ":Failed to transfer " + b + " to " + targets[0].getName()
+        //    + " got " + StringUtils.stringifyException(ie));
+    	LOG.warn(dnRegistration + ":Failed to transfer " + b + " to " + targets[0].getName()
+              + " got " + ie.getMessage());
       } finally {
         xmitsInProgress.getAndDecrement();
         IOUtils.closeStream(blockSender);

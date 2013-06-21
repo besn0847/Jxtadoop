@@ -33,7 +33,6 @@ public class Group implements Principal {
     this.group = group;
   }
 
-  @Override
   public String getName() {
     return group;
   }

@@ -148,7 +148,6 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	/**
 	 * Manages the pipe, namenode and peer advertisement discovery events. 
 	 */
-	@Override
 	public void discoveryEvent(DiscoveryEvent event) {
 		DiscoveryResponseMsg response = event.getResponse();
 				

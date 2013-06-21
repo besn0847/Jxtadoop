@@ -56,12 +56,10 @@ public class ConfiguredPolicy extends Policy implements Configurable {
     refresh();
   }
 
-  @Override
   public Configuration getConf() {
     return conf;
   }
 
-  @Override
   public void setConf(Configuration conf) {
     this.conf = conf;
     refresh();

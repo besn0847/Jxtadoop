@@ -330,7 +330,6 @@ public class DatanodeInfo extends DatanodeID implements Node {
     setAdminState(WritableUtils.readEnum(in, AdminStates.class));
   }
 
-	@Override
 	public String getName() {
 		return hostId;
 	}

@@ -958,7 +958,6 @@ public abstract class Server {
 						// the call with the Subject
 						value = Subject.doAs(call.connection.user,
 								new PrivilegedExceptionAction<Writable>() {
-									@Override
 									public Writable run() throws Exception {
 										// make the call
 										return call(call.connection.protocol,
@@ -1008,7 +1007,6 @@ public abstract class Server {
 			this.conn = c;
 		}
 
-		@Override
 		public void run() {
 			LOG.debug("Starting the connection reader");
 			int count = 0;

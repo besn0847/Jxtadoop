@@ -867,8 +867,7 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
     return false;
   }
 
-  @Override
-  public void refreshServiceAcl() throws IOException {
+   public void refreshServiceAcl() throws IOException {
     if (!serviceAuthEnabled) {
       throw new AuthorizationException("Service Level Authorization not enabled!");
     }
@@ -980,7 +979,6 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
     }
   }
 
-	@Override
 	public void handleDisconnectEvent(DatanodeEvent e) {
 		Host2NodesMap h2dnm = namesystem.getHost2DataNodeMap();
 		String dnpid = e.getPeerID().toString().replace("urn:jxta:cbid-", "");

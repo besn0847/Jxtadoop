@@ -6,44 +6,6 @@
 <!-- there.  If hdfs-site.xml does not already exist, create it.      -->
 
 <configuration>
-
-<property>
-  <name>dfs.datanode.address</name>
-  <value>0.0.0.0:26411</value>
-  <description>
-    The address where the datanode server will listen to.
-    If the port is 0 then the server will start on a free port.
-  </description>
-</property>
-
-
-<property>
-  <name>dfs.datanode.ipc.address</name>
-  <value>0.0.0.0:26415</value>
-  <description>
-    The datanode ipc server address and port.
-    If the port is 0 then the server will start on a free port.
-  </description>
-</property>
-
- <property>
-  <name>dfs.datanode.dns.interface</name>
-  <value>default</value>
-  <description>The name of the Network Interface from which a data node should 
-  report its IP address.
-  </description>
- </property>
- 
-<property>
-  <name>dfs.datanode.dns.nameserver</name>
-  <value>default</value>
-  <description>The host name or IP address of the name server (DNS)
-  which a DataNode should use to determine the host name used by the
-  NameNode for communication and display purposes.
-  </description>
- </property>
- 
- 
  
 <property>
   <name>dfs.replication.considerLoad</name>
@@ -92,7 +54,7 @@
 
 <property>
   <name>dfs.permissions.supergroup</name>
-  <value>supergroup</value>
+  <value>root</value>
   <description>The name of the group of super-users.</description>
 </property>
 

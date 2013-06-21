@@ -143,7 +143,6 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	/**
 	 * The datanode list is managed for the namenode using the connection events. 
 	 */
-	@Override
 	public void rendezvousEvent(RendezvousEvent event) {			
 		synchronized(datanodepeers) {
 			if ( event.getType() == RendezvousEvent.CLIENTCONNECT || event.getType() == RendezvousEvent.CLIENTRECONNECT) {

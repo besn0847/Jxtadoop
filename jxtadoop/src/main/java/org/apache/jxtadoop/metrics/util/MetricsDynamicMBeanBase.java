@@ -124,7 +124,6 @@ public abstract class MetricsDynamicMBeanBase implements DynamicMBean {
         attributesInfo.toArray(attrArray), null, operationsInfo, null);
   }
   
-  @Override
   public Object getAttribute(String attributeName) throws AttributeNotFoundException,
       MBeanException, ReflectionException {
     if (attributeName == null || attributeName.equals("")) 
@@ -167,7 +166,6 @@ public abstract class MetricsDynamicMBeanBase implements DynamicMBean {
     }
   }
 
-  @Override
   public AttributeList getAttributes(String[] attributeNames) {
     if (attributeNames == null || attributeNames.length == 0) 
       throw new IllegalArgumentException();
@@ -186,13 +184,11 @@ public abstract class MetricsDynamicMBeanBase implements DynamicMBean {
     return result;
   }
 
-  @Override
-  public MBeanInfo getMBeanInfo() {
+ public MBeanInfo getMBeanInfo() {
     return mbeanInfo;
   }
 
-  @Override
-  public Object invoke(String actionName, Object[] parms, String[] signature)
+ public Object invoke(String actionName, Object[] parms, String[] signature)
       throws MBeanException, ReflectionException {
     
     if (actionName == null || actionName.equals("")) 
@@ -212,15 +208,13 @@ public abstract class MetricsDynamicMBeanBase implements DynamicMBean {
     return null;
   }
 
-  @Override
   public void setAttribute(Attribute attribute)
       throws AttributeNotFoundException, InvalidAttributeValueException,
       MBeanException, ReflectionException {
     throw new ReflectionException(new NoSuchMethodException("set" + attribute));
   }
 
-  @Override
-  public AttributeList setAttributes(AttributeList attributes) {
+ public AttributeList setAttributes(AttributeList attributes) {
     return null;
   }
 }

@@ -349,7 +349,7 @@ public class Client {
 	    	  socket.shutdownOutput();
 	    	  socket.close();
 	      } catch (IOException e) {
-	        LOG.warn("Not able to close a socket", e);
+	        LOG.warn("Not able to close a socket" + e.getMessage());
 	      }
 	      // set socket to null so that the next call to setupIOstreams
 	      // can start the process of connect all over again.
@@ -559,7 +559,7 @@ public class Client {
 	    	  socket.shutdownOutput();
 	    	  socket.close();
 	      } catch (IOException ioe) {
-	    	  LOG.warn("Not able to close a socket", ioe);
+	    	  LOG.warn("Not able to close a socket :" + ioe.getMessage());
 	      }
       }
       

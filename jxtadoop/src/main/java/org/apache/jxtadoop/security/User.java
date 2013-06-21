@@ -33,7 +33,6 @@ public class User implements Principal {
     this.user = user;
   }
   
-  @Override
   public String getName() {
     return user;
   }

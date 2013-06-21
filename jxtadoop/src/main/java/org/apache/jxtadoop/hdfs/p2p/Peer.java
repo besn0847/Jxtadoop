@@ -647,7 +647,6 @@ public abstract class Peer implements P2PConstants {
 		/**
 		 * Remove the peer for the non-responded map if the advertisement is received.
 		 */
-		@Override
 		public void discoveryEvent(DiscoveryEvent event) {
 			DiscoveryResponseMsg response = event.getResponse();
 			

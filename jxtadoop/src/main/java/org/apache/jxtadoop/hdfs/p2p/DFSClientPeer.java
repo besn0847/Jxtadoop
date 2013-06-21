@@ -106,7 +106,6 @@ public class DFSClientPeer extends Peer implements DiscoveryListener {
 		}		
 	}
 
-	@Override
 	public void discoveryEvent(DiscoveryEvent event) {
 		DiscoveryResponseMsg response = event.getResponse();
 		

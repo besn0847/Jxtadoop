@@ -1277,7 +1277,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     new Configuration().writeXml(System.out);
   }
 
-  @Override
   public void readFields(DataInput in) throws IOException {
     clear();
     int size = WritableUtils.readVInt(in);

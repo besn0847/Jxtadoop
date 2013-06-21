@@ -82,7 +82,6 @@ public class ServiceAuthorizationManager {
     try{
       Subject.doAs(user, 
                    new PrivilegedExceptionAction<Void>() {
-                     @Override
                      public Void run() throws Exception {
                        try {
                          for(Permission permission : permissions) {
