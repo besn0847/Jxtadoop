@@ -50,6 +50,10 @@ public interface P2PConstants {
 	 */
 	public static final String RPCDFSCLIENTPORT = "9102";
 	/**
+	 * The default p2p client peer listening port for peer-to-peer communications.
+	 */
+	public static final String P2PCLIENTPORT = "9103";
+	/**
 	 * The namenode tag used in the advertisement from those peers
 	 */
 	public static final String RPCNAMENODETAG = "NAMENODE";
@@ -62,6 +66,10 @@ public interface P2PConstants {
 	 */
 	public static final String RPCDFSCLIENTTAG = "DFSCLIENT";
 	/**
+	 * The p2p client tag used in the advertisement from those peers
+	 */
+	public static final String P2PCLIENTTAG = "P2PCLIENT";
+	/**
 	 * The timeout for a peer remote discovery used by the peer monitor.
 	 */
 	public static final int PEERDELETIONTIMEOUT = 300000;
@@ -73,6 +81,14 @@ public interface P2PConstants {
 	 * The maximum number of peers in the cloud
 	 */
 	public static final int MAXCLOUDPEERCOUNT = 1000;
+	/**
+	 * The maximum number of advertisements to discover
+	 */
+	public static final int MAXADVDISCOVERYCOUNT = 10000;
+	/**
+	 * The discovery timeout
+	 */
+	public static final int DISCOTIME = 2000;
 	/**
 	 * Socket send buffer size
 	 */

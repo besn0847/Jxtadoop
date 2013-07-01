@@ -15,6 +15,16 @@
 </property>
 
 <property>
+  <name>fs.file.impl</name>
+  <value>org.apache.jxtadoop.fs.LocalFileSystem</value>
+</property>
+
+<property>
+  <name>fs.hdfs.impl</name>
+  <value>org.apache.jxtadoop.hdfs.DistributedFileSystem</value>
+</property>
+
+<property>
   <name>hadoop.native.lib</name>
   <value>false</value>
   <description>Should native hadoop libraries, if present, be used.</description>

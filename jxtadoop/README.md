@@ -8,14 +8,25 @@ This port requires ***JRE 1.7*** at minimum since the dependency on disk tools e
 Links :
    - Architecture : http://fbe-big-data.blogspot.fr/2013/03/jxtadoop-architecture-design.html
 
-Version 0.5.0
+Current version 0.6.1
+
+Version 0.6.1
 ------------
-Initial release with some stability issues and memory.
+- Added p2p command line to analyze peer-to-peer cloud
+- Adding checksum capability with fs cmd line
+- Fixed few build issues
+- Clean-up properties files & old classes
 
 Version 0.6.0
 ------------
 Fixed most stability issues. Removed most dependencies on system executables. Improved error handling.
 Tested with one public NameNode, 1 private DataNode, 1 corporate DataNode + 5 cloud DataNodes.
+
+Version 0.5.0
+------------
+Initial release with some stability issues and memory.
+
+
 
 Known issues
 -----------

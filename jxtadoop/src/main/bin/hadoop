@@ -61,6 +61,7 @@ if [ $# = 0 ]; then
   echo "  dfsadmin             run a DFS admin client"
   echo "  fsck                 run a DFS filesystem checking utility"
   echo "  fs                   run a generic filesystem user client"
+  echo "  p2p                  run a peer-to-peer network client"
   echo "  version              print the version"
   echo "  jar <jar>            run a jar file"
   echo "  distcp <srcurl> <desturl> copy file or directories recursively"
@@ -192,6 +193,9 @@ elif [ "$COMMAND" = "dfsadmin" ] ; then
 elif [ "$COMMAND" = "fsck" ] ; then
   CLASS=org.apache.jxtadoop.hdfs.tools.DFSck
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"
+elif [ "$COMMAND" = "p2p" ] ; then
+  CLASS=org.apache.jxtadoop.hdfs.p2p.P2PShell
+  HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"  
 elif [ "$COMMAND" = "version" ] ; then
   CLASS=org.apache.jxtadoop.util.VersionInfo
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"

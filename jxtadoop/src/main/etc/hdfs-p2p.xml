@@ -40,6 +40,12 @@
 </property>
 
 <property>
+  <name>hadoop.p2p.p2pclient.port</name>
+  <value>19103</value>
+  <description>The listenning port for the P2P Client peer</description>
+</property>
+
+<property>
   <name>hadoop.p2p.use.multicast</name>
   <value>true</value>
   <description>Should multicast be enabled</description>

@@ -591,7 +591,6 @@ public class FsShell extends Configured implements Tool {
     }
   }
     
-    
   /**
    * Get a listing of all files in that match the file pattern <i>srcf</i>.
    * @param srcf a file pattern specifying source files
@@ -772,6 +771,35 @@ public class FsShell extends Configured implements Tool {
     }
     FSDataOutputStream out = srcFs.create(f);
     out.close();
+  }
+  
+  /**
+   * Compute the checksum of the file.
+   * This will get enhanced in the future with multiple files handling.
+   * Can be used for backup and restore purposes.
+   */
+  void checksum(String src) throws IOException {
+	LOG.debug("Computing checksum for file "+src);
+	Path f = new Path(src);
+	FileSystem fs = f.getFileSystem(getConf());
+	FileStatus fst;
+	
+	if (fs.exists(f)) {
+		fst = fs.getFileStatus(f);
+		
+		if(fst.isDir()) 
+			throw new IOException(src + " is a direcory. Checksum operation not supported.");
+		else {
+			FileChecksum checksum = fs.getFileChecksum(f); 
+			String checksumString = checksum.toString();
+			int checksumLength = checksumString.length();
+			System.out.printf("%s\t%s\n", src, checksumString.substring(checksumLength-33, checksumLength));
+		}
+		
+	} else {
+		throw new IOException(src + " file does not exist");
+	}
+
   }
 
   /**
@@ -1296,6 +1324,7 @@ public class FsShell extends Configured implements Tool {
       "[" + FsShellPermissions.CHOWN_USAGE + "]\n\t" +
       "[" + FsShellPermissions.CHGRP_USAGE + "]\n\t" +      
       "[" + Count.USAGE + "]\n\t" +      
+      "[-checksum <file>]\n\t" +
       "[-help [cmd]]\n";
 
     String conf ="-conf <configuration file>:  Specify an application configuration file.";
@@ -1441,6 +1470,9 @@ public class FsShell extends Configured implements Tool {
     String chgrp = FsShellPermissions.CHGRP_USAGE + "\n" +
       "\t\tThis is equivalent to -chown ... :GROUP ...\n";
     
+    String checksum = "-checksum <file>: \tDisplays the MD5 checksum of the file\n" +
+      "\t\tin the Distributed FileSystem\n";
+    
     String help = "-help [cmd]: \tDisplays help for given command or all commands if none\n" +
       "\t\tis specified.\n";
 
@@ -1506,7 +1538,9 @@ public class FsShell extends Configured implements Tool {
       System.out.println(chgrp);
     } else if (Count.matches(cmd)) {
       System.out.println(Count.DESCRIPTION);
-    } else if ("help".equals(cmd)) {
+    } else if ("checksum".equals(cmd)) {
+        System.out.println(checksum);
+      }else if ("help".equals(cmd)) {
       System.out.println(help);
     } else {
       System.out.println(summary);
@@ -1538,6 +1572,7 @@ public class FsShell extends Configured implements Tool {
       System.out.println(chown);      
       System.out.println(chgrp);
       System.out.println(Count.DESCRIPTION);
+      System.out.println(checksum);
       System.out.println(help);
     }        
 
@@ -1675,6 +1710,9 @@ public class FsShell extends Configured implements Tool {
                          " [-stat [format] <path>]");
     } else if ("-tail".equals(cmd)) {
       System.err.println("Usage: java FsShell [" + TAIL_USAGE + "]");
+    } else if ("-checksum".equals(cmd)) {
+    	System.err.println("Usage: java FsShell" +
+    			" [-checksum <file>]");
     } else {
       System.err.println("Usage: java FsShell");
       System.err.println("           [-ls <path>]");
@@ -1705,6 +1743,7 @@ public class FsShell extends Configured implements Tool {
       System.err.println("           [" + FsShellPermissions.CHMOD_USAGE + "]");      
       System.err.println("           [" + FsShellPermissions.CHOWN_USAGE + "]");
       System.err.println("           [" + FsShellPermissions.CHGRP_USAGE + "]");
+      System.err.println("           [-checksum <file>]");
       System.err.println("           [-help [cmd]]");
       System.err.println();
       ToolRunner.printGenericCommandUsage(System.err);
@@ -1748,7 +1787,7 @@ public class FsShell extends Configured implements Tool {
     } else if ("-rm".equals(cmd) || "-rmr".equals(cmd) ||
                "-cat".equals(cmd) || "-mkdir".equals(cmd) ||
                "-touchz".equals(cmd) || "-stat".equals(cmd) ||
-               "-text".equals(cmd)) {
+               "-text".equals(cmd) || "-checksum".equals(cmd)) {
       if (argv.length < 2) {
         printUsage(cmd);
         return exitCode;
@@ -1846,7 +1885,9 @@ public class FsShell extends Configured implements Tool {
         } else {
           stat("%y".toCharArray(), argv[i]);
         }
-      } else if ("-help".equals(cmd)) {
+      } else if ("-checksum".equals(cmd)) {
+    	  checksum(argv[i++]);
+      }else if ("-help".equals(cmd)) {
         if (i < argv.length) {
           printHelp(argv[i]);
         } else {
