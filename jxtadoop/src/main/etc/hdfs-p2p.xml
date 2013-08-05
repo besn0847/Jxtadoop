@@ -23,7 +23,7 @@
 
 <property>
   <name>hadoop.p2p.namenode.port</name>
-  <value>19100</value>
+  <value>$NAMENODEPORT</value>
   <description>The listenning port for the Rendez Vous peer</description>
 </property>
 
@@ -77,13 +77,13 @@
 
 <property>
   <name>hadoop.p2p.rpc.rdv</name>
-  <value>tcp://127.0.0.1:19100</value>
+  <value>tcp://$NAMENODEADDR:$NAMENODEPORT</value>
   <description>The rpc rendez-vous seed</description>
 </property>
 
 <property>
   <name>hadoop.p2p.rpc.relay</name>
-  <value>tcp://127.0.0.1:19100</value>
+  <value>tcp://$NAMENODEADDR:$NAMENODEPORT</value>
   <description>The rpc relay seed</description>
 </property>
 

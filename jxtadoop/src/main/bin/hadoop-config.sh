@@ -55,7 +55,7 @@ fi
 HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-$HADOOP_HOME/etc}"
 
 # Specify bin dir
-HADOOP_BIN_DIR="$HADOOP_HOME/etc"
+HADOOP_BIN_DIR="$HADOOP_HOME/bin"
 
 #check to see it is specified whether to use the slaves or the
 # masters file

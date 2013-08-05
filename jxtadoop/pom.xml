@@ -4,7 +4,7 @@
 
   <groupId>org.apache</groupId>
   <artifactId>jxtadoop</artifactId>
-  <version>0.6.1</version>
+  <version>0.7.0</version>
   <packaging>jar</packaging>
 
   <name>jxtadoop</name>
@@ -12,6 +12,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <staging.dir>${project.build.directory}/staging</staging.dir>
+    <info.appName>Jxtadoop</info.appName>
+    <info.appsubpath>jxtadoop-datanode-app/standard</info.appsubpath>
+    <izpack.dir.app>${basedir}/src/main/izpack</izpack.dir.app>
+    <staging.dir.app>${basedir}/src/main/izpack</staging.dir.app>
+    <app.version>${project.version}</app.version>
   </properties>
 
   <dependencies>
@@ -131,6 +137,29 @@
 			        </execution>
 			    </executions>
  			</plugin>
+ 		<plugin>
+		    <groupId>org.codehaus.izpack</groupId>
+		    <artifactId>izpack-maven-plugin</artifactId>
+		    <extensions>true</extensions>
+		    <executions>
+				<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>izpack</goal>
+					</goals>
+					<configuration>
+					      <baseDir>${staging.dir.app}</baseDir>
+					      <installFile>${izpack.dir.app}/install.xml</installFile>
+					      <outputDirectory>${project.build.directory}</outputDirectory>
+					      <finalName>${project.build.finalName}-datanode-installer</finalName>
+					      <enableOverrideArtifact>true</enableOverrideArtifact>
+					      <mkdirs>true</mkdirs>
+					      <autoIncludeUrl>false</autoIncludeUrl>
+					      <autoIncludeDevelopers>false</autoIncludeDevelopers>
+					</configuration>
+				</execution>
+			</executions>
+		  </plugin>
   	</plugins>
   </build>
 </project>

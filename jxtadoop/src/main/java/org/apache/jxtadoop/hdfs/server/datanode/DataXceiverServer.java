@@ -167,7 +167,7 @@ class DataXceiverServer implements Runnable, FSConstants {
     assert datanode.shouldRun == false :
       "shoudRun should be set to false before killing";
     try {
-      this.ss.close();
+      if (ss != null) this.ss.close();
     } catch (IOException ie) {
       LOG.warn(datanode.dnRegistration + ":DataXceiveServer.kill(): " 
                               + StringUtils.stringifyException(ie));

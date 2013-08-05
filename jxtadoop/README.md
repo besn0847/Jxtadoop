@@ -8,7 +8,11 @@ This port requires ***JRE 1.7*** at minimum since the dependency on disk tools e
 Links :
    - Architecture : http://fbe-big-data.blogspot.fr/2013/03/jxtadoop-architecture-design.html
 
-Current version 0.6.1
+Current version 0.7.0
+
+Version 0.7.0
+------------
+- Installer for Windows and Linux
 
 Version 0.6.1
 ------------

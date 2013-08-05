@@ -278,6 +278,7 @@ public abstract class Peer implements P2PConstants {
 	public void start() {
 		// to be overriden
 	}
+	
 	/**
 	 * Load the peer id from the certificate file name or generate a new one using the see and the user login name
 	 * @throws LoginException Thrown upon user login error
@@ -538,6 +539,12 @@ public abstract class Peer implements P2PConstants {
 		PeerMonitor(DiscoveryListener dl) {
 			notrespondedpeers = new HashMap<PeerID,Integer>();
 			this.dnlist = dl;
+		}
+		/*
+		 * Shutting down the peermonitor
+		 */
+		public void shutdown() {
+			running = false;
 		}
 		/**
 		 * For each datanode in the cloud, a peer discovery is performed.

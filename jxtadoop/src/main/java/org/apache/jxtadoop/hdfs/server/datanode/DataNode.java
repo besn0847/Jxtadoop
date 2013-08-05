@@ -18,6 +18,15 @@
 
 package org.apache.jxtadoop.hdfs.server.datanode;
 
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -51,6 +60,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.conf.Configured;
 import org.apache.jxtadoop.hdfs.HDFSPolicyProvider;
+import org.apache.jxtadoop.hdfs.desktop.DesktopTray;
 import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.Block;
@@ -179,12 +189,13 @@ public class DataNode extends Configured
   private InetSocketAddress selfAddr;
   private static DataNode datanodeObject = null;
   private Thread dataNodeThread = null;
-  String machineName;
+  public String machineName;
   private static String dnThreadName;
   int socketTimeout;
   int socketWriteTimeout = 0;  
   boolean transferToAllowed = true;
   int writePacketSize = 0;
+  private boolean isConnected = false;
   
   public DataBlockScanner blockScanner = null;
   public Daemon blockScannerThread = null;
@@ -683,6 +694,7 @@ public class DataNode extends Configured
     //
     // Now loop for a long time....
     //
+    isConnected = true;
 
     while (shouldRun) {
       try {
@@ -812,9 +824,11 @@ public class DataNode extends Configured
           shutdown();
           return;
         }
+        isConnected = true ;  
         //LOG.warn(StringUtils.stringifyException(re));
-        LOG.warn(re.getMessage());
+        //LOG.warn(re.getMessage());
       } catch (IOException e) {
+    	isConnected = false ; 
         LOG.warn(e.getMessage());
       }
     } // while (shouldRun)
@@ -997,9 +1011,6 @@ public class DataNode extends Configured
     }
   }
 
-  
-
-
   /* ********************************************************************
   Protocol when a client reads data from Datanode (Cur Ver: 9):
   
@@ -1088,8 +1099,6 @@ public class DataNode extends Configured
                                       8 + /* seqno */
                                       1   /* isLastPacketInBlock */);
   
-
-
   /**
    * Used for transferring a block of data.  This class
    * sends a piece of data to another DataNode.
@@ -1224,10 +1233,17 @@ public class DataNode extends Configured
     }
   }
   
-  static boolean isDatanodeUp(DataNode dn) {
+  public static boolean isDatanodeUp(DataNode dn) {
     return dn.dataNodeThread != null && dn.dataNodeThread.isAlive();
   }
-
+  
+  /*
+   * Return true if the DataNode is connected the NameNode
+   */
+  public boolean isConnectedToNN() {
+	  return isConnected;
+  }
+  
   /** Instantiate a single datanode object. This must be run by invoking
    *  {@link DataNode#runDatanodeDaemon(DataNode)} subsequently. 
    */
@@ -1259,8 +1275,9 @@ public class DataNode extends Configured
     runDatanodeDaemon(dn);
     return dn;
   }
+  
 
-  void join() {
+  public void join() {
     if (dataNodeThread != null) {
       try {
         dataNodeThread.join();
@@ -1375,17 +1392,28 @@ public class DataNode extends Configured
   /**
    */
   public static void main(String args[]) {
+	DesktopTray desktopTray = null;
+	  
     try {
-      StringUtils.startupShutdownMessage(DataNode.class, args, LOG);
-      DataNode datanode = createDataNode(args, null);
-      if (datanode != null)
-        datanode.join();
+        // Beginning of System Tray handling
+        if(SystemTray.isSupported()) {
+      	  desktopTray = new DesktopTray();
+      	  desktopTray.init(DataNode.class,args,LOG);
+        }
+        // End of System Tray handling
+        else {
+        	StringUtils.startupShutdownMessage(DataNode.class, args, LOG);
+            DataNode datanode = createDataNode(args, null);  	
+
+            if (datanode != null)
+              datanode.join();      
+        }
     } catch (Throwable e) {
       LOG.error(StringUtils.stringifyException(e));
       System.exit(-1);
     }
   }
-
+  
   // InterDataNodeProtocol implementation
   /** {@inheritDoc} */
   public BlockMetaDataInfo getBlockMetaDataInfo(Block block

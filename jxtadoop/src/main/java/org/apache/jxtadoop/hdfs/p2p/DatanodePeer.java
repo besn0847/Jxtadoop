@@ -50,6 +50,11 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	 * <br> There should only one as for now, only a 1-namenode configuration is supported.
 	 */
 	List<PipeAdvertisement> rpcpipeadvs;
+	/*
+	 * Thread used to monitor peers
+	 */
+	Thread monitor;
+	PeerMonitor pm;
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
 	 * It also initialize the RPC advertisement and namenode lists. 
@@ -142,7 +147,8 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());
 		infojssad = new JxtaSocketAddress(npg,infoPipeAdv,npg.getPeerAdvertisement());
 		
-		Thread monitor = new Thread(this.new PeerMonitor(this),"Peer Monitor Thread");
+		pm  = this.new PeerMonitor(this);
+		 monitor = new Thread(pm,"Peer Monitor Thread");
 		monitor.start();
 	}
 	/**
