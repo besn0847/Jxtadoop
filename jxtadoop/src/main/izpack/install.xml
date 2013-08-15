@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="5.0">
+	<info>
+	    <appname>@{info.appName}</appname>
+	    <appversion>@{app.version}</appversion>
+	    <authors>
+	        <author email="franck@besnard.mobi" name="Franck Besnard" />
+	    </authors>
+	    <url>https://sourceforge.net/projects/jxtadoop/</url>
+	    <uninstaller write="yes" />
+	    <javaversion>1.7</javaversion>
+	    <requiresjdk>no</requiresjdk>
+	    <writeinstallationinformation>no</writeinstallationinformation>
+	    <pack200 />
+	</info>
+	
+	<locale>
+        <langpack iso3="eng"/>
+    </locale>
+	
+	<guiprefs width="640" height="480" resizable="no">
+		<laf name="kunststoff">
+			<os family="unix" />
+		</laf>
+		<modifier key="useHeadingPanel" value="yes"/>
+		<modifier key="useHeadingForSummary" value="yes"/>
+		<modifier key="headingImageOnLeft" value="yes"/>
+		<modifier key="headingLineCount" value="2"/>
+		<modifier key="headingFontSize" value="1.5"/>
+		<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+		<modifier key="headingPanelCounter" value="text"/>
+		<modifier key="headingPanelCounterPos" value="inHeading"/>
+	</guiprefs>
+	 
+	<resources>
+        <res id="LicencePanel.licence" src="LICENSE"/>
+        <res id="InfoPanel.info" src="README"/>
+        <res id="shortcutSpec.xml" src="Windows_shortcutSpec.xml" />
+        <res id="Unix_shortcutSpec.xml" src="Unix_shortcutSpec.xml"/>
+        <res id="userInputSpec.xml" src="userInputSpec.xml" />
+    </resources>
+	
+	<variables>
+		<variable name="DesktopShortcutCheckboxEnabled" value="true"/>
+	</variables>
+	
+	<dynamicvariables>
+		<variable name="app.version" value="@{app.version}"/>
+		<variable name="JRE_HOME" value="${JAVA_HOME}"/>
+		<variable name="NAMENODEADDR" value="${user.namenodeaddress}"/>
+		<variable name="NAMENODEPORT" value="${user.namenodeport}"/>
+		<variable name="APP_VERSION" value="@{app.version}"/>
+	</dynamicvariables> 
+	 
+	<panels>
+	    <panel classname="HelloPanel" />
+	    <panel classname="InfoPanel" />
+	    <panel classname="LicencePanel" />
+	    <panel classname="TargetPanel" />
+	    <panel classname="UserInputPanel" id="UserInputPanel.0"/>
+	    <panel classname="InstallPanel" />
+	   	<panel classname="ShortcutPanel"/>
+	    <panel classname="SimpleFinishPanel" />
+	</panels>
+	
+	<packs> 
+        <pack name="Base" required="yes">
+            <description>All the files</description>
+            <file src="../../../target/jxtadoop-@{app.version}-datanode.zip" targetdir="$INSTALL_PATH" unpack="true"/>
+            <executable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop" stage="never"/>
+            <executable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop-config.sh" stage="never"/>
+            <executable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop-daemon.sh" stage="never"/>
+            <executable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop-env.sh" stage="never"/>
+            <executable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/start-datanode.sh" stage="never"/>
+            <parsable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop-env.sh" type="plain" parse="yes"/>
+            <parsable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/etc/hdfs-p2p.xml" type="plain" parse="yes"/>
+            <parsable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/datanode.bat" type="shell" os="windows"/>
+            <parsable targetfile="$INSTALL_PATH/jxtadoop-@{app.version}/bin/hadoop.bat" type="shell" os="windows"/>
+        </pack>
+	</packs>
+	
+	<natives>
+	    <native type="izpack" name="ShellLink.dll">
+	    	<os family="windows" />
+	    </native>
+	    <native type="izpack" name="ShellLink_x64.dll">
+	    	<os family="windows" />
+	    </native>
+	</natives>
+</installation>

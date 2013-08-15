@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+	<defaultCurrentUser/>
+	<shortcut
+		name = "Jxtadoop"
+		programGroup = "no"
+		desktop = "yes"
+		applications = "no"
+		startMenu = "no"
+		startup = "yes"
+		target = "$INSTALL_PATH/jxtadoop-${app.version}/bin/start-datanode.sh"
+		commandLine = ""
+		workingDiretory = "$INSTALL_PATH/jxtadoop-@{app.version}"
+		description = "Peer-to-Peer Datanode for Jxtadoop"
+		iconFile = "$INSTALL_PATH/jxtadoop-${app.version}/etc/jxtadoop.png"
+		iconIndex = "0"
+		type = "Application"
+		encoding = "UTF-8"
+		terminal = "false"
+		KdeSubstUID = "false"
+		initialState = "normal">
+		<createForPack name="Base"/>
+	</shortcut>
+	
+	<shortcut
+		name = "Uninstaller"
+		programGroup = "no"
+		desktop = "no"
+		applications = "no"
+		startMenu = "no"
+		startup = "no"
+		target = "/usr/bin/java"
+		commandLine = "-jar $INSTALL_PATH/Uninstaller/uninstaller.jar"
+		initialState = "noShow"		
+		iconFile = "trashcan_full"
+		iconIndex = "0"
+		workingDiretory = ""
+		type = "Application"
+		encoding = "UTF-8"
+		description = "Jxtadoop Uninstaller">
+		<createForPack name="Base"/>
+	</shortcut>
+</shortcuts>

@@ -1,0 +1,13 @@
+<userInput>
+  <panel order="0" id="UserInputPanel.0">
+  	<field type="title" txt="Please specify the Jxtadoop Cloud parameters " bold="true" size="1" />
+  	<field type="divider" align="top"/>
+  	<field type="space"/>
+  	<field type="text" variable="user.namenodeaddress">
+      <spec txt="Namenode Host:" id="input.nn" size="25" set="127.0.0.1"/>
+    </field>
+    <field type="text" variable="user.namenodeport">
+      <spec txt="Namenode Port:" id="input.nnport" size="6" set="19100"/>
+    </field>
+  </panel>
+</userInput>

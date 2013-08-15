@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+	<skipIfNotSupported/>
+	<programGroup defaultName="Jxtadoop" location="applications"/>
+
+  <shortcut
+    name="Jxtadoop"
+    target="$INSTALL_PATH\jxtadoop-${app.version}\bin\datanode.bat"
+    commandLine="start"
+    workingDirectory="$INSTALL_PATH\jxtadoop-${app.version}\"
+    description="Peer-to-Peer Datanode for Jxtadoop"
+    iconFile="$INSTALL_PATH\jxtadoop-${app.version}\etc\jxtadoop.ico"
+    iconIndex="0"
+    initialState="noShow"
+    programGroup="yes"
+    desktop="yes"
+    applications="no"
+    startMenu="no"
+    startup="yes">
+    <createForPack name="Base"/>
+  </shortcut>
+  
+<shortcut
+     name="Uninstall Jxtadoop"
+     programGroup="yes"
+     desktop="no"
+     applications="no"
+     startMenu="no"
+     startup="no"
+     target="$JAVA_HOME\bin\java.exe"
+     workingDirectory=""
+     commandLine="-jar $INSTALL_PATH/Uninstaller/uninstaller.jar"
+     initialState="normal"
+     iconFile="trashcan_full"
+     iconIndex="0"
+     description="Jxtadoop Uninstaller">
+     <createForPack name="Base" />
+   </shortcut>  
+  
+  
+</shortcuts>
