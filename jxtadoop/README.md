@@ -13,6 +13,8 @@ Current version 0.7.0
 Version 0.7.0
 ------------
 - Installer for Windows and Linux
+- Desktop tray icon with Info & Shutdown menu
+- Windows startup script
 
 Version 0.6.1
 ------------

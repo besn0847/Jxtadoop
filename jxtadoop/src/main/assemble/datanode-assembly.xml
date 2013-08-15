@@ -30,6 +30,8 @@
 				<include>hadoop-daemon.sh</include>
 				<include>hadoop-env.sh</include>
 				<include>start-datanode.sh</include>
+				<include>datanode.bat</include>
+				<include>hadoop.bat</include>
 			</includes>
   		</fileSet>
   		
@@ -50,6 +52,7 @@
 				<include>log4j.properties</include>
 				<include>logging.properties</include>		
                 <include>jxtadoop.png</include>
+                <include>jxtadoop.ico</include>
 			</includes>
   		</fileSet>
   		

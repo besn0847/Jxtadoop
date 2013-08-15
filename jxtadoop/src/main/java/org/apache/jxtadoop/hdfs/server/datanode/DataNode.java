@@ -699,6 +699,8 @@ public class DataNode extends Configured
     while (shouldRun) {
       try {
         long startTime = now();
+        
+        LOG.debug("Connected to NN : "+this.isConnectedToNN());
 
         //
         // Every so often, send heartbeat or block-report
@@ -720,6 +722,7 @@ public class DataNode extends Configured
                                                        xmitsInProgress.get(),
                                                        getXceiverCount());
           myMetrics.heartbeats.inc(now() - startTime);
+          if (!isConnected) isConnected =  true;
           //LOG.info("Just sent heartbeat, with name " + localName);
           if (!processCommand(cmds))
             continue;
