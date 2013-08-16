@@ -2,7 +2,7 @@
 
 FIRST : Make sure you use JRE 1.7+
 
--- Namenode
+-- Namenode (Linux)
 	1/ Set the JAVA_HOME and JRE_HOME environment variables
 	2/ Unzip the jxtadoop-datanode-x.y.z.zip to the target directory
 			+ chmod the executable in bin/ directory
@@ -12,12 +12,12 @@ FIRST : Make sure you use JRE 1.7+
 			hadoop.p2p.rpc.relay 
 		Note that this 2 properties are mandatory even if the same multicast network
 		to avoid issues with multiple namenodes running in the same network.
-	4/ Initiliaze thenamenode : 
+	4/ Initialize the namenode : 
 			> bin/hadoop namenode -format
 	5/ Start up the namenode
 			> bin/start-namenode.sh
 
--- Datanode
+-- Datanode (Linux)
 	1/ Set the JAVA_HOME and JRE_HOME environment variables
 	2/ Unzip the jxtadoop-datanode-x.y.z.zip to the target directory
 			+ chmod the executable in bin/ directory

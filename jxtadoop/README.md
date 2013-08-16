@@ -14,7 +14,7 @@ Version 0.7.0
 ------------
 - Installer for Windows and Linux
 - Desktop tray icon with Info & Shutdown menu
-- Windows startup script
+- Windows port for Datanode 
 
 Version 0.6.1
 ------------
