@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,8 @@ import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
+import net.jxta.document.MimeMediaType;
+import net.jxta.endpoint.router.RouteController;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.IDFactory;
 import net.jxta.impl.membership.pse.FileKeyStoreManager;
@@ -40,6 +43,7 @@ import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PipeAdvertisement;
+import net.jxta.protocol.RouteAdvertisement;
 import net.jxta.socket.JxtaSocketAddress;
 
 import org.apache.commons.logging.Log;
@@ -96,7 +100,7 @@ public abstract class Peer implements P2PConstants {
 	/**
 	 * The peer identifier
 	 */
-	protected static PeerID pid;
+	protected PeerID pid;
 	/**
 	 * The rpc pipe identifier
 	 */
@@ -200,6 +204,7 @@ public abstract class Peer implements P2PConstants {
 	
 	public Peer(String s, Configuration c, String p) {
 		System.setProperty("net.jxta.endpoint.WireFormatMessageFactory.CBJX_DISABLE", "true");
+		AdvertisementFactory.registerAdvertisementInstance(MulticastAdvertisement.getAdvertisementType(),new  MulticastAdvertisement.Instantiator());
 		
 		this.peerseed = s;
 		// init config
@@ -291,13 +296,13 @@ public abstract class Peer implements P2PConstants {
 		
 		 if (CRTfile.length == 0 ) {
 			 Random randomGenerator = new Random();
-			 pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());
-			 
+			 this.pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());			 
 		 } else if (CRTfile.length == 1) {
-			pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
+			this.pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
 		 } else {
 			throw new SecurityException();
 		 }
+		 
 	}
 	/**
 	 * Load the keystore manager and the keystore needed for the access membership of the default net peergoup.
@@ -431,7 +436,7 @@ public abstract class Peer implements P2PConstants {
 	 */
 
 	public String getPeerIDwithoutURN() {
-		return pid.toString().replaceAll("urn:jxta:cbid-", "");
+		return this.pid.toString().replaceAll("urn:jxta:cbid-", "");
 	}
 	/**
 	 * Return the rpc pipe identifier
@@ -531,6 +536,7 @@ public abstract class Peer implements P2PConstants {
 		 */
 		PeerMonitor() {
 			this(null);
+			
 		}
 		/**
 		 * This constructor is used for the datanode.
@@ -634,7 +640,7 @@ public abstract class Peer implements P2PConstants {
 				
 					/*
 					 * If the peer discovery listener is not null, then this is a datanode
-					 * Then trigger a datanode peer discovery in the cloud.
+					 * Then trigger a datanode peer discovery in the cloud + a multicast discovery
 					 * The threshold is set to a high value (here 10,000) since for a non-multicast situation,
 					 * the rendez-vous will return hundreds of advertisement.				
 					 */
@@ -645,6 +651,9 @@ public abstract class Peer implements P2PConstants {
 						} catch (Exception e) {
 							LOG.error(e.getMessage());
 						}
+						
+						ds.getRemoteAdvertisements(null, DiscoveryService.ADV, null, null, P2PConstants.MAXADVDISCOVERYCOUNT,dnlist);
+						ds.getRemoteAdvertisements(null,DiscoveryService.ADV, null, null, P2PConstants.MAXADVDISCOVERYCOUNT,this);
 					} else {
 						ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*",P2PConstants.MAXCLOUDPEERCOUNT,this);
 					}
@@ -653,6 +662,7 @@ public abstract class Peer implements P2PConstants {
 		}
 		/**
 		 * Remove the peer for the non-responded map if the advertisement is received.
+		 * Also handle the Multicast adv depending on node profile (nn or dn)
 		 */
 		public void discoveryEvent(DiscoveryEvent event) {
 			DiscoveryResponseMsg response = event.getResponse();
@@ -682,6 +692,38 @@ public abstract class Peer implements P2PConstants {
 								}
 							}
 						}				
+					}
+				}
+			} else if (response.getDiscoveryType() == DiscoveryService.ADV) {
+				Enumeration<Advertisement> en = response.getAdvertisements();
+				
+				if(en!=null) {
+					while (en.hasMoreElements()) {
+						Advertisement adv = (Advertisement) en.nextElement();
+										
+						// A multicast adv has been found : it be republished to the NameNode who handles the overall multicast map
+						if (adv.getAdvType().equals(MulticastAdvertisement.AdvertisementType)) {
+								// LOG.debug("Found a Multicast Advertisement");
+								MulticastAdvertisement madv = (MulticastAdvertisement)adv;
+								String remote = madv.getRemote();
+								String local = madv.getLocal();
+								
+								if (local.equals("")) {
+									if(remote.equals(pid.toString())) {
+										// This is my own discovery, do nothing 
+									} else {
+										// This a multicast disco from the discovery peer; reforwarding to the namenode
+										madv.setLocal(pid.toString());
+										//try {
+											// ds.publish(madv);
+											ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
+										//} catch (IOException e) {}
+									}
+								} else {
+									//LOG.debug(("This is a multicast adv from Datanode peer"));
+									// Do nothing
+								}
+						}
 					}
 				}
 			}

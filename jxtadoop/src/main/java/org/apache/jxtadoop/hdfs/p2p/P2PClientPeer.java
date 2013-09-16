@@ -39,6 +39,8 @@ public class P2PClientPeer extends Peer implements DiscoveryListener {
 	
 	@Override
 	public void setupNetworking() throws LoginException, IOException, javax.security.cert.CertificateException, PeerGroupException {
+		Boolean useMulticast = new Boolean(pc.get("hadoop.p2p.use.multicast"));
+		
 		nm = new NetworkManager(NetworkManager.ConfigMode.EDGE, UserGroupInformation.login(pc).getUserName()+"P2P Client Peer",p2pdir.toURI());
 		
 		nm.setConfigPersistent(false);
@@ -54,8 +56,12 @@ public class P2PClientPeer extends Peer implements DiscoveryListener {
 			
 		nc.setTcpStartPort(-1);
 		nc.setTcpEndPort(-1);
-		nc.setUseMulticast(Boolean.getBoolean(pc.get("hadoop.p2p.use.multicast")));
-			
+		if(!useMulticast) {
+			nc.setUseMulticast(true);
+		} else {
+			nc.setUseMulticast(true);
+		}
+		
 		nc.setPeerID(pid);
 		nc.setName(P2PConstants.P2PCLIENTTAG+" - "+nc.getName());
 	    nc.setKeyStoreLocation(KeyStoreFile.toURI());
@@ -63,11 +69,19 @@ public class P2PClientPeer extends Peer implements DiscoveryListener {
 	    
 	    nc.clearRendezvousSeeds();
 		nc.addSeedRendezvous(URI.create(pc.get("hadoop.p2p.rpc.rdv")));
-		nc.setUseOnlyRendezvousSeeds(true);
+		if(!useMulticast) {
+			nc.setUseOnlyRendezvousSeeds(true);
+		} else {
+			nc.setUseOnlyRendezvousSeeds(false);	
+		}
 		
 		nc.clearRelaySeeds();
         nc.addSeedRelay(URI.create(pc.get("hadoop.p2p.rpc.relay")));
-        nc.setUseOnlyRelaySeeds(true);
+        if(!useMulticast) {
+        	nc.setUseOnlyRelaySeeds(true);
+        } else {
+        	nc.setUseOnlyRelaySeeds(false);
+        }
 	}
 	
 	public void startNetworking() throws PeerGroupException, IOException {

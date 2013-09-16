@@ -1,17 +1,31 @@
 package org.apache.jxtadoop.hdfs.p2p;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import net.jxta.discovery.DiscoveryEvent;
+import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
+import net.jxta.document.Advertisement;
+import net.jxta.document.MimeMediaType;
+import net.jxta.endpoint.EndpointAddress;
+import net.jxta.endpoint.router.RouteController;
 import net.jxta.exception.PeerGroupException;
+import net.jxta.id.IDFactory;
+import net.jxta.impl.protocol.PeerAdv;
 import net.jxta.peer.PeerID;
 import net.jxta.platform.NetworkManager;
+import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
+import net.jxta.protocol.RouteAdvertisement;
 import net.jxta.rendezvous.RendezVousService;
 import net.jxta.rendezvous.RendezvousEvent;
 import net.jxta.rendezvous.RendezvousListener;
@@ -22,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jxtadoop.conf.Configuration;
+import org.apache.jxtadoop.hdfs.server.namenode.NameNode;
 import org.apache.jxtadoop.security.UserGroupInformation;
 
 /**
@@ -39,8 +54,12 @@ import org.apache.jxtadoop.security.UserGroupInformation;
  *
  */
 @SuppressWarnings({"rawtypes","unchecked"})
-public class NamenodePeer extends Peer implements RendezvousListener {
+public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryListener {
 	public static final Log LOG = LogFactory.getLog(NamenodePeer.class);
+	/**
+	 * The Namonode parent; needed to access the cluster map
+	 */
+	private NameNode namenodeObject;
 	/**
 	 * The jxta server socket on which the RPC server will liste,.
 	 */
@@ -50,7 +69,6 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	 * The listener array
 	 */
 	private List _dnlisteners = new ArrayList();
-	
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
 	 * @param s The peer unique name
@@ -65,6 +83,16 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 	 */
 	public NamenodePeer(String s, Configuration c) {
 		super(s,c);
+	}
+	/**
+	 * Constructor with the peer name unique ID and the configuration to be used. This is important for the peer ID and key generation.
+	 * @param s The peer unique name
+	 * @param c The configuration to be used
+	 * @param n The namenode parent
+	 */
+	public NamenodePeer(String s, Configuration c, NameNode n) {
+		super(s,c);
+		this.namenodeObject = n;
 	}
 	/**
 	 * This method set up the jxta peer network configuration.
@@ -120,6 +148,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 		}
 		
 		ds = npg.getDiscoveryService();
+		ds.addDiscoveryListener(this);
 	}
 	/**
 	 * The start-up includes 2 steps.<br>
@@ -148,7 +177,7 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 			if ( event.getType() == RendezvousEvent.CLIENTCONNECT || event.getType() == RendezvousEvent.CLIENTRECONNECT) {
 				LOG.info("\tClient connected - PeerID : "+event.getPeerID());
 				datanodepeers.put((PeerID)event.getPeerID(),(PeerAdvertisement)null);
-				LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());
+				LOG.debug("Total number of datanode in the cloud : "+datanodepeers.size());					
 			} else if (event.getType() == RendezvousEvent.CLIENTDISCONNECT || event.getType() == RendezvousEvent.CLIENTFAILED) {
 				LOG.info("\tClient disconnected - PeerID : "+event.getPeerID());
 				if(datanodepeers.containsKey((PeerID)event.getPeerID()))
@@ -159,6 +188,37 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 			}
 		}
 	}
+	/**
+	 * Process multicast advertisment from Datanode peers 
+	 */
+	@Override
+	public void discoveryEvent(DiscoveryEvent event) {
+		DiscoveryResponseMsg response = event.getResponse();
+		
+		if (response.getDiscoveryType() == DiscoveryService.ADV) {
+			Enumeration<Advertisement> en = response.getAdvertisements();
+			
+			if(en!=null) {
+				while (en.hasMoreElements()) {
+					Advertisement adv = (Advertisement) en.nextElement();
+									
+					// A multicast adv has been found : updating the topology hash
+					if (adv.getAdvType().equals(MulticastAdvertisement.AdvertisementType)) {
+							MulticastAdvertisement madv = (MulticastAdvertisement)adv;
+							String remote = madv.getRemote();
+							String local = madv.getLocal();
+							String msg = "Multicast domain : "
+									+ "\n\t Local : \t" + local
+									+ "\n\t Remote : \t" + remote
+									+ "\n" ;
+							
+							if(namenodeObject.namesystem.contains(local) && namenodeObject.namesystem.contains(remote))							
+									LOG.debug(msg);
+							}
+					}
+				}
+			}
+		}
 	/**
 	 * Published the pipe advertisement in the cloud and set the server socket object.
 	 * @throws IOException The publishing failed.
@@ -203,6 +263,6 @@ public class NamenodePeer extends Peer implements RendezvousListener {
 
 		while(i.hasNext())	{
 			((P2PListener) i.next()).handleDisconnectEvent(event);
-		}
+		}	
 	}
 }

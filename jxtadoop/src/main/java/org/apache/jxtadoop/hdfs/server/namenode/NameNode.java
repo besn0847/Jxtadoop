@@ -60,7 +60,7 @@ import org.apache.jxtadoop.ipc.RPC;
 import org.apache.jxtadoop.ipc.Server;
 import org.apache.jxtadoop.util.ReflectionUtils;
 import org.apache.jxtadoop.util.StringUtils;
-import org.apache.jxtadoop.net.NetworkTopology;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.security.SecurityUtil;
 import org.apache.jxtadoop.security.UserGroupInformation;
 import org.apache.jxtadoop.security.authorize.AuthorizationException;
@@ -259,9 +259,10 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
    * @throws IOException
    */
   public NameNode(Configuration conf) throws IOException {
-	  nnpeer = new NamenodePeer("Jxtadoop Namenode Peer", conf);
-	  
 	  namenodeObject = this;
+	  
+	  // nnpeer = new NamenodePeer("Jxtadoop Namenode Peer", conf);
+	  nnpeer = new NamenodePeer("Jxtadoop Namenode Peer", conf, namenodeObject);
 	  
     try {
       initialize(conf);
@@ -803,7 +804,7 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
     return serverAddress;
   }
 
-  NetworkTopology getNetworkTopology() {
+  Peer2peerTopology getNetworkTopology() {
     return this.namesystem.clusterMap;
   }
 

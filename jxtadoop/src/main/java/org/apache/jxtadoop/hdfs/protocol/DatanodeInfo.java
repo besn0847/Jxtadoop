@@ -12,7 +12,7 @@ import org.apache.jxtadoop.io.Writable;
 import org.apache.jxtadoop.io.WritableFactories;
 import org.apache.jxtadoop.io.WritableFactory;
 import org.apache.jxtadoop.io.WritableUtils;
-import org.apache.jxtadoop.net.NetworkTopology;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.net.Node;
 import org.apache.jxtadoop.net.NodeBase;
 import org.apache.jxtadoop.util.StringUtils;
@@ -29,7 +29,7 @@ public class DatanodeInfo extends DatanodeID implements Node {
   protected long remaining;
   protected long lastUpdate;
   protected int xceiverCount;
-  protected String location = NetworkTopology.DEFAULT_RACK;
+  protected String location = Peer2peerTopology.DEFAULT_RACK;
 
   /** HostName as suplied by the datanode during registration as its 
    * name. Namenode uses datanode IP address as the name.
@@ -160,7 +160,7 @@ public class DatanodeInfo extends DatanodeID implements Node {
     float remainingPercent = getRemainingPercent();
 
     buffer.append("Name: "+id+"\n");
-    if (!NetworkTopology.DEFAULT_RACK.equals(location)) {
+    if (!Peer2peerTopology.DEFAULT_RACK.equals(location)) {
       buffer.append("Rack: "+location+"\n");
     }
     buffer.append("Decommission Status : ");
@@ -188,7 +188,7 @@ public class DatanodeInfo extends DatanodeID implements Node {
     long r = getRemaining();
     long u = getDfsUsed();
     buffer.append(id);
-    if (!NetworkTopology.DEFAULT_RACK.equals(location)) {
+    if (!Peer2peerTopology.DEFAULT_RACK.equals(location)) {
       buffer.append(" "+location);
     }
     if (isDecommissioned()) {

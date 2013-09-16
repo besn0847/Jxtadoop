@@ -86,7 +86,7 @@ implements Configurable
 
     if (scriptName == null) {
       for (int i = 0; i < names.size(); i++) {
-        m.add(NetworkTopology.DEFAULT_RACK);
+        m.add(Peer2peerTopology.DEFAULT_RACK);
       }
       return m;
     }

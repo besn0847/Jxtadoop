@@ -50,7 +50,7 @@ import org.apache.jxtadoop.util.StringUtils;
 import org.apache.jxtadoop.metrics.util.MBeanUtil;
 import org.apache.jxtadoop.net.CachedDNSToSwitchMapping;
 import org.apache.jxtadoop.net.DNSToSwitchMapping;
-import org.apache.jxtadoop.net.NetworkTopology;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.net.ScriptBasedMapping;
 import org.apache.jxtadoop.hdfs.server.namenode.LeaseManager.Lease;
 import org.apache.jxtadoop.hdfs.server.namenode.UnderReplicatedBlocks.BlockIterator;
@@ -281,7 +281,7 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
   private Host2NodesMap host2DataNodeMap = new Host2NodesMap();
     
   // datanode networktoplogy
-  NetworkTopology clusterMap = new NetworkTopology();
+  Peer2peerTopology clusterMap = new Peer2peerTopology();
   // Use less in P2P : private DNSToSwitchMapping dnsToSwitchMapping;
   
   // for block replicas placement
@@ -443,7 +443,8 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
                             + minReplication
                             + " must be less than dfs.replication.max = " 
                             + maxReplication);
-    this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", 2);
+    //this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", 2);
+    this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", P2PConstants.MAX_REPLICATION_STREAMS);
     long heartbeatInterval = conf.getLong("dfs.heartbeat.interval", 3) * 1000;
     this.heartbeatRecheckInterval = conf.getInt(
         "heartbeat.recheck.interval", 1 * 20 * 1000); // 10 seconds - orig was 5 minutes
@@ -612,6 +613,19 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
                               curReplicasDelta, expectedReplicasDelta);
   }
 
+  public boolean contains(String peerid) {
+	  if(peerid.startsWith("urn:jxta:cbid-"))
+		  peerid = peerid.substring(14);
+	  
+	  LOG.debug("Searching for : "+peerid);
+	  
+	  DatanodeDescriptor dnreg = host2DataNodeMap.getDatanodeByHost(peerid);
+	  
+	  if (dnreg == null) 
+		  return false;
+	  else
+		  return true;
+  }
   /////////////////////////////////////////////////////////
   //
   // These methods are called by secondary namenodes
@@ -2130,6 +2144,7 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
           nodeS.isAlive = true;
         }
       }
+      
       return;
     } 
 
@@ -2144,7 +2159,7 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
     }
     // register new datanode
     DatanodeDescriptor nodeDescr 
-      = new DatanodeDescriptor(nodeReg, NetworkTopology.DEFAULT_RACK, nodeReg.getPeerId());
+      = new DatanodeDescriptor(nodeReg, Peer2peerTopology.DEFAULT_RACK, nodeReg.getPeerId());
     
     resolveNetworkLocation(nodeDescr);
     unprotectedAddDatanode(nodeDescr);
@@ -2180,7 +2195,7 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
     /*if (rName == null) {
       LOG.error("The resolve call returned null! Using " + 
           NetworkTopology.DEFAULT_RACK + " for host " + names);*/
-      networkLocation = NetworkTopology.DEFAULT_RACK;
+      networkLocation = Peer2peerTopology.DEFAULT_RACK;
     /*} else {
       networkLocation = rName.get(0);
     }*/

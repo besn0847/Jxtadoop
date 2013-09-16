@@ -23,7 +23,7 @@ import org.apache.jxtadoop.hdfs.protocol.DatanodeID;
 import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.protocol.LocatedBlock;
-import org.apache.jxtadoop.net.NetworkTopology;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.net.Node;
 import org.apache.jxtadoop.net.NodeBase;
 
@@ -42,11 +42,11 @@ class ReplicationTargetChooser {
   public static final Log LOG = LogFactory.getLog(ReplicationTargetChooser.class);
 	
   private final boolean considerLoad; 
-  private NetworkTopology clusterMap;
+  private Peer2peerTopology clusterMap;
   private FSNamesystem fs;
     
   ReplicationTargetChooser(boolean considerLoad,  FSNamesystem fs,
-                           NetworkTopology clusterMap) {
+		  Peer2peerTopology clusterMap) {
     this.considerLoad = considerLoad;
     this.fs = fs;
     this.clusterMap = clusterMap;
@@ -525,7 +525,7 @@ class ReplicationTargetChooser {
    */
   public static int verifyBlockPlacement(LocatedBlock lBlk,
                                          short replication,
-                                         NetworkTopology cluster) {
+                                         Peer2peerTopology cluster) {
     int numRacks = verifyBlockPlacement(lBlk, Math.min(2,replication), cluster);
     return numRacks < 0 ? 0 : numRacks;
   }
@@ -542,7 +542,7 @@ class ReplicationTargetChooser {
    */
   public static int verifyBlockPlacement(LocatedBlock lBlk,
                                          int minRacks,
-                                         NetworkTopology cluster) {
+                                         Peer2peerTopology cluster) {
     DatanodeInfo[] locs = lBlk.getLocations();
     if (locs == null)
       locs = new DatanodeInfo[0];

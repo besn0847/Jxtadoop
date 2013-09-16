@@ -70,9 +70,13 @@ public interface P2PConstants {
 	 */
 	public static final String P2PCLIENTTAG = "P2PCLIENT";
 	/**
+	 * The p2p disco  tag used in the advertisement from those peers
+	 */
+	public static final String P2PDISCOTAG = "P2PDISCO";
+	/**
 	 * The timeout for a peer remote discovery used by the peer monitor.
 	 */
-	public static final int PEERDELETIONTIMEOUT = 300000;
+	public static final int PEERDELETIONTIMEOUT = 3000;
 	/**
 	 * The maximum number of retries before considering a datanode is no longer part of the peer cloud.
 	 */
@@ -121,4 +125,8 @@ public interface P2PConstants {
 	 * Number of chars in the peer id
 	 */
 	public static final int PEER_ID_LENGTH = 66;
+	/**
+	 * Number of concurrent replication streams
+	 */
+	public static final int MAX_REPLICATION_STREAMS = 10;
 }

@@ -62,6 +62,7 @@ import org.apache.jxtadoop.conf.Configured;
 import org.apache.jxtadoop.hdfs.HDFSPolicyProvider;
 import org.apache.jxtadoop.hdfs.desktop.DesktopTray;
 import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
+import org.apache.jxtadoop.hdfs.p2p.DiscoveryPeer;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.Block;
 import org.apache.jxtadoop.hdfs.protocol.BlockListAsLongs;
@@ -167,6 +168,7 @@ public class DataNode extends Configured
    * The datanode peer as per Jxta
    */
   private DatanodePeer dnpeer = null;
+  private DiscoveryPeer dp = null;
 
   volatile boolean shouldRun = true;
   private LinkedList<Block> receivedBlockList = new LinkedList<Block>();
@@ -223,6 +225,7 @@ public class DataNode extends Configured
     datanodeObject = this;
     
     dnpeer = new DatanodePeer("DN - "+ System.getProperty("jxtadoop.datanode.id"));
+    dp = new DiscoveryPeer("DISCO - "+ System.getProperty("jxtadoop.datanode.id"));
 
     try {
       startDataNode(conf, dataDirs);
@@ -249,6 +252,14 @@ public class DataNode extends Configured
 	  dnpeer.initialize();
 	  dnpeer.start();
 	  
+	  try {
+		  dp.init();
+		  dp.start();
+	  } catch (Exception e) {
+		  LOG.fatal(e.getMessage());
+	  }
+	  
+	  
 	  while (dnpeer.getRpcSocketAddress() == null ) {
 		  try {
 			Thread.sleep(1000);
@@ -267,6 +278,7 @@ public class DataNode extends Configured
                                      conf.get("dfs.datanode.dns.nameserver","default"));
     }*/
 	  machineName = dnpeer.getPeerIDwithoutURN();
+	  LOG.debug("Datanode registration name : "+machineName);
     
    // this.socketTimeout =  conf.getInt("dfs.socket.timeout",
    //                                   HdfsConstants.READ_TIMEOUT);

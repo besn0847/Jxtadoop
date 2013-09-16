@@ -46,7 +46,7 @@ public class NetworkTopology {
   /* Inner Node represent a switch/router of a data center or rack.
    * Different from a leave node, it has non-null children.
    */
-  private class InnerNode extends NodeBase {
+  protected class InnerNode extends NodeBase {
     private ArrayList<Node> children=new ArrayList<Node>();
     private int numOfLeaves;
         
@@ -111,7 +111,7 @@ public class NetworkTopology {
     }
         
     /* Return a child name of this node who is an ancestor of node <i>n</i> */
-    private String getNextAncestorName(Node n) {
+    protected String getNextAncestorName(Node n) {
       if (!isAncestor(n)) {
         throw new IllegalArgumentException(
                                            this + "is not an ancestor of " + n);
@@ -224,7 +224,7 @@ public class NetworkTopology {
     } // end of remove
         
     /** Given a node's string representation, return a reference to the node */ 
-    private Node getLoc(String loc) {
+    protected Node getLoc(String loc) {
       if (loc == null || loc.length() == 0) return this;
             
       String[] path = loc.split(PATH_SEPARATOR_STR, 2);
@@ -245,7 +245,7 @@ public class NetworkTopology {
         
     /** get <i>leafIndex</i> leaf of this subtree 
      * if it is not in the <i>excludedNode</i>*/
-    private Node getLeaf(int leafIndex, Node excludedNode) {
+    protected Node getLeaf(int leafIndex, Node excludedNode) {
       int count=0;
       // check if the excluded node a leaf
       boolean isLeaf =
@@ -297,8 +297,8 @@ public class NetworkTopology {
   } // end of InnerNode
     
   InnerNode clusterMap = new InnerNode(InnerNode.ROOT); // the root
-  private int numOfRacks = 0;  // rack counter
-  private ReadWriteLock netlock;
+  protected int numOfRacks = 0;  // rack counter
+  protected ReadWriteLock netlock;
     
   public NetworkTopology() {
     netlock = new ReentrantReadWriteLock();
@@ -600,7 +600,7 @@ public class NetworkTopology {
   }
 
   /* swap two array items */
-  static private void swap(Node[] nodes, int i, int j) {
+  static protected void swap(Node[] nodes, int i, int j) {
     Node tempNode;
     tempNode = nodes[j];
     nodes[j] = nodes[i];

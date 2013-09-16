@@ -46,9 +46,15 @@
 </property>
 
 <property>
+  <name>hadoop.p2p.datanode.relay</name>
+  <value>false</value>
+  <description>Should the Datanode behave like a relay</description>
+</property>
+
+<property>
   <name>hadoop.p2p.use.multicast</name>
   <value>true</value>
-  <description>Should multicast be enabled</description>
+  <description>Should multicast be enabled (default : yes)</description>
 </property>
 
 <property>

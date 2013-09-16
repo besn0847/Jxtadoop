@@ -74,7 +74,6 @@ import org.apache.jxtadoop.io.retry.RetryProxy;
 import org.apache.jxtadoop.ipc.RPC;
 import org.apache.jxtadoop.ipc.RemoteException;
 import org.apache.jxtadoop.net.NetUtils;
-import org.apache.jxtadoop.net.NetworkTopology;
 import org.apache.jxtadoop.security.UnixUserGroupInformation;
 import org.apache.jxtadoop.security.UserGroupInformation;
 import org.apache.jxtadoop.util.StringUtils;

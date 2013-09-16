@@ -190,7 +190,7 @@ public class DesktopTray extends Frame implements Runnable {
 	            	
 			            try  {
 						  while(shouldRun) {
-							  Thread.sleep(1000);
+							  Thread.sleep(5000);
 							  
 							  if(datanode !=null) {
 								  msg = "dnStatus : "+this.dnStatus+";\t connected : "+(datanode.isConnectedToNN());
@@ -204,6 +204,8 @@ public class DesktopTray extends Frame implements Runnable {
 								  } else if  (this.dnStatus == 2 && datanode.isConnectedToNN()) {
 									  this.setDesktopIconStart();
 									  this.dnStatus = 1;
+								  } else if (this.dnStatus == 1) {
+									  this.setDesktopIconStart();
 								  }
 							  }
 						  }  
