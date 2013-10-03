@@ -76,7 +76,7 @@ public interface P2PConstants {
 	/**
 	 * The timeout for a peer remote discovery used by the peer monitor.
 	 */
-	public static final int PEERDELETIONTIMEOUT = 3000;
+	public static final int PEERDELETIONTIMEOUT = 30000;
 	/**
 	 * The maximum number of retries before considering a datanode is no longer part of the peer cloud.
 	 */

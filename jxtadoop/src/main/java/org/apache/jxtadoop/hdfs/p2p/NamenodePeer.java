@@ -6,8 +6,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import javax.security.auth.login.LoginException;
 
@@ -69,6 +72,14 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 	 * The listener array
 	 */
 	private List _dnlisteners = new ArrayList();
+	/**
+	 *  The map linking peers to multi cast domain 
+	 */
+	private HashMap<String,Collection<String>> multicastMap = new HashMap<String,Collection<String>>();
+	/**
+	 * All the listeners listening to multicast event
+	 */
+	private transient Vector multicastListeners;
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
 	 * @param s The peer unique name
@@ -156,7 +167,7 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 	 * Then the peer monitor thread is started to monitor the datanode cloud.
 	 */
 	@Override
-	public void start() {
+	public void start() {		
 		try {			
 			publishPipeAdvertisement();
 		} catch (IOException e) {
@@ -212,13 +223,46 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 									+ "\n\t Remote : \t" + remote
 									+ "\n" ;
 							
+							// 
 							if(namenodeObject.namesystem.contains(local) && namenodeObject.namesystem.contains(remote))							
-									LOG.debug(msg);
-							}
+								// LOG.debug(msg);
+								if(!multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
+									LOG.debug("Adding local & remote peers to the multicast map");
+									Collection<String> domain = (Collection)new HashSet<String>();
+									domain.add(local);
+									domain.add(remote);
+									multicastMap.put(local, domain);
+									multicastMap.put(remote, domain);
+								} else if (!multicastMap.containsKey(local) && multicastMap.containsKey(remote)) {
+									LOG.debug("Adding local peer to the multicast map");
+									Collection<String> domain = multicastMap.get(remote);
+									domain.add(local);
+									multicastMap.put(local, domain);
+								} else if (multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
+									LOG.debug("Adding remote peer to the multicast map");
+									Collection<String> domain = multicastMap.get(local);
+									domain.add(remote);
+									multicastMap.put(remote, domain);
+								} else {
+									LOG.debug("Peers already in the multicast map");
+									Collection<String> domain = multicastMap.get(local);
+									//String mcd = "--Multicast domain contains : ";
+								
+									String s;
+									Iterator<String> is = domain.iterator();
+									while(is.hasNext()) {
+										//s = is.next();
+										//mcd += "\n\t" + s;
+										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									}
+									//mcd += "\n";
+									//LOG.debug(mcd);
+								}
+							} 
+						}
 					}
 				}
 			}
-		}
 	/**
 	 * Published the pipe advertisement in the cloud and set the server socket object.
 	 * @throws IOException The publishing failed.
@@ -264,5 +308,33 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 		while(i.hasNext())	{
 			((P2PListener) i.next()).handleDisconnectEvent(event);
 		}	
+	}
+	/**
+	 * Add the multicast listener to the track list
+	 **/
+	synchronized public void addMulticastListener(MulticastListener l) {
+		if(multicastListeners == null) {
+			multicastListeners = new Vector();
+		}
+		multicastListeners.addElement(l);
+	}
+	/**
+	 * Remove the multicast listener from the track list
+	 **/
+	synchronized public void removeMulticastListener(MulticastListener l) {
+		if(multicastListeners == null) {
+			multicastListeners = new Vector();
+		}
+		multicastListeners.removeElement(l);
+	}
+	/**
+	 * Fire multicast event
+	 */
+	public synchronized void fireMulticastEvent(MulticastEvent event)	{
+		Iterator i = multicastListeners.iterator();
+		
+		while(i.hasNext())	{
+			((MulticastListener) i.next()).multicastDetected(event);
+		}
 	}
 }

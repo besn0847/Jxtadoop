@@ -33,6 +33,8 @@ import org.apache.jxtadoop.fs.permission.FsPermission;
 import org.apache.jxtadoop.fs.permission.PermissionStatus;
 import org.apache.jxtadoop.hdfs.HDFSPolicyProvider;
 import org.apache.jxtadoop.hdfs.p2p.DatanodeEvent;
+import org.apache.jxtadoop.hdfs.p2p.MulticastEvent;
+import org.apache.jxtadoop.hdfs.p2p.MulticastListener;
 import org.apache.jxtadoop.hdfs.p2p.NamenodePeer;
 import org.apache.jxtadoop.hdfs.p2p.P2PListener;
 import org.apache.jxtadoop.hdfs.protocol.Block;
@@ -112,7 +114,7 @@ import java.util.Iterator;
 @SuppressWarnings({"unused"})
 public class NameNode implements ClientProtocol, DatanodeProtocol,
                                  NamenodeProtocol, FSConstants,
-                                 RefreshAuthorizationPolicyProtocol, P2PListener {
+                                 RefreshAuthorizationPolicyProtocol, P2PListener, MulticastListener {
   static{
     Configuration.addDefaultResource("hdfs-default.xml");
     Configuration.addDefaultResource("hdfs-site.xml");
@@ -194,6 +196,7 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 	  nnpeer.start();
 	  
 	  nnpeer.addP2PEventListener(this);
+	  nnpeer.addMulticastListener(this);
 	  
 	  LOG.debug("Namenode peer ID : "+nnpeer.getPeerID().toString());
 	  LOG.debug("RPC pipe ID : "+nnpeer.getRpcPipeID().toString());
@@ -990,5 +993,26 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 			LOG.debug("Removing datanode upon notification : "+dnpid);
 			h2dnm.remove(dndesc);
 		}
+	}
+
+	/**
+	 * A new multicast event has been received; Need to update the P2P network topology 
+	 */
+	@Override
+	public void multicastDetected(MulticastEvent me) {
+		String p = me.getPeerID();
+		Collection<String> d = me.getDomain();
+		int h = me.getHash();
+		
+		String mcd = "Multicast domain contains : ";
+		
+		String s;
+		Iterator<String> is = d.iterator();
+		while(is.hasNext()) {
+			s = is.next();
+			mcd += "\n\t" + s;
+		}
+		mcd += "\n";
+		LOG.debug(mcd);
 	}
 }
