@@ -42,6 +42,7 @@ import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.fs.permission.FsPermission;
 import org.apache.jxtadoop.net.NetUtils;
 import org.apache.jxtadoop.net.NodeBase;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.hdfs.DistributedFileSystem.DiskStatus;
 import org.apache.jxtadoop.hdfs.p2p.DFSClientPeer;
 import org.apache.jxtadoop.hdfs.p2p.DatanodePeer;
@@ -934,7 +935,15 @@ public class DFSClient implements FSConstants, java.io.Closeable {
   throws IOException {
     return namenode.getDatanodeReport(type);
   }
-    
+  
+  /**
+   * Returns the peer 2 peer network topology 
+   * @throws IOException
+   */
+  public Peer2peerTopology getNetworkTopology()  throws IOException {
+	  return namenode.getNetworkTopology();
+  }
+  
   /**
    * Enter, leave or get safe mode.
    * See {@link ClientProtocol#setSafeMode(FSConstants.SafeModeAction)} 

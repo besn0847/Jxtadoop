@@ -40,6 +40,7 @@ import org.apache.jxtadoop.hdfs.server.namenode.NameNode;
 import org.apache.jxtadoop.ipc.RPC;
 import org.apache.jxtadoop.ipc.RemoteException;
 import org.apache.jxtadoop.net.NetUtils;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.security.UnixUserGroupInformation;
 import org.apache.jxtadoop.security.authorize.RefreshAuthorizationPolicyProtocol;
 import org.apache.jxtadoop.util.StringUtils;
@@ -327,6 +328,28 @@ public class DFSAdmin extends FsShell {
   }
 
   /**
+   * Shows the network topology of the cluster
+   * @exception IOException if the filesystem does not exist.
+   */
+  public void showTopology() throws IOException {
+	  Peer2peerTopology topology;
+	  
+	  if (fs instanceof DistributedFileSystem) {
+		  DistributedFileSystem dfs = (DistributedFileSystem) fs;
+		  topology = dfs.getClient().getNetworkTopology();
+		  
+		  if(topology!=null) {
+			  System.out.println("Number of broadcast domains : "+topology.getNumOfRacks());
+		  	  System.out.println("Number of peer-to-peer nodes : "+topology.getNumOfLeaves());
+		  	  System.out.println();
+		  	  System.out.println(topology.printNetworkTopology());
+		  } else {
+			  System.err.println("Failed to retrieve network topology");
+		  }
+	  }
+  }
+  
+  /**
    * Safe mode maintenance command.
    * Usage: java DFSAdmin -safemode [enter | leave | get]
    * @param argv List of of command line parameters.
@@ -424,7 +447,7 @@ public class DFSAdmin extends FsShell {
   private void printHelp(String cmd) {
     String summary = "hadoop dfsadmin is the command to execute DFS administrative commands.\n" +
       "The full syntax is: \n\n" +
-      "hadoop dfsadmin [-report] [-safemode <enter | leave | get | wait>]\n" +
+      "hadoop dfsadmin [-report] [-topology] [-safemode <enter | leave | get | wait>]\n" +
       "\t[-saveNamespace]\n" +
       "\t[-refreshNodes]\n" +
       "\t[" + SetQuotaCommand.USAGE + "]\n" +
@@ -435,6 +458,8 @@ public class DFSAdmin extends FsShell {
       "\t[-help [cmd]]\n";
 
     String report ="-report: \tReports basic filesystem information and statistics.\n";
+    
+    String topology ="-topology: \tReports the network topology.\n";
         
     String safemode = "-safemode <enter|leave|get|wait>:  Safe mode maintenance command.\n" + 
       "\t\tSafe mode is a Namenode state in which it\n" +
@@ -486,7 +511,9 @@ public class DFSAdmin extends FsShell {
 
     if ("report".equals(cmd)) {
       System.out.println(report);
-    } else if ("safemode".equals(cmd)) {
+    } else if ("topology".equals(cmd)) {
+        System.out.println(topology);
+      }else if ("safemode".equals(cmd)) {
       System.out.println(safemode);
     } else if ("saveNamespace".equals(cmd)) {
       System.out.println(saveNamespace);
@@ -513,6 +540,7 @@ public class DFSAdmin extends FsShell {
     } else {
       System.out.println(summary);
       System.out.println(report);
+      System.out.println(topology);
       System.out.println(safemode);
       System.out.println(saveNamespace);
       System.out.println(refreshNodes);
@@ -651,6 +679,9 @@ public class DFSAdmin extends FsShell {
     if ("-report".equals(cmd)) {
       System.err.println("Usage: java DFSAdmin"
                          + " [-report]");
+    } else if ("-topology".equals(cmd)) {
+        System.err.println("Usage: java DFSAdmin"
+                + " [-topology]");
     } else if ("-safemode".equals(cmd)) {
       System.err.println("Usage: java DFSAdmin"
                          + " [-safemode enter | leave | get | wait]");
@@ -687,6 +718,7 @@ public class DFSAdmin extends FsShell {
     } else {
       System.err.println("Usage: java DFSAdmin");
       System.err.println("           [-report]");
+      System.err.println("           [-topology]");
       System.err.println("           [-safemode enter | leave | get | wait]");
       System.err.println("           [-saveNamespace]");
       System.err.println("           [-refreshNodes]");
@@ -736,7 +768,12 @@ public class DFSAdmin extends FsShell {
         printUsage(cmd);
         return exitCode;
       }
-    } else if ("-saveNamespace".equals(cmd)) {
+    } else if ("-topology".equals(cmd)) {
+        if (argv.length != 1) {
+            printUsage(cmd);
+            return exitCode;
+          }
+	} else if ("-saveNamespace".equals(cmd)) {
       if (argv.length != 1) {
         printUsage(cmd);
         return exitCode;
@@ -784,7 +821,9 @@ public class DFSAdmin extends FsShell {
     try {
       if ("-report".equals(cmd)) {
         report();
-      } else if ("-safemode".equals(cmd)) {
+      } else if ("-topology".equals(cmd)) {
+          showTopology();
+        } else if ("-safemode".equals(cmd)) {
         setSafeMode(argv, i);
       } else if ("-saveNamespace".equals(cmd)) {
         exitCode = saveNamespace();

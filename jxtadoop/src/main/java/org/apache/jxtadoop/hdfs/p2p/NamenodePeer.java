@@ -233,28 +233,31 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 									domain.add(remote);
 									multicastMap.put(local, domain);
 									multicastMap.put(remote, domain);
+									fireMulticastEvent(new MulticastEvent(this,local,domain));
 								} else if (!multicastMap.containsKey(local) && multicastMap.containsKey(remote)) {
 									LOG.debug("Adding local peer to the multicast map");
 									Collection<String> domain = multicastMap.get(remote);
 									domain.add(local);
 									multicastMap.put(local, domain);
+									fireMulticastEvent(new MulticastEvent(this,local,domain));
 								} else if (multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
 									LOG.debug("Adding remote peer to the multicast map");
 									Collection<String> domain = multicastMap.get(local);
 									domain.add(remote);
 									multicastMap.put(remote, domain);
+									fireMulticastEvent(new MulticastEvent(this,local,domain));
 								} else {
 									LOG.debug("Peers already in the multicast map");
-									Collection<String> domain = multicastMap.get(local);
+									//Collection<String> domain = multicastMap.get(local);
 									//String mcd = "--Multicast domain contains : ";
 								
-									String s;
-									Iterator<String> is = domain.iterator();
-									while(is.hasNext()) {
+									//String s;
+									//Iterator<String> is = domain.iterator();
+									//while(is.hasNext()) {
 										//s = is.next();
 										//mcd += "\n\t" + s;
-										fireMulticastEvent(new MulticastEvent(this,local,domain));
-									}
+										//fireMulticastEvent(new MulticastEvent(this,local,domain));
+									//}
 									//mcd += "\n";
 									//LOG.debug(mcd);
 								}

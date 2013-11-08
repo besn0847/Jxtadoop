@@ -112,7 +112,7 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 				e.printStackTrace();
 			}		
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(P2PConstants.PEERDELETIONTIMEOUT);
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 			}
@@ -135,13 +135,13 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 					multiadv = new MulticastAdvertisement();
 					multiadv.setRemote(adv.getPeerID().toString());
 					try {
-						ds.publish(multiadv);
-						ds.remotePublish(multiadv);
+						ds.publish(multiadv,2*P2PConstants.PEERDELETIONTIMEOUT,2*P2PConstants.PEERDELETIONTIMEOUT);
+						ds.remotePublish(null,multiadv,2*P2PConstants.PEERDELETIONTIMEOUT);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-		} 
+		}
 	}
 }

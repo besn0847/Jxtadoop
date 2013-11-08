@@ -1,5 +1,8 @@
 package org.apache.jxtadoop.net;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -10,9 +13,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jxtadoop.hdfs.protocol.DatanodeID;
+import org.apache.jxtadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.jxtadoop.hdfs.server.namenode.DatanodeDescriptor;
+import org.apache.jxtadoop.io.Writable;
+import org.apache.jxtadoop.io.WritableComparable;
+import org.apache.jxtadoop.io.WritableFactories;
+import org.apache.jxtadoop.io.WritableFactory;
 import org.apache.jxtadoop.net.NetworkTopology.InnerNode;
 
-public class Peer2peerTopology {
+public class Peer2peerTopology implements Writable {
 	public final static String DEFAULT_RACK = "/datanodes";
 	public static final Log LOG = 
 		    LogFactory.getLog(Peer2peerTopology.class);
@@ -59,6 +69,22 @@ public class Peer2peerTopology {
 		}
 		
 		/**
+		 * Return true if node id already in the domain
+		 * @param n
+		 * @return
+		 */
+		public boolean contains(String n) {
+			String c;
+			
+			for(int i=0;i<children.size();i++) {
+				c = children.get(i).getName();
+				if (c.equals(n))
+					return true;
+			}
+			return false;
+		}
+		
+		/**
 		 * Return the size of the broadcast domain
 		 * @return
 		 */
@@ -101,6 +127,20 @@ public class Peer2peerTopology {
 	    }
 	
 	    /**
+	     * Return node based on id
+	     * @param n
+	     * @return
+	     */
+	    Peer2PeerNode getNode(String n) {
+	    	for(int i=0;i<children.size();i++) {
+	    		if (n.equals(children.get(i).getName())) {
+	    			return (Peer2PeerNode)children.get(i);
+	    		}
+	    	}
+	    	return null;
+	    }
+	    
+	    /**
 	     * Return the broadcast ID
 	     * @return
 	     */
@@ -109,7 +149,8 @@ public class Peer2peerTopology {
 	    }
 	}
 	private ArrayList<BroadcastDomain> broadcastMap =new ArrayList<BroadcastDomain>();
-	private String defaultPath = Peer2peerTopology.DEFAULT_RACK+Peer2PeerNode.PATH_SEPARATOR_STR+"0";
+	private String defaultId = "0";
+	private String defaultPath = Peer2peerTopology.DEFAULT_RACK+Peer2PeerNode.PATH_SEPARATOR_STR+defaultId;
 	private BroadcastDomain defaultDomain = new BroadcastDomain(defaultPath);
 	protected ReadWriteLock netlock;
 	protected int numOfNodes = 0;
@@ -118,6 +159,17 @@ public class Peer2peerTopology {
 	public Peer2peerTopology() {
 		netlock = new ReentrantReadWriteLock();
 		broadcastMap.add(defaultDomain);
+		this.numOfBroadcast=1;
+	}
+	
+	/**
+	 * Create a p2p node from a descriptor
+	 * @param dd
+	 * @return
+	 */
+	private Peer2PeerNode createFromDatanodeDescriptor(DatanodeDescriptor ddn) {
+		String path =  ddn.getNetworkLocation() + Peer2PeerNode.PATH_SEPARATOR_STR + ddn.getName();
+		return new Peer2PeerNode(path);
 	}
 
 	  /** Add a peer to peer node
@@ -126,8 +178,13 @@ public class Peer2peerTopology {
 	   * @exception IllegalArgumentException 
 	   */
 	  public void add(Node n) {
+		  if(n instanceof DatanodeDescriptor) {
+			  n = createFromDatanodeDescriptor((DatanodeDescriptor)n);			  
+		  }
+		  
 		  Peer2PeerNode node = (Peer2PeerNode)n;
-		  BroadcastDomain bd;
+		  BroadcastDomain bd = null;
+		  String domain;
 		  
 		  if (node==null) return;
 		  if ((node.getName().length()==0) || (node.getNetworkLocation().length()==0)) return;
@@ -135,44 +192,27 @@ public class Peer2peerTopology {
 		  netlock.writeLock().lock();
 		  
 		  try {
-				  if(node.getNetworkLocation().equals(defaultPath)) { // If the node has default path, then add it to the worldwide domain
-					  if(!broadcastMap.get(0).contains(node)) {
-						  broadcastMap.get(0).add(node);
+			  if(node.getNetworkLocation().equals(defaultId)) { // Adding node to the default domain
+				  if(!broadcastMap.get(0).contains(node)) { // Node not in the map; adding it to the default domain
+					  broadcastMap.get(0).add(node);
+					  numOfNodes++;
+				  }
+			  } else {
+				 for(int i=0; i<broadcastMap.size();i++) {
+					  domain = broadcastMap.get(i).getID();
+					  if(domain.equals(node.getNetworkLocation())) {
+						  bd =  broadcastMap.get(i);
+						  broadcastMap.get(i).add(node);
 						  numOfNodes++;
-					  } else if (broadcastMap.size() == 1) { 
-						  bd = new BroadcastDomain(node.getPath());
-						  bd.add(node);
-						  numOfNodes++;
-						  broadcastMap.add(bd);
-						  numOfBroadcast++;
 					  }
-		      } else {
-				   if (broadcastMap.size() == 1) { 
+				  }
+				  
+				  if (bd == null) {
 					  bd = new BroadcastDomain(node.getPath());
 					  bd.add(node);
 					  numOfNodes++;
 					  broadcastMap.add(bd);
 					  numOfBroadcast++;
-				  } else {  
-					  	// Looking if node is already in a broadcast domain or if a broadcast domain already exist
-					  for(int i=1; i<broadcastMap.size();i++) {
-					  		bd = broadcastMap.get(i);
-					  		// Check 1 : Node already in the broadcast domain
-					  		if(bd.contains(node)) {
-					  			return; // Found; do nothing
-					  		} else if (bd.isBroadcast(node)) {
-					  			bd.add(node); // Found adding the node to the domain
-					  			numOfNodes++;
-					  			return;
-					  		} 
-					  }
-					  	
-				  	 // If we reach here, then a new broadcast domain is required
-				  	 bd = new BroadcastDomain(node.getPath());
-				  	 bd.add(node);
-				  	 numOfNodes++;
-				  	 broadcastMap.add(bd);
-				  	 numOfBroadcast++;
 				  }
 			  }
 		  }  finally {
@@ -185,7 +225,11 @@ public class Peer2peerTopology {
 	   * @param node
 	   * @exception IllegalArgumentException 
 	   */
-	  public void remove(Node n) {
+	  public void remove(Node n) {		  
+		  if(n instanceof DatanodeDescriptor) {
+			  n = createFromDatanodeDescriptor((DatanodeDescriptor)n);			  
+		  }
+		  
 		  Peer2PeerNode node = (Peer2PeerNode)n;
 		  BroadcastDomain bd;
 		  
@@ -201,9 +245,9 @@ public class Peer2peerTopology {
 					  bd.remove(node);
 					  numOfNodes--;
 				  }
-				  if(bd.size()==0) {
+				  if(bd.size()==0 && !bd.getID().equals("0")) {
 					  broadcastMap.remove(bd);
-					  bd =null;
+					  bd = null;
 					  numOfBroadcast--;
 				  }
 			  }
@@ -238,13 +282,58 @@ public class Peer2peerTopology {
 	  }
 	  
 	  /**
+	   * Get domain id of the domain containing the node
+	   * @param node
+	   * @return
+	   */
+	  public String getDomain(String node) {
+		  BroadcastDomain bd;
+		  
+		  if (node==null) return "";
+		  
+		  netlock.writeLock().lock();
+		  
+		  try {
+			  for(int i=0; i<broadcastMap.size();i++) {
+				  bd = broadcastMap.get(i);
+				  if (bd.contains(node)) {
+					  return bd.getID();
+				  }
+			  }
+			  return "";
+		  } finally {
+			  netlock.writeLock().unlock();
+		  }
+	  }
+	  
+		/**
+		 * Return node from peer2peer topology
+		 * @param s
+		 * @return
+		 */
+		public Peer2PeerNode getNode(String domain, String node) {
+			BroadcastDomain bd = null;  
+			
+			for(int i=0;i<=this.numOfBroadcast;i++) {
+				  if (domain.equals(broadcastMap.get(i).getID())) {
+					  bd = broadcastMap.get(i);
+					  break;
+				  }
+			 }
+			
+			if(bd != null)
+					return bd.getNode(node);
+			
+			return null;
+		}
+	  /**
 	   * Return the number of broadcast domains as the number of racks
 	   * and add the default one
 	   * 
 	   * @return
 	   */
 	  public int getNumOfRacks() {
-		  return this.numOfBroadcast+1;
+		  return this.numOfBroadcast;
 	  }
 	  
 	  /**
@@ -313,8 +402,7 @@ public class Peer2peerTopology {
 		  }
 	  }
 	  
-	  final private static Random r = new Random();
-	  
+	  final private static Random r = new Random();	  
 	  /**
 	   * Choose a random node in the input domain
 	   * 
@@ -351,7 +439,6 @@ public class Peer2peerTopology {
 		  return null;
 	  }
 	  
-	  
 	  /**
 	   * Do nothing for now
 	   * 
@@ -376,4 +463,108 @@ public class Peer2peerTopology {
 		  
 		  return domains;
 	  }
+	  
+	  /**
+	   * Return the network topology
+	   * @return the topology description
+	   */
+	  public String printNetworkTopology() {
+		  BroadcastDomain bd;
+		  Iterator<Node> in;
+		  Node n;
+		  String append;
+		  
+		  netlock.writeLock().lock();
+		  try {
+			  append = "\nNumber of broadcast domains :  \t" + this.numOfBroadcast;
+			  append += "\nNumber of peer to peer datanodes : \t" + this.numOfNodes;
+			  append += "\n";
+		  
+			  append += "\nList of broadcast domains : ";
+			  for(int i=0; i<broadcastMap.size();i++) {
+				  bd = broadcastMap.get(i);
+				  append += "\n\t" + bd.getID();
+			  }
+			  
+			  for(int i=0; i<broadcastMap.size();i++) {
+				  bd = broadcastMap.get(i);
+				  append += "\n\t- Domain : " + bd.getID();
+				  in = bd.getChildren().iterator();
+				  while(in.hasNext()) {
+					  n = in.next();
+					  append += "\n\t\t . " + n.getName();
+				  }
+				  
+			  }
+		  } finally {
+			  netlock.writeLock().unlock();
+		  }
+		  
+		  return append;
+	  }
+	  
+	  /////////////////////////////////////////////////
+	  // Writable
+	  /////////////////////////////////////////////////
+	  static {                                      // register a ctor
+	    WritableFactories.setFactory
+	      (Peer2peerTopology.class,
+	       new WritableFactory() {
+	         public Writable newInstance() { return new Peer2peerTopology(); }
+	       });
+	  }
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		BroadcastDomain bd;
+		Iterator<Node> in;
+		
+		out.writeInt(this.numOfNodes);
+		out.writeInt(this.numOfBroadcast);
+		
+		for(int i=0; i<broadcastMap.size();i++) {
+			bd = broadcastMap.get(i);
+			in = bd.getChildren().iterator();
+			
+			org.apache.jxtadoop.io.Text.writeString(out,bd.getID());
+			out.writeInt(bd.getChildren().size());
+			
+			while(in.hasNext()) {
+				org.apache.jxtadoop.io.Text.writeString(out,in.next().getName());
+			}
+		}
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		String bname, nname, npath;
+		int nsize, msize, bsize;
+		
+		netlock.writeLock().lock();
+		try {
+			nsize = in.readInt();
+			msize = in.readInt();
+			
+			LOG.debug("Broadcast : "+msize+"; Nodes : "+this.numOfNodes);
+			
+			for(int i=0; i<msize;i++) {
+				bname = org.apache.jxtadoop.io.Text.readString(in);
+				bsize = in.readInt();
+				
+				for(int j=0; j<bsize; j++) {
+					nname = org.apache.jxtadoop.io.Text.readString(in);
+					npath = Peer2peerTopology.DEFAULT_RACK 
+									+ Peer2PeerNode.PATH_SEPARATOR_STR
+									+ bname 
+									+ Peer2PeerNode.PATH_SEPARATOR_STR
+									+ nname;
+					this.add(new Peer2PeerNode(npath));
+				}
+			}
+			this.numOfNodes = nsize;
+			this.numOfBroadcast = msize;
+		} finally {
+			netlock.writeLock().unlock();
+		}
+	}
 }

@@ -167,7 +167,7 @@ public class P2PClientPeer extends Peer implements DiscoveryListener {
 			System.out.println(((Advertisement)advertisements.remove(0)).getDocument(MimeMediaType.TEXTUTF8));
 		}
 	}
-	
+
 	public void discoverNode(String peerid) {
 		try {
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "PID", peerid,  1,this);

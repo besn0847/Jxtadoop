@@ -20,6 +20,7 @@ package org.apache.jxtadoop.hdfs.protocol;
 import java.io.*;
 
 import org.apache.jxtadoop.ipc.VersionedProtocol;
+import org.apache.jxtadoop.net.Peer2peerTopology;
 import org.apache.jxtadoop.security.AccessControlException;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants.UpgradeAction;
 import org.apache.jxtadoop.hdfs.server.common.UpgradeStatusReport;
@@ -315,6 +316,12 @@ public interface ClientProtocol extends VersionedProtocol {
   public DatanodeInfo[] getDatanodeReport(FSConstants.DatanodeReportType type)
   throws IOException;
 
+  /**
+   * 
+   */
+  public Peer2peerTopology getNetworkTopology()
+  throws IOException;
+  
   /**
    * Get the block size for the given file.
    * @param filename The name of the file
