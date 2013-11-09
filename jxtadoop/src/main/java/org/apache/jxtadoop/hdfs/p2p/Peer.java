@@ -13,7 +13,6 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +25,6 @@ import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
-import net.jxta.document.MimeMediaType;
-import net.jxta.endpoint.router.RouteController;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.IDFactory;
 import net.jxta.impl.membership.pse.FileKeyStoreManager;
@@ -43,7 +40,6 @@ import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
 import net.jxta.protocol.PipeAdvertisement;
-import net.jxta.protocol.RouteAdvertisement;
 import net.jxta.socket.JxtaSocketAddress;
 
 import org.apache.commons.logging.Log;
@@ -583,23 +579,17 @@ public abstract class Peer implements P2PConstants {
 					 * 		1. Get the list of peers that did not respond
 					 * 		2. If the max retry count has been reached, then just increase the retry count
 					 * 		2. Else remove the peer from the not responded and datanodes in the cloud list
-					*/
-					//if(increment == pidkeyscount) LOG.debug("No datanode in the not responded list");
-					//else LOG.debug(pidkeyscount+" datanode(s) in the not responded list");
-					
+					*/					
 					while (increment < pidkeyscount ) {
 						lpid = (PeerID) pidkeys[increment];
 						increment++;
 						int attempt = notrespondedpeers.get(lpid);
-						//LOG.debug("Getting notresponding count : "+attempt);
 												
 						if(attempt < P2PConstants.PEERDELETIONRETRIES) {
 							attempt++;
-							//LOG.debug("Reetting notresponding count : "+attempt);
 							notrespondedpeers.remove(lpid);
 							notrespondedpeers.put(lpid, new Integer(attempt));
 						} else {
-							//LOG.info("Peer not responding for "+P2PConstants.PEERDELETIONRETRIES+" retries; Assuming dead : "+lpid);
 							fireEvent(new DatanodeEvent(new Object(),lpid));
 							notrespondedpeers.remove(lpid);
 							try {
@@ -624,15 +614,11 @@ public abstract class Peer implements P2PConstants {
 					 * 		2. If the peer is not in the not responded list, add it with a count of 1
 					 * 
 					 * Note : The DFSClients and DFSAdmin will automatically get removed.
-					 */
-					//if(increment == pidkeyscount) LOG.debug("No datanode in the cloud");
-					//else LOG.debug(pidkeyscount+" datanode(s) in the cloud");
-					
+					 */					
 					while (increment < pidkeyscount ) {
 						lpid = (PeerID) pidkeys[increment];
 						queryID = ds.getRemoteAdvertisements(lpid.toString(), DiscoveryService.PEER, "Name", "*Datanode Peer*",0,this);
 						if(!notrespondedpeers.containsKey(lpid)) {
-							//LOG.debug("Setting notresponding count to 0");
 							notrespondedpeers.put(lpid, 0);
 						}
 						increment++;
@@ -679,9 +665,7 @@ public abstract class Peer implements P2PConstants {
 					adv = (PeerAdv) en.nextElement();
 					if (adv instanceof PeerAdv) {
 						if ((adv.getName()).contains("Datanode Peer")) {
-							//LOG.debug("Found a datanode peer");
 							if(notrespondedpeers.containsKey(adv.getPeerID())) {
-								//LOG.debug("Resetting notresponding count to 0");
 								notrespondedpeers.remove(adv.getPeerID());
 							}
 							notrespondedpeers.put(adv.getPeerID(),0);
@@ -703,26 +687,19 @@ public abstract class Peer implements P2PConstants {
 										
 						// A multicast adv has been found : it be republished to the NameNode who handles the overall multicast map
 						if (adv.getAdvType().equals(MulticastAdvertisement.AdvertisementType)) {
-								// LOG.debug("Found a Multicast Advertisement");
-								MulticastAdvertisement madv = (MulticastAdvertisement)adv;
-								String remote = madv.getRemote();
-								String local = madv.getLocal();
+							MulticastAdvertisement madv = (MulticastAdvertisement)adv;
+							String remote = madv.getRemote();
+							String local = madv.getLocal();
 								
-								if (local.equals("")) {
-									if(remote.equals(pid.toString())) {
-										// This is my own discovery, do nothing 
-									} else {
-										// This a multicast disco from the discovery peer; reforwarding to the namenode
-										madv.setLocal(pid.toString());
-										//try {
-											// ds.publish(madv);
-											ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
-										//} catch (IOException e) {}
-									}
+							if (local.equals("")) {
+								if(remote.equals(pid.toString())) {
+									// This is my own discovery, do nothing 
 								} else {
-									//LOG.debug(("This is a multicast adv from Datanode peer"));
-									// Do nothing
+									// This a multicast disco from the discovery peer; reforwarding to the namenode
+									madv.setLocal(pid.toString());
+									ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
 								}
+							}
 						}
 					}
 				}

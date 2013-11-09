@@ -3,6 +3,7 @@ package org.apache.jxtadoop.hdfs.server.namenode;
 import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.net.Peer2peerTopology;
 
+@SuppressWarnings("unused")
 public class VerifyReplicationTargetChooser {
 	  static{
 		    Configuration.addDefaultResource("hdfs-default.xml");

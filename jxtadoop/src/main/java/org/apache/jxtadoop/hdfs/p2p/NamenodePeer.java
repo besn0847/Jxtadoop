@@ -1,8 +1,6 @@
 package org.apache.jxtadoop.hdfs.p2p;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -18,17 +16,11 @@ import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.jxta.document.MimeMediaType;
-import net.jxta.endpoint.EndpointAddress;
-import net.jxta.endpoint.router.RouteController;
 import net.jxta.exception.PeerGroupException;
-import net.jxta.id.IDFactory;
-import net.jxta.impl.protocol.PeerAdv;
 import net.jxta.peer.PeerID;
 import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
 import net.jxta.protocol.PeerAdvertisement;
-import net.jxta.protocol.RouteAdvertisement;
 import net.jxta.rendezvous.RendezVousService;
 import net.jxta.rendezvous.RendezvousEvent;
 import net.jxta.rendezvous.RendezvousListener;
@@ -218,12 +210,12 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 							MulticastAdvertisement madv = (MulticastAdvertisement)adv;
 							String remote = madv.getRemote();
 							String local = madv.getLocal();
-							String msg = "Multicast domain : "
+							/*String msg = "Multicast domain : "
 									+ "\n\t Local : \t" + local
 									+ "\n\t Remote : \t" + remote
 									+ "\n" ;
-							
-							// 
+							*/
+							 
 							if(namenodeObject.namesystem.contains(local) && namenodeObject.namesystem.contains(remote))							
 								// LOG.debug(msg);
 								if(!multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {

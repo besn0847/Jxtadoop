@@ -617,8 +617,6 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
 	  if(peerid.startsWith("urn:jxta:cbid-"))
 		  peerid = peerid.substring(14);
 	  
-	  LOG.debug("Searching for : "+peerid);
-	  
 	  DatanodeDescriptor dnreg = host2DataNodeMap.getDatanodeByHost(peerid);
 	  
 	  if (dnreg == null) 

@@ -177,7 +177,7 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*", 1,this);
 		} catch(Exception e) {
 			LOG.error(e.getMessage());
-			e.printStackTrace();
+			// e.printStackTrace();
 		}		
 		
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());

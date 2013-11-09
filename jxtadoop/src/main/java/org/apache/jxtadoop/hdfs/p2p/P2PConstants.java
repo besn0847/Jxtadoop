@@ -74,9 +74,13 @@ public interface P2PConstants {
 	 */
 	public static final String P2PDISCOTAG = "P2PDISCO";
 	/**
+	 * The lifetime for a multicast advertisement 
+	 */
+	public static final int MULTICASTADVLIFETIME = 30000;
+	/**
 	 * The timeout for a peer remote discovery used by the peer monitor.
 	 */
-	public static final int PEERDELETIONTIMEOUT = 30000;
+	public static final int PEERDELETIONTIMEOUT = 300000;
 	/**
 	 * The maximum number of retries before considering a datanode is no longer part of the peer cloud.
 	 */

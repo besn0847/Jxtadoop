@@ -9,6 +9,8 @@ import java.util.EventObject;
  *
  */
 public class MulticastEvent extends EventObject {
+	private static final long serialVersionUID = -6873478936739471516L;
+	
 	private String peerid;
 	private Collection<String> domain;
 	private int hash;

@@ -12,7 +12,6 @@ import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.io.DataOutputBuffer;
 import org.apache.jxtadoop.io.MD5Hash;
 import org.apache.jxtadoop.util.DataChecksum;
-import org.apache.jxtadoop.util.StringUtils;
 
 public class VerifyChecksum  extends Configured {
 	Configuration c;

@@ -17,18 +17,13 @@ import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
-import net.jxta.document.Element;
-import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.impl.protocol.PeerAdv;
 import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
-import net.jxta.protocol.PipeAdvertisement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jxtadoop.conf.Configuration;
-import org.apache.jxtadoop.hdfs.p2p.Peer.PeerMonitor;
 import org.apache.jxtadoop.security.UserGroupInformation;
 
 public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
@@ -112,7 +107,7 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 				e.printStackTrace();
 			}		
 			try {
-				Thread.sleep(P2PConstants.PEERDELETIONTIMEOUT);
+				Thread.sleep(P2PConstants.MULTICASTADVLIFETIME);
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 			}
@@ -135,8 +130,8 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 					multiadv = new MulticastAdvertisement();
 					multiadv.setRemote(adv.getPeerID().toString());
 					try {
-						ds.publish(multiadv,2*P2PConstants.PEERDELETIONTIMEOUT,2*P2PConstants.PEERDELETIONTIMEOUT);
-						ds.remotePublish(null,multiadv,2*P2PConstants.PEERDELETIONTIMEOUT);
+						ds.publish(multiadv,2*P2PConstants.MULTICASTADVLIFETIME,2*P2PConstants.MULTICASTADVLIFETIME);
+						ds.remotePublish(null,multiadv,2*P2PConstants.MULTICASTADVLIFETIME);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

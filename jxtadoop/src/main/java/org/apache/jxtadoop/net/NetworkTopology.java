@@ -36,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
  * or racks.  
  * 
  */
-@SuppressWarnings({"unused"})
 public class NetworkTopology {
   public final static String DEFAULT_RACK = "/default-rack";
   public final static int DEFAULT_HOST_LEVEL = 2;
