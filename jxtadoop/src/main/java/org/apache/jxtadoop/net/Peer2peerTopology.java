@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jxtadoop.hdfs.server.namenode.DatanodeDescriptor;
+import org.apache.jxtadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.jxtadoop.io.Writable;
 import org.apache.jxtadoop.io.WritableFactories;
 import org.apache.jxtadoop.io.WritableFactory;
@@ -173,6 +174,8 @@ public class Peer2peerTopology implements Writable {
 	protected int numOfNodes = 0;
 	// Number of Broadcast Domains including the default one 
 	protected int numOfBroadcast = 0;
+	// FS name system
+	private FSNamesystem namesystem = null;
 	
 	/**
 	 * Creating the P2P topology and add the default domain
@@ -184,12 +187,39 @@ public class Peer2peerTopology implements Writable {
 	}
 	
 	/**
+	 * Creating the P2P topology, save the FSNameSystem and add the default domain
+	 */
+	public Peer2peerTopology(FSNamesystem fsn) {
+		this();
+		this.namesystem = fsn;
+	}
+	
+	/**
 	 * Create a p2p node from a descriptor
 	 * @param DatanodeDescriptor
 	 * @return Peer2PeerNode
 	 */
 	private Peer2PeerNode createFromDatanodeDescriptor(DatanodeDescriptor ddn) {
 		String path =  ddn.getNetworkLocation() + Peer2PeerNode.PATH_SEPARATOR_STR + ddn.getName();
+		
+		LOG.debug("Descriptor to path : " + path);
+		
+		if(path.split(Peer2PeerNode.PATH_SEPARATOR_STR).length == 1)
+			path = defaultId + Peer2PeerNode.PATH_SEPARATOR_STR + path;
+		
+		if((path.split(Peer2PeerNode.PATH_SEPARATOR_STR).length == 3)) {
+				if((path.startsWith(DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR))) {
+					path = DEFAULT_RACK
+							+ Peer2PeerNode.PATH_SEPARATOR_STR + defaultId + Peer2PeerNode.PATH_SEPARATOR_STR
+							+ (path.split(Peer2PeerNode.PATH_SEPARATOR_STR))[2];
+				}
+		}
+		
+		if(!path.startsWith(DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR)) 
+			path = DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + path;		
+		
+		LOG.debug("Path is : " + path);
+		
 		return new Peer2PeerNode(path);
 	}
 
@@ -213,8 +243,9 @@ public class Peer2peerTopology implements Writable {
 		netlock.writeLock().lock();
 		  
 		try {
+			LOG.debug("Adding a node with network location : "+node.getNetworkLocation());
 			if(node.getNetworkLocation().equals(defaultId)) { // Node should be part of the default domain
-				if(!broadcastMap.get(0).contains(node)) { // Node not in the map; adding it to the default domain
+				if(!broadcastMap.get(0).contains(node.getName())) { // Node not in the map; adding it to the default domain
 					broadcastMap.get(0).add(node);
 					numOfNodes++;
 				}
@@ -237,6 +268,7 @@ public class Peer2peerTopology implements Writable {
 				}
 			}
 		} finally {
+			LOG.debug("Added 1 node to topology map; Domains : "+this.getNumOfRacks()+"; Nodes : "+this.getNumOfLeaves());
 			netlock.writeLock().unlock();
 		}
 	  }
@@ -274,6 +306,7 @@ public class Peer2peerTopology implements Writable {
 				}
 			}
 		} finally {
+			LOG.debug("Removed 1 node to topology map; Domains : "+this.getNumOfRacks()+"; Nodes : "+this.getNumOfLeaves());
 			netlock.writeLock().unlock();
 		}
 	}
@@ -427,32 +460,71 @@ public class Peer2peerTopology implements Writable {
 	 */
 	public Node chooseRandom(String d) {
 		BroadcastDomain bd;
+		Node n = null;
+		boolean exclude = false;
+		boolean browse;
 		  
-		netlock.writeLock().lock();
-		  
+		LOG.debug("Choosing in domain : "+d);
+		
+		// Remove trailing ~
+		if (d.startsWith("~")) {
+			exclude = true;
+			d = d.substring(1);
+		}
+		
+		// Set default rack id
+		if(d.equals(DEFAULT_RACK) || d.equals(DEFAULT_RACK+Peer2PeerNode.PATH_SEPARATOR_STR)) {
+			d = "0";
+		}
+		
+		// Remove trailing rack
+		if(d.startsWith(DEFAULT_RACK+Peer2PeerNode.PATH_SEPARATOR_STR)) {
+			d = d.replaceAll(DEFAULT_RACK+Peer2PeerNode.PATH_SEPARATOR_STR, "");
+		}
+		
+		LOG.debug("Searching a node in domain : "+d);
+		
+		netlock.writeLock().lock();  
+		
 		try {
 			for(int i=0; i<broadcastMap.size();i++) {
 				bd = broadcastMap.get(i);
-				  
-				if (bd.getID().equals(d)) {
+				LOG.debug("Browsing domain : "+bd.getID());
+				
+				if (bd.getID().equals(d) && !exclude) {
+					browse =true;
+				} else if (!bd.getID().equals(d) && exclude) {
+					browse = true;
+				} else {
+					browse = false;
+				}
+				
+				if (browse) {
 					Collection<Node> cn = bd.getChildren();
+					LOG.debug("Number of children : "+cn.size());
 					Iterator<Node> in = cn.iterator();
-					  
-					int index = r.nextInt(cn.size());
+					
+					int index = -1;
+					if(cn.size() > 0) index = r.nextInt(cn.size());
 					int j = 0;
-					while (j < index) {
+					
+					while (j <= index) {
 						j++;
-						in.next();
+						n = in.next();
+						LOG.debug("Browsed node : "+n.getName());
 					}
-					  
-					return in.next();
 				}
 			}
+			
+			if (n != null) LOG.debug("Returning node : "+n.getName());
+			
+			if (namesystem != null && n != null)
+				return namesystem.getHost2DataNodeMap().getDatanodeByName(n.getName());
+			else
+				return null;
 		} finally {
 			netlock.writeLock().unlock();
 		}
-		  
-		return null;
 	}
 	  
 	/**

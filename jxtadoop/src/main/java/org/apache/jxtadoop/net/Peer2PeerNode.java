@@ -1,5 +1,7 @@
 package org.apache.jxtadoop.net;
 
+import org.apache.jxtadoop.hdfs.server.namenode.DatanodeDescriptor;
+
 public class Peer2PeerNode implements Node {
 	public final static char PATH_SEPARATOR = '/';
 	public final static String PATH_SEPARATOR_STR = "/";

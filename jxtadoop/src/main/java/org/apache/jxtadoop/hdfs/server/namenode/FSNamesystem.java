@@ -281,7 +281,7 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
   private Host2NodesMap host2DataNodeMap = new Host2NodesMap();
     
   // datanode networktoplogy
-  Peer2peerTopology clusterMap = new Peer2peerTopology();
+  Peer2peerTopology clusterMap = new Peer2peerTopology(this);
   // Use less in P2P : private DNSToSwitchMapping dnsToSwitchMapping;
   
   // for block replicas placement
@@ -323,8 +323,11 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
     this.systemStart = now();
     setConfigurationParameters(conf);
 
-    this.nameNodePeerID = nn.getNameNodePeerID();
-    this.nameNodeJxtaAddress = nn.getNameNodeJxtaAddress();
+    if (nn != null) {
+    	this.nameNodePeerID = nn.getNameNodePeerID();
+    	this.nameNodeJxtaAddress = nn.getNameNodeJxtaAddress();
+    }
+    
     this.registerMBean(conf); // register the MBean for the FSNamesystemStutus
     this.dir = new FSDirectory(this, conf);
     StartupOption startOpt = NameNode.getStartupOption(conf);
@@ -332,7 +335,8 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
                          getNamespaceEditsDirs(conf), startOpt);
     long timeTakenToLoadFSImage = now() - systemStart;
     LOG.info("Finished loading FSImage in " + timeTakenToLoadFSImage + " msecs");
-    NameNode.getNameNodeMetrics().fsImageLoadTime.set(
+    if(NameNode.getNameNodeMetrics() != null) 
+    	NameNode.getNameNodeMetrics().fsImageLoadTime.set(
                               (int) timeTakenToLoadFSImage);
     this.safeMode = new SafeModeInfo(conf);
     setBlockTotal();
@@ -2365,6 +2369,8 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
           LOG.warn("ReplicationMonitor thread received exception. " + ie);
         } catch (Throwable t) {
           LOG.warn("ReplicationMonitor thread received Runtime exception. " + t);
+          LOG.fatal(t.getMessage());
+          t.printStackTrace();
           Runtime.getRuntime().exit(-1);
         }
       }

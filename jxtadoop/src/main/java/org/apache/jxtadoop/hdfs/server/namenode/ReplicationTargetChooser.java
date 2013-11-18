@@ -35,7 +35,7 @@ import java.util.*;
  * the 1st replica is placed on the local machine, 
  * otherwise a random datanode. The 2nd replica is placed on a datanode
  * that is on a different rack. The 3rd replica is placed on a datanode
- * which is on the same rack as the first replca.
+ * which is on the same rack as the first replica.
  */
 @SuppressWarnings({"unused","serial"})
 class ReplicationTargetChooser {
@@ -153,6 +153,7 @@ class ReplicationTargetChooser {
       writer=null;
     }
       
+    //LOG.debug("Selecting repication target");
     DatanodeDescriptor localNode = chooseTarget(numOfReplicas, writer, 
                                                 excludedNodes, blocksize, maxNodesPerRack, results);
       
@@ -172,7 +173,8 @@ class ReplicationTargetChooser {
                                           List<DatanodeDescriptor> results) {
       
     if (numOfReplicas == 0 || clusterMap.getNumOfLeaves()==0) {
-      return writer;
+    	// LOG.debug("numOfReplicas : "+numOfReplicas+"; getNumOfLeaves : "+clusterMap.getNumOfLeaves());
+    	return writer;
     }
       
     int numOfResults = results.size();
@@ -184,19 +186,22 @@ class ReplicationTargetChooser {
     try {
       switch(numOfResults) {
       case 0:
+    	LOG.debug("0- Selected local node");
         writer = chooseLocalNode(writer, excludedNodes, 
                                  blocksize, maxNodesPerRack, results);
         if (--numOfReplicas == 0) {
           break;
         }
       case 1:
+        LOG.debug("1 - Selected Peer ID : "+results.get(0).getPeerId());
         chooseRemoteRack(1, results.get(0), excludedNodes, 
                          blocksize, maxNodesPerRack, results);
         if (--numOfReplicas == 0) {
           break;
         }
       case 2:
-        if (clusterMap.isOnSameRack(results.get(0), results.get(1))) {
+    	  LOG.debug("2 - Selected Peer ID : "+results.get(0).getPeerId());
+    	  if (clusterMap.isOnSameRack(results.get(0), results.get(1))) {
           chooseRemoteRack(1, results.get(0), excludedNodes,
                            blocksize, maxNodesPerRack, results);
         } else if (newBlock){
@@ -210,6 +215,7 @@ class ReplicationTargetChooser {
           break;
         }
       default:
+    	LOG.debug("Default - Selected Peer ID : "+results.get(0).getPeerId());
         chooseRandom(numOfReplicas, NodeBase.ROOT, excludedNodes, 
                      blocksize, maxNodesPerRack, results);
       }
@@ -322,6 +328,7 @@ class ReplicationTargetChooser {
     int oldNumOfReplicas = results.size();
     // randomly choose one node from remote racks
     try {
+      LOG.debug("Local machine network location : "+localMachine.getNetworkLocation());	
       chooseRandom(numOfReplicas, "~"+localMachine.getNetworkLocation(),
                    excludedNodes, blocksize, maxReplicasPerRack, results);
     } catch (NotEnoughReplicasException e) {
@@ -371,7 +378,17 @@ class ReplicationTargetChooser {
       if (selectedNodes.length < numOfReplicas) {
         toContinue = false;
       }
+      
+      LOG.debug("Selected nodes : "+selectedNodes.length);
+      
       for(int i=0; i<selectedNodes.length; i++) {
+    	if(selectedNodes[i] == null) {
+    	  LOG.debug("Selected node is null ");
+    	  toContinue = false;
+    	} else {
+    	  LOG.debug("Selected node : "+selectedNodes[i].getName());
+    	}
+    	
         DatanodeDescriptor result = selectedNodes[i];
         if (isGoodTarget(result, blocksize, maxNodesPerRack, results)) {
           numOfReplicas--;
@@ -394,18 +411,22 @@ class ReplicationTargetChooser {
                                             List<Node> excludedNodes) {
     List<DatanodeDescriptor> results = 
       new ArrayList<DatanodeDescriptor>();
+    
     int numOfAvailableNodes =
       clusterMap.countNumOfAvailableNodes(nodes, excludedNodes);
+    
     numOfReplicas = (numOfAvailableNodes<numOfReplicas)?
       numOfAvailableNodes:numOfReplicas;
+    
     while(numOfReplicas > 0) {
       DatanodeDescriptor choosenNode = 
         (DatanodeDescriptor)(clusterMap.chooseRandom(nodes));
-      if (!excludedNodes.contains(choosenNode)) {
+        
+      //if (!excludedNodes.contains(choosenNode)) {
         results.add(choosenNode);
         excludedNodes.add(choosenNode);
         numOfReplicas--;
-      }
+      //}
     }
     return (DatanodeDescriptor[])results.toArray(
                                                  new DatanodeDescriptor[results.size()]);    
@@ -428,6 +449,11 @@ class ReplicationTargetChooser {
                                List<DatanodeDescriptor> results) {
     Log logr = FSNamesystem.LOG;
     // check if the node is (being) decommissed
+    if(node == null) {
+    	LOG.debug("Node is null");
+    	return false;
+    }
+    
     if (node.isDecommissionInProgress() || node.isDecommissioned()) {
       logr.debug("Node "+NodeBase.getPath(node)+
                 " is not chosen because the node is (being) decommissioned");
