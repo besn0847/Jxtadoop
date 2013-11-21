@@ -699,6 +699,8 @@ public abstract class Peer implements P2PConstants {
 									madv.setLocal(pid.toString());
 									ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
 								}
+							} else {
+								ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
 							}
 						}
 					}

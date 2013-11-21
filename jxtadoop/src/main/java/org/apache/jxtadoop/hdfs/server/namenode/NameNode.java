@@ -1002,7 +1002,7 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 	 */
 	@Override
 	public void multicastDetected(MulticastEvent me) {		
-		String bd1, bd2;
+		String bd1, bd2, s;
 		Peer2PeerNode p2pn;
 		
 		String p = me.getPeerID();
@@ -1010,8 +1010,17 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 		int h = me.getHash();
 		
 		String mcd = "Multicast domain contains : ";
+		Iterator<String> is = d.iterator();
+		while(is.hasNext()) {
+			s = is.next();
+			mcd += "\n\t" + s;
+		}
+		mcd += "\n";
+		LOG.debug(mcd);
 		
-		if (d.size() != 2) LOG.error("More than 2 nodes in the multicast; Aborting");
+		if (d.size() != 2) {
+			LOG.error("More than 2 nodes in the multicast; Aborting. Size is "+d.size());
+		}
 		
 		String n1 = (String) (d.toArray())[0];
 		String n2 = (String) (d.toArray())[1];

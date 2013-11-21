@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.security.auth.login.LoginException;
 
@@ -72,6 +74,10 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 	 * All the listeners listening to multicast event
 	 */
 	private transient Vector multicastListeners;
+	/* 
+	 * Lock used to update the topology
+	 */
+	protected ReadWriteLock netlock;
 	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
 	 * @param s The peer unique name
@@ -159,7 +165,9 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 	 * Then the peer monitor thread is started to monitor the datanode cloud.
 	 */
 	@Override
-	public void start() {		
+	public void start() {	
+		netlock = new ReentrantReadWriteLock();
+		
 		try {			
 			publishPipeAdvertisement();
 		} catch (IOException e) {
@@ -218,40 +226,46 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 							 
 							if(namenodeObject.namesystem.contains(local) && namenodeObject.namesystem.contains(remote))							
 								// LOG.debug(msg);
-								if(!multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
-									LOG.debug("Adding local & remote peers to the multicast map");
-									Collection<String> domain = (Collection)new HashSet<String>();
-									domain.add(local);
-									domain.add(remote);
-									multicastMap.put(local, domain);
-									multicastMap.put(remote, domain);
-									fireMulticastEvent(new MulticastEvent(this,local,domain));
-								} else if (!multicastMap.containsKey(local) && multicastMap.containsKey(remote)) {
-									LOG.debug("Adding local peer to the multicast map");
-									Collection<String> domain = multicastMap.get(remote);
-									domain.add(local);
-									multicastMap.put(local, domain);
-									fireMulticastEvent(new MulticastEvent(this,local,domain));
-								} else if (multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
-									LOG.debug("Adding remote peer to the multicast map");
-									Collection<String> domain = multicastMap.get(local);
-									domain.add(remote);
-									multicastMap.put(remote, domain);
-									fireMulticastEvent(new MulticastEvent(this,local,domain));
-								} else {
-									LOG.debug("Peers already in the multicast map");
-									//Collection<String> domain = multicastMap.get(local);
-									//String mcd = "--Multicast domain contains : ";
-								
-									//String s;
-									//Iterator<String> is = domain.iterator();
-									//while(is.hasNext()) {
-										//s = is.next();
-										//mcd += "\n\t" + s;
-										//fireMulticastEvent(new MulticastEvent(this,local,domain));
-									//}
-									//mcd += "\n";
-									//LOG.debug(mcd);
+								netlock.writeLock().lock();
+							
+								try {
+									if(!multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
+										LOG.debug("Adding local & remote peers to the multicast map");
+										Collection<String> domain = (Collection)new HashSet<String>();
+										domain.add(local);
+										domain.add(remote);
+										multicastMap.put(local, domain);
+										multicastMap.put(remote, domain);
+										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									} else if (!multicastMap.containsKey(local) && multicastMap.containsKey(remote)) {
+										LOG.debug("Adding local peer to the multicast map");
+										Collection<String> domain = multicastMap.get(remote);
+										domain.add(local);
+										multicastMap.put(local, domain);
+										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									} else if (multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
+										LOG.debug("Adding remote peer to the multicast map");
+										Collection<String> domain = multicastMap.get(local);
+										domain.add(remote);
+										multicastMap.put(remote, domain);
+										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									} else {
+										LOG.debug("Peers already in the multicast map");
+										Collection<String> domain = multicastMap.get(local);
+										String mcd = "--Multicast domain contains : ";
+									
+										String s;
+										Iterator<String> is = domain.iterator();
+										while(is.hasNext()) {
+											s = is.next();
+											mcd += "\n\t" + s;
+											//fireMulticastEvent(new MulticastEvent(this,local,domain));
+										}
+										mcd += "\n";
+										LOG.debug(mcd);
+									}
+								} finally {
+									netlock.writeLock().unlock();
 								}
 							} 
 						}

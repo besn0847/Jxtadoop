@@ -255,6 +255,7 @@ public class DataNode extends Configured
 	  try {
 		  dp.init();
 		  dp.start();
+		  dp.setDatanode(dnpeer);
 	  } catch (Exception e) {
 		  LOG.fatal(e.getMessage());
 	  }

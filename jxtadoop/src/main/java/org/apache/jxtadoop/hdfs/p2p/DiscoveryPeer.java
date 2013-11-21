@@ -7,7 +7,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 import javax.security.auth.login.LoginException;
 import javax.security.cert.CertificateException;
@@ -17,10 +19,14 @@ import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
+import net.jxta.document.MimeMediaType;
+import net.jxta.endpoint.EndpointService;
+import net.jxta.endpoint.router.RouteController;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.impl.protocol.PeerAdv;
 import net.jxta.platform.NetworkManager;
 import net.jxta.protocol.DiscoveryResponseMsg;
+import net.jxta.protocol.RouteAdvertisement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +40,15 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 	 * Thread used to monitor peers
 	 */
 	Thread discover;
+	/**
+	 * Associated datanode
+	 */
+	DatanodePeer datanodepeer;
+	/**
+	 * Few routing services
+	 */
+	EndpointService endpoint;
+	RouteController rcontrol;
 	
 	public DiscoveryPeer(String s) {
 		super(s,"disco");
@@ -89,6 +104,10 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 	public void start() {
 		AdvertisementFactory.registerAdvertisementInstance(MulticastAdvertisement.getAdvertisementType(),new  MulticastAdvertisement.Instantiator());
 		running = true;
+		
+		endpoint = npg.getEndpointService();
+		rcontrol = endpoint.getEndpointRouter().getRouteController();
+		
 		discover = new Thread(this,"Discovery Peer Manager");
 		discover.start(); 
 	}
@@ -118,6 +137,10 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 	public void discoveryEvent(DiscoveryEvent event) {
 		DiscoveryResponseMsg response = event.getResponse();
 		MulticastAdvertisement multiadv = null;
+		RouteAdvertisement routeadv;
+		Collection<RouteAdvertisement> routeadvs;
+		Iterator<RouteAdvertisement> routes;
+		boolean isDirect = false;
 		
 		if (response.getDiscoveryType() == DiscoveryService.PEER) {
 			Enumeration<Advertisement> en = response.getAdvertisements();
@@ -127,16 +150,36 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 				adv = (PeerAdv) en.nextElement();
 				if((adv.getName()).contains("Datanode Peer")) {
 					LOG.debug("Found a datanode peer : " + adv.getPeerID());
-					multiadv = new MulticastAdvertisement();
-					multiadv.setRemote(adv.getPeerID().toString());
-					try {
-						ds.publish(multiadv,2*P2PConstants.MULTICASTADVLIFETIME,2*P2PConstants.MULTICASTADVLIFETIME);
-						ds.remotePublish(null,multiadv,2*P2PConstants.MULTICASTADVLIFETIME);
-					} catch (IOException e) {
-						e.printStackTrace();
+					
+					routeadvs = rcontrol.getRoutes(adv.getPeerID());
+					LOG.debug("Route exist or possible ? "+rcontrol.isConnected(adv.getPeerID()));
+					routes = routeadvs.iterator();
+					while(routes.hasNext()) {
+						routeadv = routes.next();
+						LOG.debug("Route length : "+ routeadv.size());
+						//LOG.debug("Route : "+routeadv.getDocument(MimeMediaType.TEXTUTF8));
+						if(routeadv.size()==0)
+							isDirect = true;
+					}
+					
+					if (isDirect) {
+						multiadv = new MulticastAdvertisement();
+						multiadv.setRemote(adv.getPeerID().toString());
+						if(datanodepeer != null) 
+							multiadv.setLocal(this.datanodepeer.getPeerID().toString());
+						try {
+							ds.publish(multiadv,2*P2PConstants.MULTICASTADVLIFETIME,2*P2PConstants.MULTICASTADVLIFETIME);
+							ds.remotePublish(null,multiadv,2*P2PConstants.MULTICASTADVLIFETIME);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
 		}
+	}
+
+	public void setDatanode(DatanodePeer dnpeer) {
+		this.datanodepeer = dnpeer;
 	}
 }
