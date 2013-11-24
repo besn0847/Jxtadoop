@@ -58,6 +58,10 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	Thread monitor;
 	PeerMonitor pm;
 	/**
+	 * Is this datanode a relay ?
+	 */
+	private Boolean isRelay;
+	/**
 	 * Constructor with the peer name unique ID. This is important for the peer ID and key generation.
 	 * It also initialize the RPC advertisement and namenode lists. 
 	 * @param s The peer unique name
@@ -78,7 +82,7 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	 */
 	@Override
 	public void setupNetworking() throws LoginException, IOException, javax.security.cert.CertificateException, PeerGroupException {
-	    Boolean isRelay = new Boolean(pc.get("hadoop.p2p.datanode.relay"));
+	    isRelay = new Boolean(pc.get("hadoop.p2p.datanode.relay"));
 	    Boolean useMulticast = new Boolean(pc.get("hadoop.p2p.use.multicast"));
 	    
 		if (isRelay) {
@@ -319,5 +323,9 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 		} catch (SocketTimeoutException ste) {}
 				
 		return js;
+	}
+	
+	public boolean isRelay() {
+		return this.isRelay;
 	}
 }

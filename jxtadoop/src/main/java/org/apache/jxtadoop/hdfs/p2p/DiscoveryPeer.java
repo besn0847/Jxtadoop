@@ -152,17 +152,17 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 					LOG.debug("Found a datanode peer : " + adv.getPeerID());
 					
 					routeadvs = rcontrol.getRoutes(adv.getPeerID());
-					LOG.debug("Route exist or possible ? "+rcontrol.isConnected(adv.getPeerID()));
+					//LOG.debug("Route exist or possible ? "+rcontrol.isConnected(adv.getPeerID()));
 					routes = routeadvs.iterator();
 					while(routes.hasNext()) {
 						routeadv = routes.next();
-						LOG.debug("Route length : "+ routeadv.size());
+						//LOG.debug("Route length : "+ routeadv.size());
 						//LOG.debug("Route : "+routeadv.getDocument(MimeMediaType.TEXTUTF8));
 						if(routeadv.size()==0)
 							isDirect = true;
 					}
 					
-					if (isDirect) {
+					if (isDirect && !datanodepeer.isRelay()) {
 						multiadv = new MulticastAdvertisement();
 						multiadv.setRemote(adv.getPeerID().toString());
 						if(datanodepeer != null) 

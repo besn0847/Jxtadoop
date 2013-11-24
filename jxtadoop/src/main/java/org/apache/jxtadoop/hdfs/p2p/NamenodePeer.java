@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -69,7 +70,7 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 	/**
 	 *  The map linking peers to multi cast domain 
 	 */
-	private HashMap<String,Collection<String>> multicastMap = new HashMap<String,Collection<String>>();
+	private HashMap<String,HashMap<String,Long>> multicastMap = new HashMap<String,HashMap<String,Long>>();
 	/**
 	 * All the listeners listening to multicast event
 	 */
@@ -229,40 +230,75 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 								netlock.writeLock().lock();
 							
 								try {
+									// Case : local & remote peers are NOT in the multicast map 
+									// 		then create a new domain + add both peers + declare both entries 
 									if(!multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
 										LOG.debug("Adding local & remote peers to the multicast map");
-										Collection<String> domain = (Collection)new HashSet<String>();
-										domain.add(local);
-										domain.add(remote);
+										HashMap<String,Long> domain = new HashMap<String,Long>();
+										
+										domain.put(local,System.currentTimeMillis());
+										domain.put(remote,System.currentTimeMillis());
+										
 										multicastMap.put(local, domain);
 										multicastMap.put(remote, domain);
+										
 										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									// Case : Remote peer is already in the multicast but local is not	
+									//		then retrieve the domain based on the remote key + add the local peer + declare both entries again
 									} else if (!multicastMap.containsKey(local) && multicastMap.containsKey(remote)) {
 										LOG.debug("Adding local peer to the multicast map");
-										Collection<String> domain = multicastMap.get(remote);
-										domain.add(local);
+										HashMap<String,Long> domain = multicastMap.remove(remote);
+										
+										domain.put(local,System.currentTimeMillis());
+										
 										multicastMap.put(local, domain);
+										multicastMap.put(remote, domain);
+										
 										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									// Case : Local peer is already in the multicast but remote is not	
+									//		then retrieve the domain based on the local key + add the remote peer + declare both entries again
 									} else if (multicastMap.containsKey(local) && !multicastMap.containsKey(remote)) {
 										LOG.debug("Adding remote peer to the multicast map");
-										Collection<String> domain = multicastMap.get(local);
-										domain.add(remote);
+										HashMap<String,Long> domain = multicastMap.remove(local);
+										
+										domain.put(remote,System.currentTimeMillis());
+										
+										multicastMap.put(local, domain);
 										multicastMap.put(remote, domain);
+										
 										fireMulticastEvent(new MulticastEvent(this,local,domain));
+									// Case : both nodes are already in the map
+									//		then check if they are in the domain
 									} else {
-										LOG.debug("Peers already in the multicast map");
-										Collection<String> domain = multicastMap.get(local);
-										String mcd = "--Multicast domain contains : ";
-									
-										String s;
-										Iterator<String> is = domain.iterator();
-										while(is.hasNext()) {
-											s = is.next();
-											mcd += "\n\t" + s;
-											//fireMulticastEvent(new MulticastEvent(this,local,domain));
+										LOG.debug("Peers already in the multicast map; Updating");										
+										
+										HashMap<String,Long> ldomain = multicastMap.remove(local);
+										HashMap<String,Long> rdomain = multicastMap.remove(remote);
+										
+										if(ldomain.containsKey(remote)) ldomain.remove(remote);
+										ldomain.put(remote,System.currentTimeMillis());
+										
+										if(!rdomain.containsKey(local)) rdomain.remove(local);
+										rdomain.put(local,System.currentTimeMillis());
+										
+										Set<String> lkeys = ldomain.keySet();
+										for(String key : lkeys) {
+											if((System.currentTimeMillis() - ldomain.get(key)) > P2PConstants.PEERDELETIONRETRIES * P2PConstants.PEERDELETIONTIMEOUT * 1000) {
+												LOG.debug("Removing peer on no contact from multicast map : " + key);
+												ldomain.remove(key);
+											}
 										}
-										mcd += "\n";
-										LOG.debug(mcd);
+										
+										Set<String> rkeys = rdomain.keySet();
+										for(String key : rkeys) {
+											if((System.currentTimeMillis() - rdomain.get(key)) > P2PConstants.PEERDELETIONRETRIES * P2PConstants.PEERDELETIONTIMEOUT * 1000) {
+												LOG.debug("Removing peer on no contact from multicast map : " + key);
+												rdomain.remove(key);
+											}
+										}
+
+										multicastMap.put(local, ldomain);
+										multicastMap.put(remote, rdomain);
 									}
 								} finally {
 									netlock.writeLock().unlock();

@@ -77,6 +77,7 @@ import java.net.*;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.Iterator;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**********************************************************
  * NameNode serves as both directory namespace manager and
@@ -1006,7 +1007,7 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 		Peer2PeerNode p2pn;
 		
 		String p = me.getPeerID();
-		Collection<String> d = me.getDomain();
+		Collection<String> d = (Collection<String>)me.getDomain().keySet();
 		int h = me.getHash();
 		
 		String mcd = "Multicast domain contains : ";
@@ -1016,58 +1017,57 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 			mcd += "\n\t" + s;
 		}
 		mcd += "\n";
-		LOG.debug(mcd);
 		
-		if (d.size() != 2) {
-			LOG.error("More than 2 nodes in the multicast; Aborting. Size is "+d.size());
+		LOG.debug("Number of nodes in this broadcast domain is "+d.size());
+
+		for(int m = 1;m < d.size(); m++) {
+			String n1 = (String) (d.toArray())[0];
+			String n2 = (String) (d.toArray())[m];
+				
+			n1 = n1.replace("urn:jxta:cbid-", "");
+			n2 = n2.replace("urn:jxta:cbid-", "");
+				
+			mcd += "\n\t" + n1 +  "\n\t" + n2 + "\n";
+			LOG.debug("Processing : "+mcd);
+				
+			bd1 = this.namesystem.clusterMap.getDomain(n1);
+			bd2 = this.namesystem.clusterMap.getDomain(n2);
+			LOG.debug("bd1 : "+bd1+"; bd2 : "+bd2);
+				
+			if(bd1.equals("0") && bd2.equals("0")) {
+					bd1 = (new Integer(this.namesystem.clusterMap.getNumOfRacks())).toString();
+					bd2 = bd1;
+					
+					LOG.debug("Changing nodes to new broadcast domain : " + bd2);
+					p2pn = this.namesystem.clusterMap.getNode("0", n1);
+					this.namesystem.clusterMap.remove(p2pn);
+					p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd1 + Peer2PeerNode.PATH_SEPARATOR_STR + n1);				
+					this.namesystem.clusterMap.add(p2pn);
+					
+					p2pn = this.namesystem.clusterMap.getNode("0", n2);
+					this.namesystem.clusterMap.remove(p2pn);
+					p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd2 + Peer2PeerNode.PATH_SEPARATOR_STR + n2);				
+					this.namesystem.clusterMap.add(p2pn);
+			} else if (bd1.equals("0") && !bd2.equals("0") && !bd2.equals("")) {
+					LOG.debug("Setting 1st node on the same broadcast domain : " + bd2);
+					bd1 = bd2;
+					p2pn = this.namesystem.clusterMap.getNode("0", n1);
+					this.namesystem.clusterMap.remove(p2pn);
+					p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd1 + Peer2PeerNode.PATH_SEPARATOR_STR + n1);
+					this.namesystem.clusterMap.add(p2pn);
+			} else if (!bd1.equals("0") && !bd1.equals("0") && bd2.equals("0")) {
+					LOG.debug("Setting 2nd node on the same broadcast domain : " + bd1);
+					bd2 = bd1;
+					p2pn = this.namesystem.clusterMap.getNode("0", n2);
+					this.namesystem.clusterMap.remove(p2pn);
+					p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd2 + Peer2PeerNode.PATH_SEPARATOR_STR + n2);
+					this.namesystem.clusterMap.add(p2pn);
+			} else if (!bd1.equals("0") && !bd1.equals("") && bd2.equals(bd1)) {
+					LOG.debug("The 2 nodes are already in the same broadcast domain in the topology");
+					return;
+			} else {
+					LOG.error("The 2 nodes are not in the same broadcast domain in the topology");
+			}
 		}
-		
-		String n1 = (String) (d.toArray())[0];
-		String n2 = (String) (d.toArray())[1];
-		
-		n1 = n1.replace("urn:jxta:cbid-", "");
-		n2 = n2.replace("urn:jxta:cbid-", "");
-		
-		mcd += "\n\t" + n1 +  "\n\t" + n2 + "\n";
-		// LOG.debug(mcd);
-			
-		bd1 = this.namesystem.clusterMap.getDomain(n1);
-		bd2 = this.namesystem.clusterMap.getDomain(n2);
-		// LOG.debug("bd1 : "+bd1+"; bd2 : "+bd2);
-			
-		if(bd1.equals("0") && bd2.equals("0")) {
-				bd1 = (new Integer(this.namesystem.clusterMap.getNumOfRacks())).toString();
-				bd2 = bd1;
-				
-				LOG.debug("Changing nodes to new broadcast domain : " + bd2);
-				p2pn = this.namesystem.clusterMap.getNode("0", n1);
-				this.namesystem.clusterMap.remove(p2pn);
-				p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd1 + Peer2PeerNode.PATH_SEPARATOR_STR + n1);				
-				this.namesystem.clusterMap.add(p2pn);
-				
-				p2pn = this.namesystem.clusterMap.getNode("0", n2);
-				this.namesystem.clusterMap.remove(p2pn);
-				p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd2 + Peer2PeerNode.PATH_SEPARATOR_STR + n2);				
-				this.namesystem.clusterMap.add(p2pn);
-		} else if (bd1.equals("0") && !bd2.equals("0")) {
-				LOG.debug("Setting 1st node on the same broadcast domain : " + bd2);
-				bd1 = bd2;
-				p2pn = this.namesystem.clusterMap.getNode("0", n1);
-				this.namesystem.clusterMap.remove(p2pn);
-				p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd1 + Peer2PeerNode.PATH_SEPARATOR_STR + n1);
-				this.namesystem.clusterMap.add(p2pn);
-		} else if (!bd1.equals("0") && bd2.equals("0")) {
-			LOG.debug("Setting 2nd node on the same broadcast domain : " + bd1);
-			bd2 = bd1;
-			p2pn = this.namesystem.clusterMap.getNode("0", n2);
-			this.namesystem.clusterMap.remove(p2pn);
-			p2pn = new Peer2PeerNode(Peer2peerTopology.DEFAULT_RACK + Peer2PeerNode.PATH_SEPARATOR_STR + bd2 + Peer2PeerNode.PATH_SEPARATOR_STR + n2);
-			this.namesystem.clusterMap.add(p2pn);
-		} else if (!bd1.equals("0") && bd2.equals(bd1)) {
-			// LOG.debug("The 2 nodes are already in the same broadcast domain in the topology");
-			return;
-		} else {
-			LOG.error("The 2 nodes are not in the same broadcast domain in the topology");
-		}		
 	}
 }

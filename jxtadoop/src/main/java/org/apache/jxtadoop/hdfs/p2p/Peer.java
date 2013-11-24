@@ -692,13 +692,14 @@ public abstract class Peer implements P2PConstants {
 							String local = madv.getLocal();
 								
 							if (local.equals("")) {
-								if(remote.equals(pid.toString())) {
+								/*if(remote.equals(pid.toString())) {
 									// This is my own discovery, do nothing 
 								} else {
 									// This a multicast disco from the discovery peer; reforwarding to the namenode
 									madv.setLocal(pid.toString());
 									ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
-								}
+								}*/
+								LOG.error("Local peer ID is empty; Dropping");
 							} else {
 								ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
 							}
