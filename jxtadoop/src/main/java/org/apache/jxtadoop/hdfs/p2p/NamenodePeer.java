@@ -219,11 +219,11 @@ public class NamenodePeer extends Peer implements RendezvousListener, DiscoveryL
 							MulticastAdvertisement madv = (MulticastAdvertisement)adv;
 							String remote = madv.getRemote();
 							String local = madv.getLocal();
-							/*String msg = "Multicast domain : "
+							String msg = "Multicast domain : "
 									+ "\n\t Local : \t" + local
 									+ "\n\t Remote : \t" + remote
 									+ "\n" ;
-							*/
+							LOG.debug(msg);
 							 
 							if(namenodeObject.namesystem.contains(local) && namenodeObject.namesystem.contains(remote))							
 								// LOG.debug(msg);

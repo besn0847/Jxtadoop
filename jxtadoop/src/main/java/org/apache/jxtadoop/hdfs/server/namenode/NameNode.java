@@ -1010,13 +1010,13 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 		Collection<String> d = (Collection<String>)me.getDomain().keySet();
 		int h = me.getHash();
 		
-		String mcd = "Multicast domain contains : ";
+		/*String mcd = "Multicast domain contains : ";
 		Iterator<String> is = d.iterator();
 		while(is.hasNext()) {
 			s = is.next();
 			mcd += "\n\t" + s;
 		}
-		mcd += "\n";
+		mcd += "\n";*/
 		
 		LOG.debug("Number of nodes in this broadcast domain is "+d.size());
 
@@ -1027,8 +1027,8 @@ public class NameNode implements ClientProtocol, DatanodeProtocol,
 			n1 = n1.replace("urn:jxta:cbid-", "");
 			n2 = n2.replace("urn:jxta:cbid-", "");
 				
-			mcd += "\n\t" + n1 +  "\n\t" + n2 + "\n";
-			LOG.debug("Processing : "+mcd);
+			//mcd += "\n\t" + n1 +  "\n\t" + n2 + "\n";
+			//LOG.debug("Processing : "+mcd);
 				
 			bd1 = this.namesystem.clusterMap.getDomain(n1);
 			bd2 = this.namesystem.clusterMap.getDomain(n2);

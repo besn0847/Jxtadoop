@@ -701,6 +701,9 @@ public abstract class Peer implements P2PConstants {
 								}*/
 								LOG.error("Local peer ID is empty; Dropping");
 							} else {
+								LOG.debug("Publishing a multicast adv with : \n\t local : "
+										+ madv.getLocal() + "\n\t remote : "
+										+ madv.getRemote() + "\n");
 								ds.remotePublish(namenodepeers.get(0).getPeerID().toString(),madv);
 							}
 						}

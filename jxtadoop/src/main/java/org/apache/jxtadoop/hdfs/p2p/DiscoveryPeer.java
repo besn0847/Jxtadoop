@@ -140,7 +140,7 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 		RouteAdvertisement routeadv;
 		Collection<RouteAdvertisement> routeadvs;
 		Iterator<RouteAdvertisement> routes;
-		boolean isDirect = false;
+		boolean isDirect;
 		
 		if (response.getDiscoveryType() == DiscoveryService.PEER) {
 			Enumeration<Advertisement> en = response.getAdvertisements();
@@ -150,14 +150,15 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 				adv = (PeerAdv) en.nextElement();
 				if((adv.getName()).contains("Datanode Peer")) {
 					LOG.debug("Found a datanode peer : " + adv.getPeerID());
+					isDirect = false;
 					
 					routeadvs = rcontrol.getRoutes(adv.getPeerID());
-					//LOG.debug("Route exist or possible ? "+rcontrol.isConnected(adv.getPeerID()));
+					LOG.debug("Route exist or possible ? "+rcontrol.isConnected(adv.getPeerID()));
 					routes = routeadvs.iterator();
 					while(routes.hasNext()) {
 						routeadv = routes.next();
-						//LOG.debug("Route length : "+ routeadv.size());
-						//LOG.debug("Route : "+routeadv.getDocument(MimeMediaType.TEXTUTF8));
+						LOG.debug("Route length : "+ routeadv.size());
+						LOG.debug("Route : "+routeadv.getDocument(MimeMediaType.TEXTUTF8));
 						if(routeadv.size()==0)
 							isDirect = true;
 					}
@@ -165,13 +166,17 @@ public class DiscoveryPeer extends Peer implements Runnable, DiscoveryListener {
 					if (isDirect && !datanodepeer.isRelay()) {
 						multiadv = new MulticastAdvertisement();
 						multiadv.setRemote(adv.getPeerID().toString());
-						if(datanodepeer != null) 
+						if(datanodepeer != null) {
 							multiadv.setLocal(this.datanodepeer.getPeerID().toString());
-						try {
-							ds.publish(multiadv,2*P2PConstants.MULTICASTADVLIFETIME,2*P2PConstants.MULTICASTADVLIFETIME);
-							ds.remotePublish(null,multiadv,2*P2PConstants.MULTICASTADVLIFETIME);
-						} catch (IOException e) {
-							e.printStackTrace();
+							try {
+								LOG.debug("Publishing a multicast adv with : \n\t local : "
+										+ multiadv.getLocal() + "\n\t remote : "
+										+ multiadv.getRemote() + "\n");
+								ds.publish(multiadv,2*P2PConstants.MULTICASTADVLIFETIME,2*P2PConstants.MULTICASTADVLIFETIME);
+								ds.remotePublish(null,multiadv,2*P2PConstants.MULTICASTADVLIFETIME);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}
