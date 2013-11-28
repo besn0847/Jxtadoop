@@ -29,6 +29,7 @@ import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.socket.JxtaServerSocket;
 import net.jxta.socket.JxtaSocket;
 import net.jxta.socket.JxtaSocketAddress;
+
 /**
  * This class extends the peer one to specifiy the datanode peer.<br>
  * This kind of peer both communicates with namenode to collect instructions about what as to be performed<br>
@@ -76,12 +77,22 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	 */
 	@Override
 	public void setupNetworking() throws LoginException, IOException, javax.security.cert.CertificateException, PeerGroupException {
-		nm = new NetworkManager(NetworkManager.ConfigMode.EDGE, UserGroupInformation.login(pc).getUserName()+"Datanode Peer",p2pdir.toURI());
+		//nm = new NetworkManager(NetworkManager.ConfigMode.EDGE, UserGroupInformation.login(pc).getUserName()+"Datanode Peer",p2pdir.toURI());
+		Boolean isRelay = new Boolean(pc.get("hadoop.p2p.datanode.relay"));
+		Boolean useMulticast = new Boolean(pc.get("hadoop.p2p.use.multicast"));
+		
+
+		if (isRelay) {
+			LOG.info("Starting the DataNode in RELAY mode");
+			nm = new NetworkManager(NetworkManager.ConfigMode.RELAY, UserGroupInformation.login(pc).getUserName()+"Datanode Peer",p2pdir.toURI());
+		} else {
+			LOG.info("Starting the DataNode in EDGE mode");
+			nm = new NetworkManager(NetworkManager.ConfigMode.EDGE, UserGroupInformation.login(pc).getUserName()+"Datanode Peer",p2pdir.toURI());
+		}
 		
 		nm.setConfigPersistent(false);
 		
 		nc = nm.getConfigurator();
-		
 		
 		//if (!nc.exists()) {
 			nc.setTcpPort(Integer.parseInt(pc.get("hadoop.p2p.datanode.port", P2PConstants.RPCDATANODEPORT)));
@@ -93,10 +104,24 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 			
 			nc.setTcpStartPort(-1);
 			nc.setTcpEndPort(-1);
-			nc.setUseMulticast(Boolean.getBoolean(pc.get("hadoop.p2p.use.multicast")));
+			
+			//nc.setUseMulticast(Boolean.getBoolean(pc.get("hadoop.p2p.use.multicast")));
+			if (isRelay) {
+				 nc.setUseMulticast(false);
+			} else {
+				 if(!useMulticast) {
+				 	nc.setUseMulticast(false);
+				 } else {
+					 nc.setUseMulticast(true);
+				 }        
+			}
+			
+			if(nc.getMulticastStatus())
+				LOG.info("Multicast is enabled");
 			
 			nc.setPeerID(pid);
-			nc.setName(P2PConstants.RPCNAMENODETAG+" - "+nc.getName());
+			//nc.setName(P2PConstants.RPCNAMENODETAG+" - "+nc.getName());
+			nc.setName(P2PConstants.RPCDATANODETAG+" - "+nc.getName());
 	        nc.setKeyStoreLocation(KeyStoreFile.toURI());
 	        nc.setPassword(p2ppass);
 	        
@@ -110,11 +135,29 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 		
 		nc.clearRendezvousSeeds();
 		nc.addSeedRendezvous(URI.create(pc.get("hadoop.p2p.rpc.rdv")));
-		nc.setUseOnlyRendezvousSeeds(true);
+		//nc.setUseOnlyRendezvousSeeds(true);
+		if (isRelay) {
+			 nc.setUseOnlyRendezvousSeeds(true);
+		} else {
+			 if(!useMulticast) {
+				 nc.setUseOnlyRendezvousSeeds(true);
+			 } else {
+				 nc.setUseOnlyRendezvousSeeds(false);
+			 }
+		}
               
 		nc.clearRelaySeeds();
         nc.addSeedRelay(URI.create(pc.get("hadoop.p2p.rpc.relay")));
-        nc.setUseOnlyRelaySeeds(true);
+        //nc.setUseOnlyRelaySeeds(true);
+        if (isRelay) {
+        	 nc.setUseOnlyRelaySeeds(true);
+        } else {
+        	 if(!useMulticast) {
+        		 nc.setUseOnlyRelaySeeds(true);
+        	 } else {
+        		 nc.setUseOnlyRelaySeeds(false);
+        	 }
+        }
         
 		npg = nm.startNetwork();
 		
@@ -131,8 +174,8 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	}
 	/**
 	 * Start-up the datanode peer.
-	 * <br>Triggers a remote discovery for DN and NN. Then it assigns a default Jxta socker adrress to the pipes in the peer group.
-	 * <br>Finally it kicks off the peer monitor thread.
+	 * <br>Triggers a remote discovery for DN and NN + Multicast Disco. Then it assigns a default Jxta socker adrress to the pipes in the peer group.
+     * <br>Finally it kicks off the peer monitor thread.
 	 */
 	@Override
 	public void start() {		
@@ -141,14 +184,14 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 			ds.getRemoteAdvertisements(null, DiscoveryService.PEER, "Name", "*Datanode Peer*", 1,this);
 		} catch(Exception e) {
 			LOG.error(e.getMessage());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}		
 		
 		jssad = new JxtaSocketAddress(npg,rpcPipeAdv,npg.getPeerAdvertisement());
 		infojssad = new JxtaSocketAddress(npg,infoPipeAdv,npg.getPeerAdvertisement());
 		
 		pm  = this.new PeerMonitor(this);
-		 monitor = new Thread(pm,"Peer Monitor Thread");
+		monitor = new Thread(pm,"Peer Monitor Thread");
 		monitor.start();
 	}
 	/**
@@ -159,18 +202,19 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 				
 		if (response.getDiscoveryType() == DiscoveryService.ADV) {
 			Enumeration<Advertisement> en = response.getAdvertisements();
-			PipeAdvertisement adv;
+			Advertisement adv;
 			
 			if(en!=null) {
 				while (en.hasMoreElements()) {
 					adv = (PipeAdvertisement) en.nextElement();
 									
-					if (adv instanceof PipeAdvertisement) {
-						if ( adv.getName().equals(P2PConstants.RPCPIPENAME)) {
-							LOG.debug("Found the RPC pipe; Pipe id : "+adv.getPipeID().toString());
-							rpcpipeadvs.add(adv);
-						}
-					}
+					if (adv.getAdvType().equals(PipeAdvertisement.getAdvertisementType())) {
+						 PipeAdvertisement padv = (PipeAdvertisement)adv;
+						 if ( padv.getName().equals(P2PConstants.RPCPIPENAME)) {
+							 LOG.debug("Found the RPC pipe; Pipe id : "+padv.getPipeID().toString());
+							 rpcpipeadvs.add(padv);
+						 }
+					}  
 				}
 			}
 			
@@ -270,7 +314,7 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 	
 	public JxtaSocket getInfoSocket(PeerID pid) throws IOException {
 		JxtaSocket js = null;
-						
+					
 		int soTimeout = Integer.parseInt(pc.get("hadoop.p2p.rpc.timeout"));
 		
 		try {

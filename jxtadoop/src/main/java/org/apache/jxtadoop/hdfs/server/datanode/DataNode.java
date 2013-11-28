@@ -267,6 +267,7 @@ public class DataNode extends Configured
                                      conf.get("dfs.datanode.dns.nameserver","default"));
     }*/
 	  machineName = dnpeer.getPeerIDwithoutURN();
+	  LOG.debug("Datanode registration name : "+machineName);
     
    // this.socketTimeout =  conf.getInt("dfs.socket.timeout",
    //                                   HdfsConstants.READ_TIMEOUT);

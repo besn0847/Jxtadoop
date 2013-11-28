@@ -4,7 +4,7 @@
 
   <groupId>org.apache</groupId>
   <artifactId>jxtadoop</artifactId>
-  <version>0.7.0</version>
+  <version>0.8.0</version>
   <packaging>jar</packaging>
 
   <name>jxtadoop</name>

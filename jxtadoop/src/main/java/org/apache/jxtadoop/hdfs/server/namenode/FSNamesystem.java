@@ -443,7 +443,8 @@ public class FSNamesystem implements FSConstants, FSNamesystemMBean {
                             + minReplication
                             + " must be less than dfs.replication.max = " 
                             + maxReplication);
-    this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", 2);
+    //this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", 2);
+    this.maxReplicationStreams = conf.getInt("dfs.max-repl-streams", P2PConstants.MAX_REPLICATION_STREAMS);
     long heartbeatInterval = conf.getLong("dfs.heartbeat.interval", 3) * 1000;
     this.heartbeatRecheckInterval = conf.getInt(
         "heartbeat.recheck.interval", 1 * 20 * 1000); // 10 seconds - orig was 5 minutes

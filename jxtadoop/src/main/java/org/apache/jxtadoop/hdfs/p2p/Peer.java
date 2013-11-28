@@ -96,7 +96,8 @@ public abstract class Peer implements P2PConstants {
 	/**
 	 * The peer identifier
 	 */
-	protected static PeerID pid;
+	// protected static PeerID pid;
+	protected PeerID pid;
 	/**
 	 * The rpc pipe identifier
 	 */
@@ -291,10 +292,11 @@ public abstract class Peer implements P2PConstants {
 		
 		 if (CRTfile.length == 0 ) {
 			 Random randomGenerator = new Random();
-			 pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());
-			 
+			 // pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());
+			 this.pid = IDFactory.newPeerID(PeerGroupID.defaultNetPeerGroupID, (UserGroupInformation.login(pc).getUserName()+randomGenerator.nextLong()+this.peerseed).getBytes());       
 		 } else if (CRTfile.length == 1) {
-			pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
+			// pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
+			 this.pid = (PeerID) IDFactory.fromURI(URI.create("urn:jxta:"+FileSystemUtils.getFilenameWithoutExtension(CRTfile[0].getName())));
 		 } else {
 			throw new SecurityException();
 		 }
@@ -431,7 +433,7 @@ public abstract class Peer implements P2PConstants {
 	 */
 
 	public String getPeerIDwithoutURN() {
-		return pid.toString().replaceAll("urn:jxta:cbid-", "");
+		return this.pid.toString().replaceAll("urn:jxta:cbid-", "");
 	}
 	/**
 	 * Return the rpc pipe identifier
