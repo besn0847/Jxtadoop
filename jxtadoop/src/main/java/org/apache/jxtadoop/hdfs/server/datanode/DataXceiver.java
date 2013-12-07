@@ -61,8 +61,7 @@ class DataXceiver implements Runnable, FSConstants {
   DataNode datanode;
   DataXceiverServer dataXceiverServer;
   
-  public DataXceiver(JxtaSocket s, DataNode datanode, 
-      DataXceiverServer dataXceiverServer) {
+  public DataXceiver(JxtaSocket s, DataNode datanode, DataXceiverServer dataXceiverServer) {
     LOG.debug("Kicking off a new DataXceiver");
     this.s = s;
     this.datanode = datanode;
@@ -167,21 +166,19 @@ class DataXceiver implements Runnable, FSConstants {
 	        throw new IOException("Unknown opcode " + op + " in data stream");
       }
     } catch (SocketTimeoutException ste) {
+    	LOG.debug("Time out while receiving data on DataXceiver");
+    	LOG.debug(ste);
     	ste.printStackTrace();
-    //} catch (Throwable t) {
-    //  LOG.error(datanode.dnRegistration + ":DataXceiver",t);
-    //  t.printStackTrace();
     } catch (Exception t) {
         LOG.error(datanode.dnRegistration + ":DataXceiver FAILED",t);
         t.printStackTrace();
     } finally {
       LOG.debug(datanode.dnRegistration + ":Number of active connections is: "
                                + datanode.getXceiverCount());
-      
-      IOUtils.closeStream(in);
+	      
+	  IOUtils.closeStream(in);
       IOUtils.closeSocket(s);
       dataXceiverServer.childSockets.remove(s);
-      
       s = null;
     }
   }
@@ -346,8 +343,11 @@ class DataXceiver implements Runnable, FSConstants {
           //                   (HdfsConstants.WRITE_TIMEOUT_EXTENSION * numTargets);
           // NetUtils.connect(mirrorSock, mirrorTarget, timeoutValue);
           mirrorSock = datanode.getDnPeer().getInfoSocket(mirrorNode.toString());
+          if(mirrorSock == null)
+        	  throw new IOException("Failed to get a mirror socket");
           //mirrorSock.setSoTimeout(timeoutValue);
-          mirrorSock.setSoTimeout(Integer.parseInt(datanode.getConf().get("hadoop.p2p.info.timeout")));
+          //mirrorSock.setTcpNoDelay(true);
+          //mirrorSock.setSoTimeout(Integer.parseInt(datanode.getConf().get("hadoop.p2p.info.timeout")));
           //mirrorSock.setSendBufferSize(DEFAULT_DATA_SOCKET_SIZE);
           /*mirrorOut = new DataOutputStream(
              new BufferedOutputStream(
@@ -391,7 +391,12 @@ class DataXceiver implements Runnable, FSConstants {
             }
           }
 
-        } catch (IOException e) {
+        } catch (SocketTimeoutException ste) {
+        	LOG.debug("Time out while receiving data on DataXceiver");
+        	LOG.debug(ste);
+        	ste.printStackTrace();
+        }
+        catch (IOException e) {
         	LOG.debug("IOException occurred : "+e.getMessage());
           if (client.length() != 0) {
             Text.writeString(replyOut, mirrorNode);
@@ -401,8 +406,10 @@ class DataXceiver implements Runnable, FSConstants {
           mirrorOut = null;
           IOUtils.closeStream(mirrorIn);
           mirrorIn = null;
-          IOUtils.closeSocket(mirrorSock);
-          mirrorSock = null;
+          if(mirrorSock != null) {
+        	  IOUtils.closeSocket(mirrorSock);
+        	  mirrorSock = null;
+          }
           if (client.length() > 0) {
             throw e;
           } else {

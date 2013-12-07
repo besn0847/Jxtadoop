@@ -269,7 +269,8 @@ class BlockReceiver implements java.io.Closeable, FSConstants {
     try {
 	nRead = in.read(buf.array(), buf.limit(), toRead);
 	} catch (SocketTimeoutException ste) {
-		throw new IOException("Time out while reading data in block receiver");
+		// throw new IOException("Time out while reading data in block receiver");
+		LOG.debug("Time out while reading data in block receiver");
 	}
     
     if (nRead < 0) {
@@ -321,7 +322,8 @@ class BlockReceiver implements java.io.Closeable, FSConstants {
       try {
     	  readToBuf(-1);
       } catch (SocketTimeoutException ste) {
-    	  throw new IOException("Timeout occurred while reading next packet");
+    	  // throw new IOException("Timeout occurred while reading next packet");
+    	  LOG.debug("Timeout occurred while reading next packet");
       }
     }
     
@@ -575,8 +577,7 @@ class BlockReceiver implements java.io.Closeable, FSConstants {
       }
 
     } catch (IOException ioe) {
-      LOG.info("Exception in receiveBlock for block " + block + 
-               " " + ioe);
+      LOG.info("Exception in receiveBlock for block " + block + " " + ioe);
       IOUtils.closeStream(this);
       if (responder != null) {
         responder.interrupt();

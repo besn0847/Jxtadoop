@@ -176,6 +176,7 @@ public class DataNode extends Configured
   public final static String EMPTY_DEL_HINT = "";
   AtomicInteger xmitsInProgress = new AtomicInteger();
   Daemon dataXceiverServer = null;
+  Daemon dataXceiver = null;
   ThreadGroup threadGroup = null;
   long blockReportInterval;
   //disallow the sending of BR before instructed to do so
@@ -981,7 +982,11 @@ public class DataNode extends Configured
                  block + " to " + xfersBuilder);                       
       }
 
+	  LOG.debug("Number of threads in Xceiver : "+this.threadGroup.activeCount());
       new Daemon(new DataTransfer(xferTargets, block, this)).start();
+      //this.dataXceiver = new Daemon(threadGroup, new DataTransfer(xferTargets, block, this));
+      //this.threadGroup.setDaemon(true); // auto destroy when empty
+      //this.dataXceiver.start();
     }
   }
 
@@ -1138,7 +1143,10 @@ public class DataNode extends Configured
         //NetUtils.connect(sock, curTarget, socketTimeout);
         jsock = dnpeer.getInfoSocket(targets[0].getPeerId());
     	// jsock.setSoTimeout(targets.length * socketTimeout);
-        jsock.setSoTimeout(Integer.parseInt(conf.get("hadoop.p2p.rpc.timeout")));
+        if (jsock == null) {
+        	throw new IOException("Failed to get jxta socket for data transfer");
+        }
+        //jsock.setSoTimeout(Integer.parseInt(conf.get("hadoop.p2p.rpc.timeout"))); -- No need as already done
 
         long writeTimeout = socketWriteTimeout + 
                             HdfsConstants.WRITE_TIMEOUT_EXTENSION * (targets.length-1);
@@ -1177,6 +1185,8 @@ public class DataNode extends Configured
         // no response necessary
         LOG.info(dnRegistration + ":Transmitted block " + b + " to " + curTarget.getPeerAdvertisement().getPeerID().toString());
 
+      } catch (SocketTimeoutException ste) {
+    	  LOG.debug("Failed to get jxta socket to transfer data");
       } catch (IOException ie) {
         //LOG.warn(dnRegistration + ":Failed to transfer " + b + " to " + targets[0].getName()
         //    + " got " + StringUtils.stringifyException(ie));
@@ -1186,7 +1196,7 @@ public class DataNode extends Configured
         xmitsInProgress.getAndDecrement();
         IOUtils.closeStream(blockSender);
         IOUtils.closeStream(out);
-        IOUtils.closeSocket(jsock);
+        //IOUtils.closeSocket(jsock);
       }
     }
   }

@@ -57,7 +57,6 @@ import org.apache.jxtadoop.security.UserGroupInformation;
  * 													In this version, there is no encryption for the comms between peers so the key management is limited to the local peer.<br>
  * 													PKI will be required in that enhanced version.<br>
  * </td></tr><tr><td valign=top>JxtaSocketAddress</td><td>1 or 2 socket addresses are available depending on the peer type<br>
- *   												Namenode	-> 1 to process the RPC requests from the datanodes<br>
  *   												Datanode		-> 2 : 1 to send the RPC requests to the namanode + 1 to process the ones from the other datanodes<br>
  * </td></tr><tr><td valign=top>PipeAdvertisement</td><td>The default RPC pipe advertisement to be propagated by the namenode in the peer group<br>
  *   												The RPC pipes on the datanodes will use the *SAME* advertisement for sake of simplicity<br>
@@ -504,6 +503,7 @@ public abstract class Peer implements P2PConstants {
 		}
 		return null;
 	}
+	
 	/**
 	 * Empty class to be overridden 
 	 * 
@@ -587,15 +587,15 @@ public abstract class Peer implements P2PConstants {
 						lpid = (PeerID) pidkeys[increment];
 						increment++;
 						int attempt = notrespondedpeers.get(lpid);
-						//LOG.debug("Getting notresponding count : "+attempt);
+						LOG.debug("Getting notresponding count : "+attempt);
 												
 						if(attempt < P2PConstants.PEERDELETIONRETRIES) {
 							attempt++;
-							//LOG.debug("Reetting notresponding count : "+attempt);
+							LOG.debug("Resetting notresponding count : "+attempt);
 							notrespondedpeers.remove(lpid);
 							notrespondedpeers.put(lpid, new Integer(attempt));
 						} else {
-							//LOG.info("Peer not responding for "+P2PConstants.PEERDELETIONRETRIES+" retries; Assuming dead : "+lpid);
+							LOG.debug("Peer not responding for "+P2PConstants.PEERDELETIONRETRIES+" retries; Assuming dead : "+lpid);
 							fireEvent(new DatanodeEvent(new Object(),lpid));
 							notrespondedpeers.remove(lpid);
 							try {
@@ -628,7 +628,7 @@ public abstract class Peer implements P2PConstants {
 						lpid = (PeerID) pidkeys[increment];
 						queryID = ds.getRemoteAdvertisements(lpid.toString(), DiscoveryService.PEER, "Name", "*Datanode Peer*",0,this);
 						if(!notrespondedpeers.containsKey(lpid)) {
-							//LOG.debug("Setting notresponding count to 0");
+							LOG.debug("Setting notresponding count to 0");
 							notrespondedpeers.put(lpid, 0);
 						}
 						increment++;
@@ -671,9 +671,9 @@ public abstract class Peer implements P2PConstants {
 					adv = (PeerAdv) en.nextElement();
 					if (adv instanceof PeerAdv) {
 						if ((adv.getName()).contains("Datanode Peer")) {
-							//LOG.debug("Found a datanode peer");
+							LOG.debug("Found a datanode peer");
 							if(notrespondedpeers.containsKey(adv.getPeerID())) {
-								//LOG.debug("Resetting notresponding count to 0");
+								LOG.debug("Resetting notresponding count to 0");
 								notrespondedpeers.remove(adv.getPeerID());
 							}
 							notrespondedpeers.put(adv.getPeerID(),0);

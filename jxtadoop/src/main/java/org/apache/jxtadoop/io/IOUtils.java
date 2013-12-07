@@ -167,7 +167,7 @@ public class IOUtils {
    * @param sock the Socket to close
    */
   public static void closeSocket( JxtaSocket jsock ) {
-	  LOG.debug("call to IOUtils jXtacloseSocket()");
+	LOG.debug("call to IOUtils jXtacloseSocket()");
     // avoids try { close() } dance
     if ( jsock != null ) {
       try {  

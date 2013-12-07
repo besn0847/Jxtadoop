@@ -19,6 +19,7 @@ import net.jxta.impl.protocol.PeerAdv;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.security.UserGroupInformation;
 
 import net.jxta.peer.PeerID;
@@ -159,7 +160,7 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
         	 }
         }
         
-		npg = nm.startNetwork();
+		npg = nm.startNetwork(); 
 		
 		npg.getRendezVousService().setAutoStart(false);
 		
@@ -308,21 +309,21 @@ public class DatanodePeer extends Peer implements DiscoveryListener {
 		return new JxtaSocketAddress(npg, infoPipeAdv, peerAdv);
 	}	
 	
-	public JxtaSocket getInfoSocket(String pid) throws IOException {
+	public JxtaSocket getInfoSocket(String pid) throws IOException,SocketTimeoutException {
 		return getInfoSocket(Peer.getPeerID(pid));
 	}
 	
-	public JxtaSocket getInfoSocket(PeerID pid) throws IOException {
+	public JxtaSocket getInfoSocket(PeerID pid) throws IOException, SocketTimeoutException {
 		JxtaSocket js = null;
 					
 		int soTimeout = Integer.parseInt(pc.get("hadoop.p2p.rpc.timeout"));
 		
-		try {
-			js = new JxtaSocket(npg,pid,this.getInfoSocketAddress(pid).getPipeAdv(),soTimeout,true);
-			js.setNetPeerGroup(npg);
-			js.setTcpNoDelay(true);
-		} catch (SocketTimeoutException ste) {}
-				
+		js = new JxtaSocket(npg,pid,this.getInfoSocketAddress(pid).getPipeAdv(),soTimeout,true);
+		js.setNetPeerGroup(npg);
+		js.setTcpNoDelay(true);
+		//js.setSendBufferSize(P2PConstants.JXTA_SOCKET_SENDBUFFER_SIZE);
+        //js.setReceiveBufferSize(P2PConstants.JXTA_SOCKET_RECVBUFFER_SIZE);
+			
 		return js;
 	}
 }

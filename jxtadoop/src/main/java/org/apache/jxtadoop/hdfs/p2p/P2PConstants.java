@@ -112,11 +112,11 @@ public interface P2PConstants {
 	/**
 	 * Default DFS block size
 	 */
-	public static final long DEFAULT_BLOCK_SIZE = 1 * 1024 * 1024;
+	public static final long DEFAULT_BLOCK_SIZE = 4 * 1024 * 1024;
 	/**
 	 * Default local block size
 	 */
-	public static final long DEFAULT_LOCAL_BLOCK_SIZE = 1 * 1024 * 1024;
+	public static final long DEFAULT_LOCAL_BLOCK_SIZE = 4 * 1024 * 1024;
 	/**
 	 * Default I/O bytes per checksum
 	 */
@@ -128,5 +128,5 @@ public interface P2PConstants {
 	/**
  	 * Number of concurrent replication streams
  	 */
- 	public static final int MAX_REPLICATION_STREAMS = 10;
+ 	public static final int MAX_REPLICATION_STREAMS = 1;
 }

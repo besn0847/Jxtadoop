@@ -34,6 +34,7 @@ import org.apache.jxtadoop.conf.Configuration;
 import org.apache.jxtadoop.hdfs.p2p.P2PConstants;
 import org.apache.jxtadoop.hdfs.protocol.FSConstants;
 import org.apache.jxtadoop.hdfs.server.balancer.Balancer;
+import org.apache.jxtadoop.io.IOUtils;
 import org.apache.jxtadoop.util.Daemon;
 import org.apache.jxtadoop.util.StringUtils;
 
@@ -132,17 +133,24 @@ class DataXceiverServer implements Runnable, FSConstants {
    */
   public void run() {
     while (datanode.shouldRun) {
+      JxtaSocket s = null; 
+      
       try {
-        JxtaSocket s = (JxtaSocket) ss.accept();
+        s = (JxtaSocket) ss.accept();
         s.setTcpNoDelay(true);
-        // s.setSendBufferSize(P2PConstants.JXTA_SOCKET_SENDBUFFER_SIZE);
-        // s.setReceiveBufferSize(P2PConstants.JXTA_SOCKET_RECVBUFFER_SIZE);
         s.setSoTimeout(Integer.parseInt(conf.get("hadoop.p2p.info.timeout")));
+        //s.setSendBufferSize(P2PConstants.JXTA_SOCKET_SENDBUFFER_SIZE);
+        //s.setReceiveBufferSize(P2PConstants.JXTA_SOCKET_RECVBUFFER_SIZE);
+        
         LOG.debug("New incoming info connection");
         new Daemon(datanode.threadGroup, 
             new DataXceiver(s, datanode, this)).start();
       } catch (SocketTimeoutException ignored) {
-    	  // ignored.printStackTrace();
+    	  //ignored.printStackTrace();
+    	  LOG.debug("Timeout while receiving data on DataXceiverServer");
+    	  IOUtils.closeSocket(s);
+    	  this.childSockets.remove(s);
+    	  s = null;
       } catch (IOException ie) {
         LOG.warn(datanode.dnRegistration + ":DataXceiveServer: " 
                                 + StringUtils.stringifyException(ie));
