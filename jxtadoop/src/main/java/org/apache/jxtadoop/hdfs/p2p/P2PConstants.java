@@ -128,5 +128,5 @@ public interface P2PConstants {
 	/**
  	 * Number of concurrent replication streams
  	 */
- 	public static final int MAX_REPLICATION_STREAMS = 1;
+ 	public static final int MAX_REPLICATION_STREAMS = 5;
 }

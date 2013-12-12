@@ -401,13 +401,14 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
 
     private File createTmpFile(Block b, File f) throws IOException {
       if (f.exists()) {
-        throw new IOException("Unexpected problem in creating temporary file for "+
-                              b + ".  File " + f + " should not be present, but is.");
+    	f.delete();
+    	//throw new IOException("Unexpected problem in creating temporary file for "+
+        //                      b + ".  File " + f + " should not be present, but is.");
       }
       // Create the zero-length temp file
       //
       boolean fileCreated = false;
-      try {
+      try { 
         fileCreated = f.createNewFile();
       } catch (IOException ioe) {
         throw (IOException)new IOException(DISK_ERROR +f).initCause(ioe);
@@ -1012,8 +1013,11 @@ public class FSDataset implements FSConstants, FSDatasetInterface {
         threads = activeFile.threads;
         
         if (!isRecovery) {
-          throw new BlockAlreadyExistsException("Block " + b +
-                                  " has already been started (though not completed), and thus cannot be created.");
+          DataNode.LOG.debug("Block " + b +" has already been started (though not completed), and thus cannot be created.");
+          DataNode.LOG.debug("(Removing the Exception)");
+          isRecovery = false;
+          //throw new BlockAlreadyExistsException("Block " + b +
+          //                        " has already been started (though not completed), and thus cannot be created.");
         } else {
           for (Thread thread:threads) {
             thread.interrupt();

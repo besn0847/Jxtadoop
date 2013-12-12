@@ -165,6 +165,9 @@ class DataXceiver implements Runnable, FSConstants {
 	    	  LOG.debug("Unknown op code");
 	        throw new IOException("Unknown opcode " + op + " in data stream");
       }
+      
+	  IOUtils.closeStream(in);
+      IOUtils.closeSocket(s);
     } catch (SocketTimeoutException ste) {
     	LOG.debug("Time out while receiving data on DataXceiver");
     	LOG.debug(ste);
@@ -175,9 +178,9 @@ class DataXceiver implements Runnable, FSConstants {
     } finally {
       LOG.debug(datanode.dnRegistration + ":Number of active connections is: "
                                + datanode.getXceiverCount());
-	      
-	  IOUtils.closeStream(in);
-      IOUtils.closeSocket(s);
+	  // IOUtils.closeStream(in);
+      // IOUtils.closeSocket(s);
+
       dataXceiverServer.childSockets.remove(s);
       s = null;
     }
