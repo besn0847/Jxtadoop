@@ -50,6 +50,8 @@
 		<variable name="JRE_HOME" value="${JAVA_HOME}"/>
 		<variable name="NAMENODEADDR" value="${user.namenodeaddress}"/>
 		<variable name="NAMENODEPORT" value="${user.namenodeport}"/>
+		<variable name="RELAYADDR" value="${user.relayaddress}"/>
+		<variable name="RELAYPORT" value="${user.relayport}"/>
 		<variable name="APP_VERSION" value="@{app.version}"/>
 	</dynamicvariables> 
 	 

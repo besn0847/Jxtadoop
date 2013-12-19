@@ -89,7 +89,7 @@
 
 <property>
   <name>hadoop.p2p.rpc.relay</name>
-  <value>tcp://$NAMENODEADDR:$NAMENODEPORT</value>
+  <value>tcp://$RELAYADDR:$RELAYPORT</value>
   <description>The rpc relay seed</description>
 </property>
 

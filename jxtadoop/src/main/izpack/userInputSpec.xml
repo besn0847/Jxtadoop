@@ -4,10 +4,16 @@
   	<field type="divider" align="top"/>
   	<field type="space"/>
   	<field type="text" variable="user.namenodeaddress">
-      <spec txt="Namenode Host:" id="input.nn" size="25" set="127.0.0.1"/>
+      <spec txt="Namenode Host:" id="input.nn" size="25" set="cloud.besnard.mobi"/>
     </field>
     <field type="text" variable="user.namenodeport">
       <spec txt="Namenode Port:" id="input.nnport" size="6" set="19100"/>
+    </field>
+	<field type="text" variable="user.relayaddress">
+      <spec txt="Relay Host:" id="input.relay" size="25" set="cloud.besnard.mobi"/>
+    </field>
+    <field type="text" variable="user.relayport">
+      <spec txt="Relay Port:" id="input.relayport" size="6" set="19101"/>
     </field>
   </panel>
 </userInput>
