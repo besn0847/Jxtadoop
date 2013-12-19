@@ -2492,6 +2492,7 @@ public class DFSClient implements FSConstants, java.io.Closeable {
             
             } catch (Exception e) {
             	LOG.warn("Caught exception in data streamer : "+e.getMessage());
+            	clientRunning = false;
             } catch (Throwable e) {
               LOG.warn("DataStreamer Exception: " + 
                        StringUtils.stringifyException(e));
@@ -3203,7 +3204,7 @@ public class DFSClient implements FSConstants, java.io.Closeable {
             if (NotReplicatedYetException.class.getName().
                 equals(e.getClassName())) {
 
-                if (retries == 0) { 
+                /*if (retries == 0) { 
                   throw e;
                 } else {
                   --retries;
@@ -3220,7 +3221,13 @@ public class DFSClient implements FSConstants, java.io.Closeable {
                     sleeptime *= 2;
                   } catch (InterruptedException ie) {
                   }
-                }
+            	}*/
+            	
+            	LOG.warn("NotReplicatedYetException; Exiting");
+            	System.err.println("Failed to replicate blocks");
+            	LOG.info(StringUtils.stringifyException(e));
+            	// throw new NotReplicatedYetException("Failed to replicate blocks");
+            	System.exit(1);
             } else {
               throw e;
             }

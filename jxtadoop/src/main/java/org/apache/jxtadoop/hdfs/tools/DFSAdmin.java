@@ -848,8 +848,13 @@ public class DFSAdmin extends FsShell {
    * @param argv Command line parameters.
    * @exception Exception if the filesystem does not exist.
    */
-  public static void main(String[] argv) throws Exception {
-    int res = ToolRunner.run(new DFSAdmin(new Configuration()), argv);
+  public static void main(String[] argv) {
+    int res=0;
+	try {
+		res = ToolRunner.run(new DFSAdmin(new Configuration()), argv);
+	} catch (Exception e) {
+		System.err.println("Failed to run DFSadmin command");
+	}
     System.exit(res);
   }
 }

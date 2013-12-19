@@ -182,18 +182,23 @@ elif [ "$COMMAND" = "datanode" ] ; then
   CLASS='org.apache.jxtadoop.hdfs.server.datanode.DataNode'
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_DATANODE_OPTS"
 elif [ "$COMMAND" = "fs" ] ; then
+  rm -rf $HADOOP_HOME/var/p2p/client/*
   CLASS=org.apache.jxtadoop.fs.FsShell
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"
 elif [ "$COMMAND" = "dfs" ] ; then
+  rm -rf $HADOOP_HOME/var/p2p/client/*
   CLASS=org.apache.jxtadoop.fs.FsShell
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"
 elif [ "$COMMAND" = "dfsadmin" ] ; then
+  rm -rf $HADOOP_HOME/var/p2p/client/*
   CLASS=org.apache.jxtadoop.hdfs.tools.DFSAdmin
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"
 elif [ "$COMMAND" = "fsck" ] ; then
+  rm -rf $HADOOP_HOME/var/p2p/client/*
   CLASS=org.apache.jxtadoop.hdfs.tools.DFSck
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"
 elif [ "$COMMAND" = "p2p" ] ; then
+  rm -rf $HADOOP_HOME/var/p2p/client/*
   CLASS=org.apache.jxtadoop.hdfs.p2p.P2PShell
   HADOOP_OPTS="$HADOOP_OPTS $HADOOP_CLIENT_OPTS"  
 elif [ "$COMMAND" = "version" ] ; then

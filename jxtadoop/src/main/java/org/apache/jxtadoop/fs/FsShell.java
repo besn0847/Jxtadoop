@@ -1948,15 +1948,25 @@ public class FsShell extends Configured implements Tool {
   /**
    * main() has some simple utility methods
    */
-  public static void main(String argv[]) throws Exception {
-    FsShell shell = new FsShell();
-    int res;
+  public static void main(String argv[]) {
+    FsShell shell = null;
+    int res=0;
+    
     try {
     	LOG.debug("Starting shell with cmd : "+argv);
+    	shell = new FsShell();
         res = ToolRunner.run(shell, argv);
+    } catch(Exception e) {
+    	System.err.println("Failed to execute shell command");
+    	System.exit(res);
     } finally {
     	LOG.debug("Closing shell");
-    	shell.close();
+    	try {
+			if (shell!= null) shell.close();
+		} catch (IOException e) {
+			System.err.println("Failed to closed shell connection to namenode");
+			System.exit(res);
+		}
     }
     
     System.exit(res);
